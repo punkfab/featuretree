@@ -313,6 +313,24 @@ run `gen.py` / `roundtrip.py` directly), and make sure the FreeCAD AppImage is l
   edge fillet/chamfer *recognition*, other backends (Fusion API / SolidWorks macro).
 - A SolidWorks `.SLDPRT` can't be written on Linux — that backend would emit a macro.
 
+## Citing
+
+If featuretree is useful in your research or product, please cite it (GitHub also offers
+"Cite this repository" from [`CITATION.cff`](CITATION.cff)):
+
+```bibtex
+@misc{featuretree2026,
+  author       = {Newcome, Dan},
+  title        = {featuretree: Round-trip editable feature trees from a neutral IR,
+                  for AI- and code-generated CAD},
+  year         = {2026},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{https://github.com/punkfab/featuretree}},
+  note         = {First public release 2026-06-26}
+}
+```
+
 ## License
 
 [MIT](LICENSE)

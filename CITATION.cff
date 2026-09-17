@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use featuretree in research or a product, please cite it."
+type: software
+title: "featuretree: round-trip editable feature trees from a neutral IR, for AI- and code-generated CAD"
+authors:
+  - family-names: Newcome
+    given-names: Dan
+repository-code: "https://github.com/punkfab/featuretree"
+url: "https://github.com/punkfab/featuretree"
+license: MIT
+date-released: "2026-06-26"
+abstract: >-
+  featuretree authors a CAD design once as a small neutral feature IR (named, ordered
+  operations; edges selected by query, never by kernel id) and emits it as a native, editable
+  parametric feature tree in FreeCAD and Onshape, and as a build123d solid, from one source.
+  Human edits made in the CAD GUI read back by feature name, so they survive regeneration and
+  flow back to the code. A STEP->IR recogniser recovers a parametric tree from a frozen B-rep
+  (extrude/revolve in any orientation, multi-axis pockets and cross-axis holes) and
+  self-verifies every recovery by re-emitting the tree and comparing volume and bounding box
+  to the original, reporting VERIFIED or honestly PARTIAL rather than a silently wrong guess.
+  It is the editable round-trip layer that code- and LLM-generated CAD otherwise lacks.
+keywords:
+  - CAD
+  - parametric modeling
+  - feature tree
+  - feature recognition
+  - round-trip editing
+  - FreeCAD
+  - Onshape
+  - build123d
+  - AI-generated CAD
+  - topological naming
