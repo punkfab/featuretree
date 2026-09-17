@@ -2,8 +2,22 @@
 
 **Emit an editable feature tree — in FreeCAD *and* Onshape — from a small neutral feature-IR, round-trip human edits back by name, and render the same IR to a build123d solid.**
 
-A neutral *file* (STEP/STL) loses the parametric feature tree: it imports into FreeCAD as one
-frozen solid you can't edit by operation. `featuretree` keeps the tree. You author a design once as
+<!-- HERO GIF — record `docs/roundtrip.gif` (storyboard in LAUNCH.md), then uncomment:
+<p align="center">
+  <img src="docs/roundtrip.gif" width="720"
+       alt="code/LLM writes the IR → native editable feature tree opens in FreeCAD → drag a sketch/param by hand → the edit reads back into the code by name">
+  <br><em>Author once as code (or have an LLM write it) → a native, editable FreeCAD tree → hand-edit → your change reads back <b>by name</b>.</em>
+</p>
+-->
+
+**AI and code can generate CAD now — but they hand you a *dead solid*.** A build123d/LLM-generated
+part, or a `.step`/`.stl`, opens in FreeCAD as one frozen lump: you can't grab a pad and change its
+depth, because the parametric feature tree is gone. `featuretree` is the missing **round-trip** — it
+keeps the design as named, ordered *operations* the whole way, so generated CAD stays hand-editable in
+a real tool and your edits flow back to the code.
+
+A neutral *file* (STEP/STL) — or a code-baked solid — loses the parametric feature tree: it imports
+into FreeCAD as one frozen solid you can't edit by operation. `featuretree` keeps the tree. You author a design once as
 a small **feature IR** (named, ordered operations), and an emitter re-authors it in FreeCAD's *own*
 feature vocabulary (`PartDesign::Sketch / Pad / Pocket / Fillet`), with each object's `Label` set to
 your feature name. Open the `.FCStd` and the operations are right there in the left-panel tree,
@@ -46,7 +60,7 @@ wall that kills neutral feature-file formats. The IR sidesteps it:
 As a Claude Code skill:
 
 ```bash
-git clone https://github.com/dnewcome/featuretree.git ~/.claude/skills/featuretree
+git clone https://github.com/punkfab/featuretree.git ~/.claude/skills/featuretree
 ```
 
 Claude Code discovers it automatically; ask it to use the `featuretree` skill when you want a
