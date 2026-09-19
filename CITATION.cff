@@ -43,3 +43,16 @@ keywords:
   - build123d
   - AI-generated CAD
   - topological naming
+
+preferred-citation:
+  type: article
+  title: "featuretree: Verified Recovery of Editable CAD Feature Trees from STEP, for Open CAD Systems"
+  authors:
+    - family-names: Newcome
+      given-names: Daniel
+      orcid: "https://orcid.org/0009-0000-6015-8713"
+  year: 2026
+  month: 9
+  doi: "10.5281/zenodo.22848793"
+  url: "https://doi.org/10.5281/zenodo.22848793"
+  notes: "Preprint archived on Zenodo."

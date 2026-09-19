@@ -1,6 +1,6 @@
 # featuretree
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22848721.svg)](https://doi.org/10.5281/zenodo.22848721)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Paper](https://img.shields.io/badge/paper-10.5281%2Fzenodo.22848793-blue)](https://doi.org/10.5281/zenodo.22848793)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22848721.svg)](https://doi.org/10.5281/zenodo.22848721)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Emit an editable feature tree — in FreeCAD *and* Onshape — from a small neutral feature-IR, round-trip human edits back by name, and render the same IR to a build123d solid.**
 
