@@ -1,0 +1,14 @@
+# CAD program inference / reconstruction
+Fusion 360 Gallery: A Dataset and Environment for Programmatic CAD Construction from Human Design Sequences
+CAD-Recode: Reverse Engineering CAD Code from Point Clouds
+InverseCSG: Automatic Conversion of 3D Models to CSG Trees
+CSGNet: Neural Shape Parser for Constructive Solid Geometry
+DeepCAD: A Deep Generative Network for Computer-Aided Design Models
+Point2Cyl: Reverse Engineering 3D Objects from Point Clouds to Extrusion Cylinders
+# B-rep learning / machining feature recognition
+BRepNet: A topological message passing system for solid models
+UV-Net: Learning from Boundary Representations
+BrepMFR: Enhancing machining feature recognition in B-rep models through deep learning and domain adaptation
+# classical AFR + persistent naming
+A discourse on geometric feature recognition from CAD models
+A mechanism for persistently naming topological entities in history-based parametric solid models

@@ -58,7 +58,7 @@ hand-edit → the change reads back by name."*
 > multi-axis — floor/through pockets and cross-axis holes), and every recovery is **self-verified** by
 > re-emitting and comparing volume + bounding box to the original — so it's either VERIFIED (provably
 > the same solid, now editable) or honestly PARTIAL, never a silently-wrong guess. On the NIST CTC-01
-> part it takes a 139%-off base extrude to a verified 51-feature tree.
+> part it takes a 155%-off base extrude to a verified 51-feature tree.
 >
 > Honest limits: edge fillets/chamfers aren't recovered (left as sub-tolerance residual); additive
 > bosses / splines / lofts come back PARTIAL rather than faked; the native-tree emit needs a FreeCAD

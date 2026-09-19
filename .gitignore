@@ -2,6 +2,11 @@
 __pycache__/
 *.py[cod]
 
-# Generated CAD artifacts (regenerate with: python3 gen.py --sample plate)
+# Generated CAD artifacts (regenerate with: python3 gen.py --sample plate,
+# or python3 step_recognize.py <file>.stp --fcstd out/demo/<name>.FCStd)
+out/**/*.FCStd
+out/**/*.stl
+out/**/*.FCBak
 out/*.FCStd
 out/*.stl
+out/*.FCBak

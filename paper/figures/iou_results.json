@@ -1,0 +1,186 @@
+{
+  "corpus": "/home/dan/Downloads/NIST-PMI-STEP-Files/AP203 geometry only",
+  "results": [
+    {
+      "part": "nist_ctc_01_asme1_rd.stp",
+      "status": "VERIFIED",
+      "dvol_pct": 0.1,
+      "features": 51,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 8,
+      "best": {
+        "iou": 0.9984145699609069,
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "vol_rec": 14627973.530411853,
+        "union": 14647009.448279228,
+        "inter": 14623787.639517047,
+        "overcut": 19035.917867375538,
+        "uncut": 4185.8908948060125,
+        "symdiff": 23221.80876218155,
+        "symdiff_pct": 0.15858832602316456,
+        "iou_pct": 99.8414569960907
+      },
+      "vol_orig": 14642823.557384422,
+      "seconds": 12.9
+    },
+    {
+      "part": "nist_ctc_02_asme1_rc.stp",
+      "status": "ERROR",
+      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
+      "seconds": 57.2
+    },
+    {
+      "part": "nist_ctc_03_asme1_rc.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 41.46,
+      "features": 16,
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 3.62
+    },
+    {
+      "part": "nist_ctc_04_asme1_rd.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 2.43,
+      "features": 270,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 26.91
+    },
+    {
+      "part": "nist_ctc_05_asme1_rd.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 51.8,
+      "features": 106,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 8.52
+    },
+    {
+      "part": "nist_ftc_06_asme1_rd.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 31.45,
+      "features": 41,
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 6.91
+    },
+    {
+      "part": "nist_ftc_07_asme1_rd.stp",
+      "status": "ERROR",
+      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
+      "seconds": 7.17
+    },
+    {
+      "part": "nist_ftc_08_asme1_rc.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 52.55,
+      "features": 218,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 37.16
+    },
+    {
+      "part": "nist_ftc_09_asme1_rd.stp",
+      "status": "VERIFIED",
+      "dvol_pct": 0.19,
+      "features": 80,
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 8,
+      "best": {
+        "iou": 0.9968387930093449,
+        "rot": [
+          270,
+          0,
+          0
+        ],
+        "vol_rec": 136706.35360367887,
+        "union": 136791.94303746798,
+        "inter": 136359.51539087264,
+        "overcut": 85.58943378910772,
+        "uncut": 346.8382128062367,
+        "symdiff": 432.4276465953444,
+        "symdiff_pct": 0.31692426573385235,
+        "iou_pct": 99.68387930093449
+      },
+      "vol_orig": 136445.10482466174,
+      "seconds": 9.68
+    },
+    {
+      "part": "nist_ftc_10_asme1_rb.stp",
+      "status": "ERROR",
+      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
+      "seconds": 7.53
+    },
+    {
+      "part": "nist_ftc_11_asme1_rb.stp",
+      "status": "VERIFIED",
+      "dvol_pct": 0.0,
+      "features": 2,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "method": "revolve",
+      "n_orientations_matching_bbox": 16,
+      "best": {
+        "iou": 0.9999968376082241,
+        "rot": [
+          0,
+          0,
+          270
+        ],
+        "vol_rec": 5129.369915294146,
+        "union": 5129.38613642268,
+        "inter": 5129.369915294146,
+        "overcut": 0.01622112853328872,
+        "uncut": 0.0,
+        "symdiff": 0.01622112853328872,
+        "symdiff_pct": 0.00031623917759097795,
+        "iou_pct": 99.9996837608224
+      },
+      "vol_orig": 5129.38613642268,
+      "seconds": 2.86
+    }
+  ]
+}

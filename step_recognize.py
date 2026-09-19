@@ -16,7 +16,7 @@ extrude doesn't verify, the residual (base − original) is carved feature by fe
 lump is itself a 2D profile extruded along ITS OWN axis — a floor / through-web pocket along the
 main axis, a cross-hole perpendicular to it — so each is recognized and subtracted as a `prism_cut`
 (a placed profile-along-an-axis), looping until the residual vanishes. On the NIST CTC-01 test part
-this takes a 139%-off base extrude to a verified reconstruction, leaving only the edge chamfers.
+this takes a 155%-off base extrude to a verified reconstruction, leaving only the edge chamfers.
 
 The honesty comes from SELF-VERIFICATION: the recognized IR is re-emitted through b3d_emit and its
 volume + (rotation-tolerant) bounding box are compared to the original STEP. Several axes can look

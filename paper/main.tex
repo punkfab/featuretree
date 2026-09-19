@@ -1,0 +1,343 @@
+% ============================================================================
+% Build: tectonic main.tex   (or: latexmk -pdf main.tex)
+% Venue-neutral source. If a venue ever requires pdflatex + a shipped .bbl
+% (arXiv does), both are produced by: tectonic --keep-intermediates main.tex
+% Numbers in this paper are reproduced by commands in figures/README.md.
+%
+% FRAMING NOTE (2026-09-19): this paper deliberately makes NO novelty claim
+% about the method. A prior-art scan (paper/prior-art/FINDINGS.md) established
+% that verification-gated feature recovery is anticipated by Gupta & Nau (1995),
+% ships in SolidWorks FeatureWorks (~1998) and PTC Creo (~2007), and is
+% disclosed in expired patents from 2000. The contribution claimed here is
+% availability, an honest evaluation, and a negative result. Do not reintroduce
+% novelty language.
+% ============================================================================
+\documentclass[11pt]{article}
+
+\usepackage[margin=1.1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{wasysym}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xspace}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newcommand{\eg}{e.g.\xspace}
+\newcommand{\VERIFIED}{\textsc{verified}}
+\newcommand{\PARTIAL}{\textsc{partial}}
+\newcommand{\REFUSED}{\textsc{refused}}
+
+\title{\textbf{\code{featuretree}: Verified Recovery of Editable CAD\\
+Feature Trees from STEP, for Open CAD Systems}}
+\author{Dan Newcome\\[2pt]
+  \small punkfab\\
+  \small\url{https://github.com/punkfab/featuretree}}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Importing a STEP file into a parametric CAD system yields a single frozen solid:
+the design history is gone, and no pad depth or hole diameter can be edited.
+Recovering that history is a well-studied problem --- the acceptance criterion
+we use was stated as a definition by \citet{TODO-gupta-nau} in 1995, and
+commercial implementations have shipped since roughly 1998. It is nonetheless
+absent from every open-source CAD system and from every callable library we
+could find: the capability exists only inside proprietary seats costing
+thousands of dollars per year, with no API. We describe \code{featuretree}, an
+MIT-licensed, training-free recogniser that recovers an editable feature tree
+from an exact B-rep, gates every recovery by re-executing the tree and comparing
+the result against the input, and emits into FreeCAD and Onshape --- two systems
+with no import-time feature recognition at all. On the eleven-part NIST MBE PMI
+conformance corpus it returns \VERIFIED{} for 3 parts, \PARTIAL{} for 5, and
+explicitly refuses 3, producing \emph{no silently incorrect trees}; all three
+\VERIFIED{} recoveries exceed \SI{99.68}{\percent} IoU against the input. We
+also report a negative result about our own acceptance criterion: a scalar
+volume comparison lets over-cut and uncut material cancel, understating the true
+geometric discrepancy by \num{1.56}$\times$ on one part, which a two-sided IoU
+test eliminates. We claim no methodological novelty; we claim an available,
+honest implementation and a measured account of where it fails.
+\end{abstract}
+
+\section{Introduction}
+
+A solid model in a neutral exchange format carries geometry but no design
+history. Opened in a parametric CAD tool it is one frozen body. Recovering an
+editable history from such a body is the classical problem of automated feature
+recognition (AFR), and it is genuinely old: \citet{TODO-gupta-nau} defined a
+recovered feature set as correct precisely when subtracting those features from
+stock reproduces the part, and \citet{TODO-vandenbrande} built a rule-based
+system that rejected invalid candidates and iterated to a complete
+decomposition. Both date from the mid-1990s.
+
+The capability also ships. SolidWorks FeatureWorks has recognised features on
+imported bodies since approximately 1998, and PTC's Creo Feature Recognition
+Tool, available since Pro/ENGINEER Wildfire~4.0, states in its documentation
+that it ``validates the model to ensure that the new features do not modify its
+geometry''~\citep{TODO-creo-frt}. Geomagic Design~X recovers a parametric tree
+and transfers it into five different CAD systems. The ISO~10303 standard went
+further still: Parts~55, 108, 111 and 112 standardise construction history,
+parameters and constraints, rolled into AP203 edition~2 and
+AP242~\citep{TODO-pratt-kim}.
+
+\paragraph{So why can you not do this?} Every implementation above is a GUI
+feature inside a proprietary seat, priced from thousands to tens of thousands of
+dollars per year, and none exposes an API a program can call. The two CAD
+systems most accessible to an independent developer have nothing: Onshape's
+documentation states that files imported from another system ``do not have a
+feature tree in Onshape'', and FreeCAD has carried feature recognition as an
+open request since 2011, with maintainers reporting no capacity to implement it.
+The standardised route fared no better --- \citet{TODO-pratt-kim} reported in
+2006 that ``there are at present no commercial STEP translators making use of''
+the construction-history capabilities, and we are not aware of published work
+since that revisits the question. Twenty years later the practical situation is
+unchanged.
+
+This paper is a response to that gap, not to a gap in the methods literature.
+
+\paragraph{Contributions.}
+\begin{enumerate}
+\item \textbf{An open implementation (\S\ref{sec:system}).} A training-free,
+  MIT-licensed recogniser from exact B-rep to an editable feature tree, emitted
+  natively into FreeCAD PartDesign and Onshape, and to a \code{build123d} solid,
+  from one neutral intermediate representation. It is a library, not a GUI
+  feature.
+\item \textbf{An evaluation with an explicit refusal class
+  (\S\ref{sec:results}).} On the NIST MBE PMI conformance corpus we report
+  \VERIFIED{}/\PARTIAL{}/\REFUSED{} per part, with reconstruction IoU for every
+  accepted recovery. We are not aware of another AFR evaluation that reports a
+  refusal rate alongside a success rate.
+\item \textbf{A negative result about the acceptance criterion
+  (\S\ref{sec:cancellation}).} Over-cut and uncut material enter a volume
+  difference with opposite signs. We measure the resulting cancellation and show
+  why a two-sided test is required.
+\end{enumerate}
+
+\paragraph{What this paper does not claim.} It does not claim novelty for
+verification-gated recovery, for neutral feature representations, for
+multi-target emission, or for round-tripping GUI edits. Each is anticipated;
+\S\ref{sec:related} says by whom. The claim is availability, measurement, and
+honesty about failure.
+
+\section{Related work, and what it anticipates}
+\label{sec:related}
+
+We state the anticipating work plainly, because the contribution here does not
+depend on it being absent.
+
+\paragraph{The acceptance criterion is not new.} \citet{TODO-gupta-nau} require
+that subtracting the recovered features from stock reproduce the part exactly,
+and return a binary verdict --- a part with no feasible plan ``is considered
+unmachinable''. Ours is the same gate with a measured tolerance in place of set
+identity. In the learning literature, \citet{TODO-willis-fusion} accept a
+reconstruction when IoU${}=1$, noting explicitly that a recovered sequence need
+not match the ground-truth sequence: geometric equivalence rather than intent
+recovery, published in 2021.
+
+\paragraph{Neutral feature representations are not new.} The macro-parametric
+approach~\citep{TODO-mun-han} defines tool-agnostic modelling commands replayed
+into a target system, and Proficiency's commercial Universal Product
+Representation~\citep{TODO-rappoport} held both parametric and B-rep versions of
+each feature and regenerated native trees in six CAD systems from around 2000.
+
+\paragraph{Multi-target emission and GUI round-trip are not new.} The BYU Neutral
+Parametric Canonical Form line~\citep{TODO-shumway} supports concurrent editing
+across NX, CATIA and Creo, capturing edits made in each GUI and propagating them
+through a neutral database. It keys on database GUIDs where we key on stable
+feature names --- an implementation difference, not an inventive one.
+
+\paragraph{Query-based references are not new.} \citet{TODO-cascaval} formalise
+references as ``queries that select elements from the constructed geometry'',
+exactly the alternative to stored kernel identifiers that we adopt, with
+correctness criteria we do not attempt.
+
+\paragraph{What we did not find.} We searched for, and did not find: any
+open-source B-rep-to-feature-tree recogniser; any AFR evaluation reporting a
+graded verdict with a measured geometric residual per part; and any published
+analysis of why the standardised AP242 construction-history route was not
+adopted. Absence in one search is weak evidence, and we report these as unfound
+rather than as nonexistent.
+
+\section{System}
+\label{sec:system}
+
+The intermediate representation is a list of named, ordered features ---
+\code{sketch}, \code{pad}, \code{pocket}, \code{revolve}, \code{prism\_cut},
+\code{fillet} --- as plain JSON. Geometry is selected by \emph{query},
+re-resolved against live geometry at each build rather than by persisted kernel
+identifiers, which is what lets one IR drive structurally different backends and
+lets edits be matched back by name. Authored IR uses human-meaningful names;
+recovered IR uses generated ones (\code{pocket0}, \code{cut2}), stable enough
+for the round trip but carrying no design intent.
+
+Recovery proceeds cross-sectionally. Candidate axes are identified along which
+the solid is prismatic, or about which it is a body of revolution; the outline
+and through-holes are taken from cross-sections sampled at several heights;
+blind features are deferred rather than drilled speculatively, since
+over-cutting cannot be undone; and when the base extrude does not verify, the
+residual is carved feature by feature, each remaining lump itself recognised as
+a profile extruded along its own axis. Because several axes can appear
+prismatic, candidates are not scored heuristically --- one is generated per axis
+and the verifier selects the winner.
+
+\paragraph{The gate.} Let $S$ be the input solid, $T$ a candidate tree and
+$E(T)$ its re-execution. We accept when the volume difference and a
+rotation-tolerant bounding-box comparison both fall within tolerance, and report
+\PARTIAL{} with the residual otherwise. When no axis yields a recognisable
+extrude or body of revolution, the recogniser \REFUSED{}s outright rather than
+returning a best guess. Section~\ref{sec:cancellation} shows why this particular
+invariant is weaker than it looks.
+
+\section{Evaluation}
+\label{sec:results}
+
+\paragraph{Corpus.} The NIST MBE PMI Validation and Conformance Testing
+artifacts, ``AP203 geometry only'' variants: eleven parts (CTC-01--05,
+FTC-06--11), pure B-rep with no PMI annotations. These are human-designed
+conformance artifacts intended to be difficult. NIST's own documentation notes
+that they are not error-free reference files and that conformance checkers
+report syntax errors in some of them, so a refusal may reflect the input rather
+than the recogniser.
+
+\begin{table}[htbp]
+\centering
+\caption{Recovery over the eleven-part NIST corpus. IoU is computed after
+rotation-aware co-registration, because recovery works in the part's own frame
+and the recovered solid is generally rotated relative to the input. Regenerate
+with \code{paper/figures/run\_corpus.py} and \code{paper/figures/iou\_corpus.py}.}
+\label{tab:corpus}
+\begin{tabular}{llS[table-format=2.2]S[table-format=3.0]S[table-format=2.1]S[table-format=3.3]}
+\toprule
+Part & Verdict & {$|\Delta V|/V$ (\%)} & {Features} & {Time (s)} & {IoU (\%)} \\
+\midrule
+CTC-01 & \VERIFIED  &  0.10 &  51 & 15.7 & 99.841 \\
+CTC-02 & \REFUSED   & {--}  & {--}& 66.4 & {--} \\
+CTC-03 & \PARTIAL   & 41.46 &  16 &  6.1 & {--} \\
+CTC-04 & \PARTIAL   &  2.43 & 270 & 37.2 & {--} \\
+CTC-05 & \PARTIAL   & 51.80 & 106 & 11.6 & {--} \\
+FTC-06 & \PARTIAL   & 31.45 &  41 &  8.7 & {--} \\
+FTC-07 & \REFUSED   & {--}  & {--}&  8.4 & {--} \\
+FTC-08 & \PARTIAL   & 52.55 & 218 & 48.3 & {--} \\
+FTC-09 & \VERIFIED  &  0.19 &  80 &  5.1 & 99.684 \\
+FTC-10 & \REFUSED   & {--}  & {--}&  8.5 & {--} \\
+FTC-11 & \VERIFIED  &  0.00 &   2 &  1.6 & 100.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Results.} Three parts \VERIFIED{} (\SI{27}{\percent}), five
+\PARTIAL{} (\SI{45}{\percent}), three \REFUSED{} (\SI{27}{\percent}). All three
+refusals were the same explicit rejection --- no recognisable extrude or body of
+revolution --- rather than a crash or a guess.
+
+The result we consider most important is that \textbf{no incorrect tree was
+accepted}. Every \VERIFIED{} recovery exceeds \SI{99.68}{\percent} IoU against
+the input. A \SI{27}{\percent} acceptance rate with an explicit refusal class is
+a different and more useful contract than a higher rate with no soundness
+signal, and it is the property that makes the output safe to edit.
+
+\paragraph{Scale and comparability.} This is eleven parts. It establishes that
+the verdict contract holds on non-trivial standard geometry; it does not
+establish a rate over a part distribution, and no general recovery rate should
+be read into it. FTC-11 in particular is a two-feature revolve recovered in
+\SI{1.6}{\second} and should carry little weight. We note explicitly that these
+numbers are \emph{not} comparable to the \SI{99}{\percent}-plus accuracies
+reported on MFCAD++ and similar benchmarks: those measure per-face
+classification against ground-truth labels on procedurally generated data,
+whereas this measures whether a recovered program rebuilds a human-designed
+conformance part.
+
+\section{A negative result: volume comparison admits cancellation}
+\label{sec:cancellation}
+
+The scalar $|\Delta V|/V$ conceals its own structure. On CTC-01 the recovered
+solid is \emph{smaller} than the original ($\Delta V =
+\SI{-14850}{\cubic\milli\metre}$), so the residual cannot be attributed to uncut
+chamfers, which would make it larger. Co-registering the solids and decomposing
+by inclusion--exclusion gives \SI{19036}{\cubic\milli\metre} of \emph{over-cut}
+against \SI{4186}{\cubic\milli\metre} of \emph{uncut} material: opposite signs,
+partially cancelling, so the total geometric discrepancy
+(\SI{0.159}{\percent}) is \num{1.56} times the \SI{0.101}{\percent} the verifier
+reports.
+
+Nothing in a volume-plus-extent test bounds that cancellation factor. A
+\VERIFIED{} verdict under it should be read as ``reproduces the part's volume
+and extent to within $\epsilon$'', not ``is the part to within $\epsilon$''. A
+two-sided test --- IoU, or a symmetric-difference bound --- removes the failure
+mode entirely, because over-cut and uncut material both increase the symmetric
+difference. IoU is additionally the metric the CAD-program-inference literature
+already reports, so adopting it buys comparability at the same time. We report
+IoU in Table~\ref{tab:corpus} for this reason, and recommend it as the
+acceptance criterion in place of the volume test the implementation currently
+ships.
+
+\paragraph{A practical obstacle.} The decomposition had to be derived from the
+union by inclusion--exclusion, because direct OpenCASCADE difference and
+intersection between these operands returned degenerate results --- an empty
+intersection for solids whose bounding boxes coincide exactly. Any stronger
+verifier built on Booleans will meet the same problem.
+
+\section{Limitations}
+\label{sec:limits}
+
+\begin{itemize}
+\item \textbf{Eleven parts.} A demonstration of the contract, not a study of a
+  rate. A corpus-scale evaluation remains the obvious next step.
+\item \textbf{\PARTIAL{} failures are unquantified.} Our IoU harness pre-filters
+  candidate orientations by bounding-box match, and a wrong recovery has a wrong
+  bounding box, so the five \PARTIAL{} parts have no IoU. We can say that they
+  failed and by how much volume, but not how wrong they are geometrically.
+\item \textbf{Equivalence, not intent.} Verification certifies that $E(T)$
+  matches $S$, not that $T$ is the designer's history. Recovered feature names
+  are generated and carry no design intent.
+\item \textbf{Edge blends are outside the vocabulary.} Fillets and chamfers are
+  not swept profiles and are left as sub-tolerance residual, so a chamfered part
+  can verify while the recovered tree has sharp edges.
+\item \textbf{Recovery is subtractive only.} Additive bosses cannot be
+  recovered; such parts are reported \PARTIAL{}, not approximated.
+\item \textbf{Freeform geometry is rejected, not approximated.} Splines,
+  ellipses, lofts and sweeps admit no faithful sketch-and-pad tree.
+\item \textbf{Tolerances are uncalibrated.} $\epsilon$ was chosen to separate
+  observed successes from observed failures on the parts tested. It is not
+  derived from a manufacturing tolerance model.
+\item \textbf{Refusals are not attributed.} We did not separate refusals caused
+  by geometry outside the vocabulary from refusals caused by defects in the
+  input files, which NIST documents as present.
+\end{itemize}
+
+\section{Conclusion}
+
+The methods here are not new; their availability is. A capability described in
+the literature in 1995, shipped commercially since 1998 and standardised in
+AP242 is still absent from open CAD, and that gap is a practical problem for
+anyone building on FreeCAD, Onshape or a code-CAD toolchain. We have shown that
+a training-free implementation reaches a useful contract on standard
+conformance geometry --- accepting a quarter of the corpus with no incorrect
+acceptances, and refusing rather than guessing on the rest --- and we have
+measured a real weakness in the acceptance criterion we began with, together
+with the two-sided replacement that removes it.
+
+\section*{Availability}
+
+\code{featuretree} is MIT-licensed and has been publicly available since
+2026-06-26 at \url{https://github.com/punkfab/featuretree}; the recognition
+component dates from 2026-07-10. Every number reported here is reproduced by the
+commands in \code{paper/figures/README.md}, verified against the repository
+state on 2026-09-19. The prior-art scan supporting \S\ref{sec:related} is in
+\code{paper/prior-art/FINDINGS.md}.
+% TODO-ON-DEPOSIT: add the archived release DOI here once a Zenodo deposit exists.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

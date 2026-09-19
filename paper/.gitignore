@@ -1,0 +1,13 @@
+# LaTeX build outputs — rebuild with: tectonic main.tex (or latexmk -pdf)
+# NOTE: arXiv submission NEEDS main.bbl — generate it (tectonic --keep-intermediates
+# or bibtex) at submission time even though it's ignored here.
+main.pdf
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+build*.log

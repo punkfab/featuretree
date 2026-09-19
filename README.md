@@ -197,7 +197,7 @@ before the next is trusted:
    designer's exact operations — and anything that doesn't reconstruct is rejected, never faked.
 
 On the NIST CTC-01 test part (multi-level pockets, through-web windows, 12 cross-holes, 8 chamfers)
-this takes a 139%-off base extrude to a **verified** 51-feature tree, and that tree re-emits to the
+this takes a 155%-off base extrude to a **verified** 51-feature tree, and that tree re-emits to the
 **identical volume in both build123d *and* FreeCAD** — the recovered part is genuinely editable in
 either.
 
@@ -209,8 +209,14 @@ either.
   necessarily the same *history*. Recognition is inference and non-unique in general.
 - **Edge fillets/chamfers aren't in the vocabulary** — they're edge blends, not swept profiles — so
   they're left as **sub-tolerance residual**. A chamfered part can verify within tolerance while the
-  recovered tree has sharp edges (`recovered.residual_lumps` and a warning disclose it). NIST's 8
-  chamfers are its whole ~0.1% residual.
+  recovered tree has sharp edges (`recovered.residual_lumps` and a warning disclose it).
+- **The reported Δvol is a NET, and it can hide compensating errors.** On NIST CTC-01 the
+  recovered solid is *smaller* than the original (−0.101%), so the residual is not just uncut
+  chamfers — those would make it *larger*. Decomposing it (`paper/figures/error_decomposition.py`)
+  gives **0.130% over-cut** vs **0.029% uncut**: opposite signs that partially cancel, so the true
+  geometric discrepancy (0.159%) is **1.56× the 0.101% the verifier reports**. VERIFIED means
+  "reproduces the part's volume and extent to within tolerance", *not* "is the part to within
+  tolerance". A two-sided symmetric-difference check would close this gap.
 - **Additive bosses can't be recovered** (recovery only *subtracts* from the outline envelope). A
   raised post on a base is flagged PARTIAL, not faked.
 - **Splines / ellipses / lofts / sweeps / freeform → PARTIAL.** No faithful sketch-and-pad tree
@@ -232,11 +238,40 @@ then `b3d_emit` regenerates an equivalent solid to confirm parity. Or export it 
 Geometry that's a mesh boolean (no clean sketch/pad) can't be a feature tree — export those as
 STEP/STL and import as a single solid, and say so.
 
+## Ingesting cadgen / text-to-cad assemblies — the editable round-trip for agent-generated CAD
+
+[text-to-cad](https://github.com/earthtojake/text-to-cad) ("CAD Skills", the dominant agent-writes-
+build123d toolchain) emits, by design, a *dead solid*: a labeled STEP assembly plus a `.step.json`
+sidecar carrying the typed mates / gear couplings / poses that STEP itself cannot. `cadgen_ingest.py`
+is the editable half it declines to build. It reads the STEP (part labels and the `o1.N` occurrence
+tree survive the XCAF import) and the sidecar (mates joined to occurrences **by id and cross-checked
+by label** — disagreements are reported, never hidden), recovers each part's editable tree with
+`step_recognize` in the part's *own* frame, and returns an **assembly IR** ([`assembly_ir.py`](assembly_ir.py)):
+occurrences + per-part feature trees + mates + couplings + poses, plain JSON.
+
+```bash
+python3 cadgen_ingest.py model.step                                 # sidecar auto-found: model.step.json
+python3 cadgen_ingest.py model.step --sidecar k.step.json --emit out.asm.json
+python3 cadgen_ingest.py --package tree_dir                         # a materialized tree (assembly.json)
+python3 cadgen_ingest.py --selftest
+```
+
+On cadgen's own planetary-gear hero model (9 parts, 8 mates, a gear coupling, 2 poses) **every part
+recovers as a VERIFIED editable tree** (gears Δ0.0%, pins Δ0.01%), with all mates joined and labels
+agreeing. Two things learned the hard way, both encoded: parts are recognized **re-centred in their
+own frame** (an off-origin planet gear was PARTIAL at Δ38% in world coordinates and VERIFIED at Δ0.0%
+locally) and the occurrence carries the placement back, **self-checked** by re-placing the part; and
+cadgen is not consistent about where placement lives (a gear's is in `.location`, its pin's is baked
+into the geometry), so the world bounding-box centre — not `.location` — defines the part frame.
+`tests/fixtures/cadgen/` holds genuine cadgen output the tests run against.
+
 ## How it runs
 
 | file | runs under | role |
 |------|-----------|------|
 | `ir.py` | any Python 3 | the DSL / IR — single source of truth, plain JSON-able dicts |
+| `assembly_ir.py` | any Python 3 | the ASSEMBLY IR — occurrences + parts + typed mates / couplings / poses (additive to `ir.py`) |
+| `cadgen_ingest.py` | host Python 3 | ingest a cadgen / text-to-cad STEP + `.step.json` sidecar (or tree package) → assembly IR, each part a verified editable tree |
 | `b3d_emit.py` | host Python 3 | render an IR spec → a build123d Solid (+ `.stl`) in-process, no FreeCAD |
 | `step_recognize.py` | host Python 3 | recover an IR from a STEP B-rep (2.5D-prismatic), self-verified by re-emit |
 | `gen.py` | host Python 3 | emit an IR spec → `.FCStd` (+ `.stl`); shells out to FreeCAD |
@@ -309,6 +344,10 @@ run `gen.py` / `roundtrip.py` directly), and make sure the FreeCAD AppImage is l
 - **Onshape backend:** sketches (polys / circles / rects) → Pad / Pocket via `onpy`; geometry
   exact. Sketches arrive under-defined; fillets / face-attach / non-Top planes / `prism_cut` not yet.
   See [Onshape backend](#onshape-backend).
+- **cadgen / text-to-cad ingest:** STEP + sidecar (or tree package) → assembly IR with a verified
+  editable tree per part, mates / couplings / poses preserved, placements self-checked. The
+  per-part trees emit through `gen.py` today; emitting the *assembly itself* as a native FreeCAD /
+  Onshape assembly (a placed link per occurrence, mates as joints) is the next step, not yet built.
 - **Deferred:** non-XY/XZ unattached planes, richer edge selectors (by-radius / position / count),
   edge fillet/chamfer *recognition*, other backends (Fusion API / SolidWorks macro).
 - A SolidWorks `.SLDPRT` can't be written on Linux — that backend would emit a macro.

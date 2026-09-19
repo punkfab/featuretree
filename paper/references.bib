@@ -1,0 +1,136 @@
+% ============================================================================
+% BIBLIOGRAPHY PROVENANCE
+%
+% Unlike the first draft, these entries were RETRIEVED during the prior-art scan
+% of 2026-09-19 (see paper/prior-art/FINDINGS.md), not written from memory.
+% Each entry records its verification level:
+%
+%   VERIFIED-FULLTEXT  = the document itself was fetched and read
+%   VERIFIED-METADATA  = title/authors/venue/DOI confirmed via Crossref or
+%                        OpenAlex; full text not read
+%   ABSTRACT-LEVEL     = abstract read, full text paywalled or bot-gated
+%
+% Anything still uncertain carries TODO-VERIFY naming exactly what is uncertain.
+% ============================================================================
+
+% VERIFIED-FULLTEXT -- read from the author's preprint at
+% https://www.cs.umd.edu/~nau/papers/gupta1995systematic.pdf
+% The FBM correctness definition (subtract features from stock, get the part)
+% is the anticipating disclosure for this paper's acceptance criterion.
+@article{TODO-gupta-nau,
+  author  = {Gupta, Satyandra K. and Nau, Dana S.},
+  title   = {A Systematic Approach for Analyzing the Manufacturability of Machined Parts},
+  journal = {Computer-Aided Design},
+  volume  = {27},
+  number  = {5},
+  pages   = {323--342},
+  year    = {1995},
+  doi     = {10.1016/0010-4485(95)96797-P}
+}
+
+% ABSTRACT-LEVEL -- abstract read via OpenAlex; IEEE full text not retrieved.
+% TODO-VERIFY: page range.
+@article{TODO-vandenbrande,
+  author  = {Vandenbrande, Jan H. and Requicha, Aristides A. G.},
+  title   = {Spatial Reasoning for the Automatic Recognition of Machinable Features in Solid Models},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {15},
+  number  = {12},
+  pages   = {1269--1285},
+  year    = {1993},
+  doi     = {10.1109/34.250845}
+}
+
+% VERIFIED-FULLTEXT -- full text fetched and read. Source of the quoted
+% statement that no commercial STEP translators used the construction-history
+% capabilities.
+@inproceedings{TODO-pratt-kim,
+  author    = {Pratt, Michael J. and Kim, Junhwan},
+  title     = {Experience in the Exchange of Procedural Shape Models using {ISO} 10303 ({STEP})},
+  booktitle = {Proceedings of the ACM Symposium on Solid and Physical Modeling (SPM)},
+  pages     = {229--238},
+  year      = {2006},
+  doi       = {10.1145/1128888.1128920}
+}
+
+% VERIFIED-METADATA -- authors, venue and year confirmed from the arXiv record.
+% TODO-VERIFY: the IoU=1 "exact reconstruction" definition and the ~67% figure
+% are from SECONDARY coverage; the primary PDF exceeded the fetch size limit and
+% has NOT been read. Do not quote a number from this work without reading it.
+@article{TODO-willis-fusion,
+  author  = {Willis, Karl D. D. and Pu, Yewen and Luo, Jieliang and Chu, Hang and
+             Du, Tao and Lambourne, Joseph G. and Solar-Lezama, Armando and Matusik, Wojciech},
+  title   = {Fusion 360 Gallery: A Dataset and Environment for Programmatic {CAD}
+             Construction from Human Design Sequences},
+  journal = {ACM Transactions on Graphics},
+  volume  = {40},
+  number  = {4},
+  year    = {2021},
+  doi     = {10.1145/3450626.3459818},
+  note    = {SIGGRAPH 2021; preprint arXiv:2010.02392}
+}
+
+% VERIFIED-METADATA via Crossref/OpenAlex; content corroborated through
+% Pratt & Kim 2006 and Safdar et al. 2020, both read.
+@article{TODO-mun-han,
+  author  = {Mun, Duhwan and Han, Soonhung and Kim, Junhwan and Oh, Youchon},
+  title   = {A Set of Standard Modeling Commands for the History-Based Parametric Approach},
+  journal = {Computer-Aided Design},
+  volume  = {35},
+  number  = {13},
+  pages   = {1171--1179},
+  year    = {2003},
+  doi     = {10.1016/S0010-4485(03)00022-8}
+}
+
+% ABSTRACT-LEVEL -- ACM DL returned HTTP 403; the Universal Product
+% Representation architecture is described in Pratt & Kim 2006 (read).
+% TODO-VERIFY: page range.
+@inproceedings{TODO-rappoport,
+  author    = {Rappoport, Ari},
+  title     = {An Architecture for Universal {CAD} Data Exchange},
+  booktitle = {Proceedings of the ACM Symposium on Solid Modeling and Applications},
+  year      = {2003},
+  doi       = {10.1145/781644.781648}
+}
+
+% VERIFIED-FULLTEXT -- PDF fetched and read. Source of the multi-CAD GUI-edit
+% round-trip validation protocol quoted in FINDINGS.md.
+@article{TODO-shumway,
+  author  = {Shumway, David and Sadler, Jonathan and Salmon, John},
+  title   = {Hybrid State Transactional Database for Product Lifecycle Management
+             Features in a Multi-Engineer Synchronous Heterogeneous {CAD} Environment},
+  journal = {Computer-Aided Design and Applications},
+  volume  = {15},
+  number  = {1},
+  pages   = {34--46},
+  year    = {2018},
+  doi     = {10.1080/16864360.2017.1353736}
+}
+
+% ABSTRACT-LEVEL -- ACM DL returned HTTP 403; abstract read via OpenAlex, and
+% the abstract alone is decisive on query-based references.
+@article{TODO-cascaval,
+  author  = {Cascaval, Dan and Bod{\'i}k, Rastislav and Schulz, Adriana},
+  title   = {A Lineage-Based Referencing {DSL} for Computer-Aided Design},
+  journal = {Proceedings of the ACM on Programming Languages},
+  volume  = {7},
+  number  = {PLDI},
+  pages   = {Article 168},
+  year    = {2023},
+  doi     = {10.1145/3591223}
+}
+
+% VERIFIED-FULLTEXT -- vendor documentation page fetched and read; source of the
+% quoted sentence about Feature Recognition validating the model.
+% TODO-VERIFY: the ~2007 / Wildfire 4.0 first-availability date is
+% ABSTRACT-LEVEL (from a PTC support-article extract, ptc.com root 403s).
+@misc{TODO-creo-frt,
+  author       = {{PTC}},
+  title        = {About the Feature Recognition Tool},
+  howpublished = {Creo Parametric 11.0 Help Center,
+                  \url{https://support.ptc.com/help/creo/creo_pma/r11.0/usascii/part_modeling/feature_recognition_tool/About_Feature_Recognition.html}},
+  year         = {2026},
+  note         = {Accessed 2026-09-19. Feature available since Pro/ENGINEER Wildfire 4.0
+                  (TODO-VERIFY exact release)}
+}

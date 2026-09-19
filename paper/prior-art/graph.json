@@ -1,0 +1,2303 @@
+{
+ "seeds": [
+  {
+   "id": "https://openalex.org/W3160403431",
+   "title": "Fusion 360 Gallery: A Dataset and Environment for Programmatic CAD Construction from Human Design Sequences",
+   "year": 2020
+  },
+  {
+   "id": "https://openalex.org/W4405627025",
+   "title": "CAD-Recode: Reverse Engineering CAD Code From Point Clouds",
+   "year": 2025
+  },
+  {
+   "id": "https://openalex.org/W2776935257",
+   "title": "CSGNet: Neural Shape Parser for Constructive Solid Geometry",
+   "year": 2018
+  },
+  {
+   "id": "https://openalex.org/W3162843412",
+   "title": "DeepCAD: A Deep Generative Network for Computer-Aided Design Models",
+   "year": 2021
+  },
+  {
+   "id": "https://openalex.org/W4313034350",
+   "title": "Point2Cyl: Reverse Engineering 3D Objects from Point Clouds to Extrusion Cylinders",
+   "year": 2022
+  },
+  {
+   "id": "https://openalex.org/W3150272099",
+   "title": "BRepNet: A topological message passing system for solid models",
+   "year": 2021
+  },
+  {
+   "id": "https://openalex.org/W3159520272",
+   "title": "UV-Net: Learning from Boundary Representations",
+   "year": 2021
+  },
+  {
+   "id": "https://openalex.org/W4395449267",
+   "title": "BrepMFR: Enhancing machining feature recognition in B-rep models through deep learning and domain adaptation",
+   "year": 2024
+  },
+  {
+   "id": "https://openalex.org/W1988658389",
+   "title": "A Discourse on Geometric Feature Recognition From CAD Models",
+   "year": 2000
+  },
+  {
+   "id": "https://openalex.org/W2063385633",
+   "title": "A mechanism for persistently naming topological entities in history-based parametric solid models",
+   "year": 1997
+  }
+ ],
+ "hits": [
+  {
+   "id": "W4381185173",
+   "seeds_cited": 4,
+   "work": {
+    "id": "https://openalex.org/W4381185173",
+    "display_name": "CLUSTERING OF SEQUENTIAL CAD MODELLING DATA",
+    "publication_year": 2023,
+    "cited_by_count": 4,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "hybrid",
+     "oa_url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/99FAD60D62C488C358EF95CA52909ECA/S2732527X23000949a.pdf/div-class-title-clustering-of-sequential-cad-modelling-data-div.pdf",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1017/pds.2023.94",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1017/pds.2023.94",
+     "pdf_url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/99FAD60D62C488C358EF95CA52909ECA/S2732527X23000949a.pdf/div-class-title-clustering-of-sequential-cad-modelling-data-div.pdf",
+     "source": {
+      "id": "https://openalex.org/S4210205958",
+      "display_name": "Proceedings of the Design Society",
+      "issn_l": "2732-527X",
+      "issn": [
+       "2732-527X"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310311721",
+      "host_organization_name": "Cambridge University Press",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310311721",
+       "https://openalex.org/P4310311702"
+      ],
+      "host_organization_lineage_names": [
+       "Cambridge University Press",
+       "University of Cambridge"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc-nd",
+     "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Proceedings of the Design Society",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1017/pds.2023.94"
+   }
+  },
+  {
+   "id": "W4294783216",
+   "seeds_cited": 3,
+   "work": {
+    "id": "https://openalex.org/W4294783216",
+    "display_name": "Reconstructing editable prismatic CAD from rounded voxel models",
+    "publication_year": 2022,
+    "cited_by_count": 33,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://arxiv.org/pdf/2209.01161",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3550469.3555424",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1145/3550469.3555424",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "SIGGRAPH Asia 2022 Conference Papers",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1145/3550469.3555424"
+   }
+  },
+  {
+   "id": "W4400245825",
+   "seeds_cited": 3,
+   "work": {
+    "id": "https://openalex.org/W4400245825",
+    "display_name": "Openecad: An Efficient Visual Language Model for Editable 3d-Cad Design",
+    "publication_year": 2024,
+    "cited_by_count": 3,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://doi.org/10.2139/ssrn.4882845",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.2139/ssrn.4882845",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.2139/ssrn.4882845",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210172589",
+      "display_name": "SSRN Electronic Journal",
+      "issn_l": "1556-5068",
+      "issn": [
+       "1556-5068"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "host_organization": "https://openalex.org/I1318003438",
+      "host_organization_name": "RELX Group (Netherlands)",
+      "host_organization_lineage": [
+       "https://openalex.org/I1318003438"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "acceptedVersion",
+     "is_accepted": true,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "posted-content"
+    },
+    "doi": "https://doi.org/10.2139/ssrn.4882845"
+   }
+  },
+  {
+   "id": "W3160403431",
+   "seeds_cited": 3,
+   "work": {
+    "id": "https://openalex.org/W3160403431",
+    "display_name": "Fusion 360 Gallery: A Dataset and Environment for Programmatic CAD Construction from Human Design Sequences",
+    "publication_year": 2020,
+    "cited_by_count": 10,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://arxiv.org/pdf/2010.02392",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "pmh:oai:arXiv.org:2010.02392",
+     "is_oa": true,
+     "landing_page_url": "http://arxiv.org/abs/2010.02392",
+     "pdf_url": "https://arxiv.org/pdf/2010.02392",
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "text"
+    },
+    "doi": "https://doi.org/10.48550/arxiv.2010.02392"
+   }
+  },
+  {
+   "id": "W7153610800",
+   "seeds_cited": 3,
+   "work": {
+    "id": "https://openalex.org/W7153610800",
+    "display_name": "An intelligent approach for reconstructing feature-based models from boundary representations via organic adaptation of two-level networks",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.engappai.2026.114768",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.engappai.2026.114768",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S900972176",
+      "display_name": "Engineering Applications of Artificial Intelligence",
+      "issn_l": "0952-1976",
+      "issn": [
+       "0952-1976",
+       "1873-6769"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Engineering Applications of Artificial Intelligence",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.engappai.2026.114768"
+   }
+  },
+  {
+   "id": "W4405942382",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4405942382",
+    "display_name": "Point2skh: End-to-end Parametric Primitive Inference from Point Clouds with Improved Denoising Transformer",
+    "publication_year": 2024,
+    "cited_by_count": 5,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "hybrid",
+     "oa_url": "https://doi.org/10.1016/j.cad.2024.103838",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.cad.2024.103838",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1016/j.cad.2024.103838",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210171473",
+      "display_name": "Computer-Aided Design",
+      "issn_l": "0010-4485",
+      "issn": [
+       "0010-4485",
+       "1879-2685"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc-nd",
+     "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer-Aided Design",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.cad.2024.103838"
+   }
+  },
+  {
+   "id": "W4400379264",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4400379264",
+    "display_name": "Less Redundancy: Deduplicating Cad Datasets for Efffcient Deep Learning",
+    "publication_year": 2024,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "http://doi.org/10.2139/ssrn.4887598",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.2139/ssrn.4887598",
+     "is_oa": true,
+     "landing_page_url": "http://doi.org/10.2139/ssrn.4887598",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210172589",
+      "display_name": "SSRN Electronic Journal",
+      "issn_l": "1556-5068",
+      "issn": [
+       "1556-5068"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "host_organization": "https://openalex.org/I1318003438",
+      "host_organization_name": "RELX Group (Netherlands)",
+      "host_organization_lineage": [
+       "https://openalex.org/I1318003438"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "acceptedVersion",
+     "is_accepted": true,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "posted-content"
+    },
+    "doi": "https://doi.org/10.2139/ssrn.4887598"
+   }
+  },
+  {
+   "id": "W3126753585",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W3126753585",
+    "display_name": "Im2Vec: Synthesizing Vector Graphics without Vector Supervision",
+    "publication_year": 2021,
+    "cited_by_count": 92,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cvpr46437.2021.00726",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cvpr46437.2021.00726",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cvpr46437.2021.00726"
+   }
+  },
+  {
+   "id": "W4386065741",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4386065741",
+    "display_name": "SECAD-Net: Self-Supervised CAD Reconstruction by Learning Sketch-Extrude Operations",
+    "publication_year": 2023,
+    "cited_by_count": 51,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cvpr52729.2023.01613",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cvpr52729.2023.01613",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cvpr52729.2023.01613"
+   }
+  },
+  {
+   "id": "W4402169971",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4402169971",
+    "display_name": "A parametric and feature-based CAD dataset to support human-computer interaction for advanced 3D shape learning",
+    "publication_year": 2024,
+    "cited_by_count": 34,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "hybrid",
+     "oa_url": "https://doi.org/10.3233/ica-240744",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.3233/ica-240744",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.3233/ica-240744",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S107631664",
+      "display_name": "Integrated Computer-Aided Engineering",
+      "issn_l": "1069-2509",
+      "issn": [
+       "1069-2509",
+       "1875-8835"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310318577",
+      "host_organization_name": "IOS Press",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310318577"
+      ],
+      "host_organization_lineage_names": [
+       "IOS Press"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc",
+     "license_id": "https://openalex.org/licenses/cc-by-nc",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Integrated Computer-Aided Engineering",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.3233/ica-240744"
+   }
+  },
+  {
+   "id": "W4377832123",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4377832123",
+    "display_name": "Neurosymbolic Models for Computer Graphics",
+    "publication_year": 2023,
+    "cited_by_count": 31,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1111/cgf.14775",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1111/cgf.14775",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S67831204",
+      "display_name": "Computer Graphics Forum",
+      "issn_l": "0167-7055",
+      "issn": [
+       "0167-7055",
+       "1467-8659"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320595",
+      "host_organization_name": "Wiley",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320595"
+      ],
+      "host_organization_lineage_names": [
+       "Wiley"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer Graphics Forum",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1111/cgf.14775"
+   }
+  },
+  {
+   "id": "W4412374989",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4412374989",
+    "display_name": "Geometric Deep Learning for Computer-Aided Design: A Survey",
+    "publication_year": 2025,
+    "cited_by_count": 28,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://doi.org/10.1109/access.2025.3587121",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1109/access.2025.3587121",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1109/access.2025.3587121",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S2485537415",
+      "display_name": "IEEE Access",
+      "issn_l": "2169-3536",
+      "issn": [
+       "2169-3536"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319808",
+      "host_organization_name": "Institute of Electrical and Electronics Engineers",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319808"
+      ],
+      "host_organization_lineage_names": [
+       "Institute of Electrical and Electronics Engineers"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "IEEE Access",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1109/access.2025.3587121"
+   }
+  },
+  {
+   "id": "W4401833026",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4401833026",
+    "display_name": "OpenECAD: An efficient visual language model for editable 3D-CAD design",
+    "publication_year": 2024,
+    "cited_by_count": 22,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.cag.2024.104048",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.cag.2024.104048",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S94821547",
+      "display_name": "Computers & Graphics",
+      "issn_l": "0097-8493",
+      "issn": [
+       "0097-8493",
+       "1873-7684"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computers &amp; Graphics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.cag.2024.104048"
+   }
+  },
+  {
+   "id": "W4391244152",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4391244152",
+    "display_name": "Brep2Seq: a dataset and hierarchical deep learning network for reconstruction and generation of computer-aided design models",
+    "publication_year": 2023,
+    "cited_by_count": 19,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://doi.org/10.1093/jcde/qwae005",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1093/jcde/qwae005",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1093/jcde/qwae005",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S2485147958",
+      "display_name": "Journal of Computational Design and Engineering",
+      "issn_l": "2288-4300",
+      "issn": [
+       "2288-4300",
+       "2288-5048"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310311648",
+      "host_organization_name": "Oxford University Press",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310311648",
+       "https://openalex.org/P4310311647"
+      ],
+      "host_organization_lineage_names": [
+       "Oxford University Press",
+       "University of Oxford"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc",
+     "license_id": "https://openalex.org/licenses/cc-by-nc",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Journal of Computational Design and Engineering",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1093/jcde/qwae005"
+   }
+  },
+  {
+   "id": "W4404691757",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4404691757",
+    "display_name": "TransCAD: A Hierarchical Transformer for CAD Sequence Inference from Point Clouds",
+    "publication_year": 2024,
+    "cited_by_count": 15,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1007/978-3-031-73030-6_2",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1007/978-3-031-73030-6_2",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S106296714",
+      "display_name": "Lecture notes in computer science",
+      "issn_l": "0302-9743",
+      "issn": [
+       "0302-9743",
+       "1611-3349"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319900",
+      "host_organization_name": "Springer Science+Business Media",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319900",
+       "https://openalex.org/P4310319965"
+      ],
+      "host_organization_lineage_names": [
+       "Springer Science+Business Media",
+       "Springer Nature"
+      ],
+      "type": "book series"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Lecture Notes in Computer Science",
+     "raw_type": "book-chapter"
+    },
+    "doi": "https://doi.org/10.1007/978-3-031-73030-6_2"
+   }
+  },
+  {
+   "id": "W4413155680",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4413155680",
+    "display_name": "DTGBrepGen: A Novel B-rep Generative Model through Decoupling Topology and Geometry",
+    "publication_year": 2025,
+    "cited_by_count": 10,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cvpr52734.2025.01997",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cvpr52734.2025.01997",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cvpr52734.2025.01997"
+   }
+  },
+  {
+   "id": "W4387848902",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4387848902",
+    "display_name": "MultiCAD: Contrastive Representation Learning for Multi-modal 3D Computer-Aided Design Models",
+    "publication_year": 2023,
+    "cited_by_count": 21,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://dl.acm.org/doi/pdf/10.1145/3583780.3614982",
+     "any_repository_has_fulltext": null
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3583780.3614982",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1145/3583780.3614982",
+     "pdf_url": "https://dl.acm.org/doi/pdf/10.1145/3583780.3614982",
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Proceedings of the 32nd ACM International Conference on Information and Knowledge Management",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1145/3583780.3614982"
+   }
+  },
+  {
+   "id": "W4321512645",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4321512645",
+    "display_name": "CADOps-Net: Jointly Learning CAD Operation Types and Steps from Boundary-Representations",
+    "publication_year": 2022,
+    "cited_by_count": 20,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://orbilu.uni.lu/handle/10993/58901",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1109/3dv57658.2022.00024",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/3dv57658.2022.00024",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2022 International Conference on 3D Vision (3DV)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/3dv57658.2022.00024"
+   }
+  },
+  {
+   "id": "W4402727686",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4402727686",
+    "display_name": "Draw Step by Step: Reconstructing CAD Construction Sequences from Point Clouds via Multimodal Diffusion",
+    "publication_year": 2024,
+    "cited_by_count": 20,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cvpr52733.2024.02564",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cvpr52733.2024.02564",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cvpr52733.2024.02564"
+   }
+  },
+  {
+   "id": "W4402754287",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4402754287",
+    "display_name": "SfmCAD: Unsupervised CAD Reconstruction by Learning Sketch-based Feature Modeling Operations",
+    "publication_year": 2024,
+    "cited_by_count": 14,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cvpr52733.2024.00447",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cvpr52733.2024.00447",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cvpr52733.2024.00447"
+   }
+  },
+  {
+   "id": "W4406980114",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4406980114",
+    "display_name": "A history-based parametric CAD sketch dataset with advanced engineering commands",
+    "publication_year": 2025,
+    "cited_by_count": 13,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.cad.2025.103848",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.cad.2025.103848",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210171473",
+      "display_name": "Computer-Aided Design",
+      "issn_l": "0010-4485",
+      "issn": [
+       "0010-4485",
+       "1879-2685"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer-Aided Design",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.cad.2025.103848"
+   }
+  },
+  {
+   "id": "W4399938834",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4399938834",
+    "display_name": "Parametric Primitive Analysis of CAD Sketches With Vision Transformer",
+    "publication_year": 2024,
+    "cited_by_count": 7,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://arxiv.org/pdf/2407.00410",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1109/tii.2024.3413358",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/tii.2024.3413358",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S184777250",
+      "display_name": "IEEE Transactions on Industrial Informatics",
+      "issn_l": "1551-3203",
+      "issn": [
+       "1551-3203",
+       "1941-0050"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319808",
+      "host_organization_name": "Institute of Electrical and Electronics Engineers",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319808"
+      ],
+      "host_organization_lineage_names": [
+       "Institute of Electrical and Electronics Engineers"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "IEEE Transactions on Industrial Informatics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1109/tii.2024.3413358"
+   }
+  },
+  {
+   "id": "W4410211564",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4410211564",
+    "display_name": "PS-CAD: Local Geometry Guidance via Prompting and Selection for CAD Reconstruction",
+    "publication_year": 2025,
+    "cited_by_count": 7,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "hybrid",
+     "oa_url": "https://doi.org/10.1145/3733595",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3733595",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1145/3733595",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S185367456",
+      "display_name": "ACM Transactions on Graphics",
+      "issn_l": "0730-0301",
+      "issn": [
+       "0730-0301",
+       "1557-7368"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319798",
+      "host_organization_name": "Association for Computing Machinery",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319798"
+      ],
+      "host_organization_lineage_names": [
+       "Association for Computing Machinery"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc-sa",
+     "license_id": "https://openalex.org/licenses/cc-by-nc-sa",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "ACM Transactions on Graphics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1145/3733595"
+   }
+  },
+  {
+   "id": "W4411343851",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4411343851",
+    "display_name": "A Survey on Deep Learning in 3D CAD Reconstruction",
+    "publication_year": 2025,
+    "cited_by_count": 5,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://www.mdpi.com/2076-3417/15/12/6681/pdf?version=1750058919",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.3390/app15126681",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.3390/app15126681",
+     "pdf_url": "https://www.mdpi.com/2076-3417/15/12/6681/pdf?version=1750058919",
+     "source": {
+      "id": "https://openalex.org/S4210205812",
+      "display_name": "Applied Sciences",
+      "issn_l": "2076-3417",
+      "issn": [
+       "2076-3417"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310310987",
+      "host_organization_name": "Multidisciplinary Digital Publishing Institute",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310310987"
+      ],
+      "host_organization_lineage_names": [
+       "Multidisciplinary Digital Publishing Institute"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Applied Sciences",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.3390/app15126681"
+   }
+  },
+  {
+   "id": "W4413145897",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4413145897",
+    "display_name": "BrepGiff: Lightweight Generation of Complex B-rep with 3D GAT Diffusion",
+    "publication_year": 2025,
+    "cited_by_count": 5,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cvpr52734.2025.02476",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cvpr52734.2025.02476",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cvpr52734.2025.02476"
+   }
+  },
+  {
+   "id": "W4417125575",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4417125575",
+    "display_name": "Img2CAD: Reverse Engineering 3D CAD Models from Images through VLM-Assisted Conditional Factorization",
+    "publication_year": 2025,
+    "cited_by_count": 5,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3757377.3763891",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1145/3757377.3763891",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Proceedings of the SIGGRAPH Asia 2025 Conference Papers",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1145/3757377.3763891"
+   }
+  },
+  {
+   "id": "W4379964926",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4379964926",
+    "display_name": "B-rep Matching for Collaborating Across CAD Systems",
+    "publication_year": 2023,
+    "cited_by_count": 3,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "bronze",
+     "oa_url": "https://dl.acm.org/doi/pdf/10.1145/3592125",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3592125",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1145/3592125",
+     "pdf_url": "https://dl.acm.org/doi/pdf/10.1145/3592125",
+     "source": {
+      "id": "https://openalex.org/S185367456",
+      "display_name": "ACM Transactions on Graphics",
+      "issn_l": "0730-0301",
+      "issn": [
+       "0730-0301",
+       "1557-7368"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319798",
+      "host_organization_name": "Association for Computing Machinery",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319798"
+      ],
+      "host_organization_lineage_names": [
+       "Association for Computing Machinery"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "ACM Transactions on Graphics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1145/3592125"
+   }
+  },
+  {
+   "id": "W4388948920",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4388948920",
+    "display_name": "A Survey of Methods for Converting Unstructured Data to CSG Models",
+    "publication_year": 2023,
+    "cited_by_count": 9,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.cad.2023.103655",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.cad.2023.103655",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210171473",
+      "display_name": "Computer-Aided Design",
+      "issn_l": "0010-4485",
+      "issn": [
+       "0010-4485",
+       "1879-2685"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer-Aided Design",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.cad.2023.103655"
+   }
+  },
+  {
+   "id": "W4412588561",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4412588561",
+    "display_name": "Stitch-A-Shape: Bottom-up Learning for B-Rep Generation",
+    "publication_year": 2025,
+    "cited_by_count": 3,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://doi.org/10.1145/3721238.3730661",
+     "any_repository_has_fulltext": null
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3721238.3730661",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1145/3721238.3730661",
+     "pdf_url": null,
+     "source": null,
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Proceedings of the Special Interest Group on Computer Graphics and Interactive Techniques Conference Conference Papers",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1145/3721238.3730661"
+   }
+  },
+  {
+   "id": "W4406708748",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4406708748",
+    "display_name": "Reconstructing Geometric Models from the Point Clouds of Buildings Based on a Transformer Network",
+    "publication_year": 2025,
+    "cited_by_count": 2,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://www.mdpi.com/2072-4292/17/3/359/pdf?version=1737534889",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.3390/rs17030359",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.3390/rs17030359",
+     "pdf_url": "https://www.mdpi.com/2072-4292/17/3/359/pdf?version=1737534889",
+     "source": {
+      "id": "https://openalex.org/S43295729",
+      "display_name": "Remote Sensing",
+      "issn_l": "2072-4292",
+      "issn": [
+       "2072-4292"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310310987",
+      "host_organization_name": "Multidisciplinary Digital Publishing Institute",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310310987"
+      ],
+      "host_organization_lineage_names": [
+       "Multidisciplinary Digital Publishing Institute"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Remote Sensing",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.3390/rs17030359"
+   }
+  },
+  {
+   "id": "W4390190197",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4390190197",
+    "display_name": "SHARP Challenge 2023: Solving CAD History and pArameters Recovery from Point clouds and 3D scans. Overview, Datasets, Metrics, and Baselines",
+    "publication_year": 2023,
+    "cited_by_count": 7,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://orbilu.uni.lu/bitstream/10993/56054/1/SHARP2023_ICCVW23_Submission.pdf",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1109/iccvw60793.2023.00194",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/iccvw60793.2023.00194",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2023 IEEE/CVF International Conference on Computer Vision Workshops (ICCVW)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/iccvw60793.2023.00194"
+   }
+  },
+  {
+   "id": "W4400489998",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4400489998",
+    "display_name": "View2CAD: Parsing Multi-view into CAD Command Sequences",
+    "publication_year": 2024,
+    "cited_by_count": 3,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cscwd61410.2024.10580755",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cscwd61410.2024.10580755",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2024 27th International Conference on Computer Supported Cooperative Work in Design (CSCWD)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cscwd61410.2024.10580755"
+   }
+  },
+  {
+   "id": "W4412364508",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4412364508",
+    "display_name": "Replacing NURBS surfaces with analytic surfaces based on isocurve characteristics in B-rep models",
+    "publication_year": 2025,
+    "cited_by_count": 1,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://academic.oup.com/jcde/advance-article-pdf/doi/10.1093/jcde/qwaf063/63734154/qwaf063.pdf",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1093/jcde/qwaf063",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1093/jcde/qwaf063",
+     "pdf_url": "https://academic.oup.com/jcde/advance-article-pdf/doi/10.1093/jcde/qwaf063/63734154/qwaf063.pdf",
+     "source": {
+      "id": "https://openalex.org/S2485147958",
+      "display_name": "Journal of Computational Design and Engineering",
+      "issn_l": "2288-4300",
+      "issn": [
+       "2288-4300",
+       "2288-5048"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310311648",
+      "host_organization_name": "Oxford University Press",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310311648",
+       "https://openalex.org/P4310311647"
+      ],
+      "host_organization_lineage_names": [
+       "Oxford University Press",
+       "University of Oxford"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc",
+     "license_id": "https://openalex.org/licenses/cc-by-nc",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Journal of Computational Design and Engineering",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1093/jcde/qwaf063"
+   }
+  },
+  {
+   "id": "W4392940206",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4392940206",
+    "display_name": "Robust Shape Fitting for 3D Scene Abstraction",
+    "publication_year": 2024,
+    "cited_by_count": 4,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://researchportal.bath.ac.uk/en/publications/91dd8511-3a56-4db0-b7b1-bb2b3eb5967a",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1109/tpami.2024.3379014",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/tpami.2024.3379014",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S199944782",
+      "display_name": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+      "issn_l": "0162-8828",
+      "issn": [
+       "0162-8828",
+       "1939-3539",
+       "2160-9292"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "doyens",
+       "cwts-core"
+      ],
+      "host_organization": "https://openalex.org/P4310320439",
+      "host_organization_name": "IEEE Computer Society",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320439",
+       "https://openalex.org/P4310319808"
+      ],
+      "host_organization_lineage_names": [
+       "IEEE Computer Society",
+       "Institute of Electrical and Electronics Engineers"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "IEEE Transactions on Pattern Analysis and Machine Intelligence",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1109/tpami.2024.3379014"
+   }
+  },
+  {
+   "id": "W4412441549",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4412441549",
+    "display_name": "Generating command modeling and design graphs with data augmentation for enhanced 3D modeling support",
+    "publication_year": 2025,
+    "cited_by_count": 2,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "hybrid",
+     "oa_url": "https://doi.org/10.1016/j.aei.2025.103644",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.aei.2025.103644",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.1016/j.aei.2025.103644",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S112141509",
+      "display_name": "Advanced Engineering Informatics",
+      "issn_l": "1474-0346",
+      "issn": [
+       "1474-0346",
+       "1873-5320"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by-nc-nd",
+     "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Advanced Engineering Informatics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.aei.2025.103644"
+   }
+  },
+  {
+   "id": "W7160096590",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7160096590",
+    "display_name": "Constraint-Aware Feature Learning for Parametric Point Cloud",
+    "publication_year": 2025,
+    "cited_by_count": 1,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/iccv51701.2025.02610",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/iccv51701.2025.02610",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2025 IEEE/CVF International Conference on Computer Vision (ICCV)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/iccv51701.2025.02610"
+   }
+  },
+  {
+   "id": "W3167804518",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W3167804518",
+    "display_name": "SketchGen: Generating Constrained CAD Sketches",
+    "publication_year": 2021,
+    "cited_by_count": 26,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://arxiv.org/pdf/2106.02711",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "pmh:oai:arXiv.org:2106.02711",
+     "is_oa": true,
+     "landing_page_url": "http://arxiv.org/abs/2106.02711",
+     "pdf_url": "https://arxiv.org/pdf/2106.02711",
+     "source": {
+      "id": "https://openalex.org/S4306400194",
+      "display_name": "arXiv (Cornell University)",
+      "issn_l": "2331-8422",
+      "issn": [
+       "2331-8422"
+      ],
+      "is_oa": true,
+      "is_in_doaj": false,
+      "is_core": false,
+      "host_organization": "https://openalex.org/I205783295",
+      "host_organization_name": "Cornell University",
+      "host_organization_lineage": [
+       "https://openalex.org/I205783295"
+      ],
+      "host_organization_lineage_names": [],
+      "type": "repository"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "submittedVersion",
+     "is_accepted": false,
+     "is_published": false,
+     "raw_source_name": null,
+     "raw_type": "text"
+    },
+    "doi": "https://doi.org/10.48550/arxiv.2106.02711"
+   }
+  },
+  {
+   "id": "W4404892969",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4404892969",
+    "display_name": "SweepNet: Unsupervised Learning Shape Abstraction via Neural Sweepers",
+    "publication_year": 2024,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1007/978-3-031-72913-3_17",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1007/978-3-031-72913-3_17",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S106296714",
+      "display_name": "Lecture notes in computer science",
+      "issn_l": "0302-9743",
+      "issn": [
+       "0302-9743",
+       "1611-3349"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319900",
+      "host_organization_name": "Springer Science+Business Media",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319900",
+       "https://openalex.org/P4310319965"
+      ],
+      "host_organization_lineage_names": [
+       "Springer Science+Business Media",
+       "Springer Nature"
+      ],
+      "type": "book series"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Lecture Notes in Computer Science",
+     "raw_type": "book-chapter"
+    },
+    "doi": "https://doi.org/10.1007/978-3-031-72913-3_17"
+   }
+  },
+  {
+   "id": "W4406264097",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4406264097",
+    "display_name": "CF-CAD: A Contrastive Fusion Network For 3D Computer-Aided Design Generative Modeling",
+    "publication_year": 2025,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1007/978-981-97-5555-4_31",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1007/978-981-97-5555-4_31",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S106296714",
+      "display_name": "Lecture notes in computer science",
+      "issn_l": "0302-9743",
+      "issn": [
+       "0302-9743",
+       "1611-3349"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319900",
+      "host_organization_name": "Springer Science+Business Media",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319900",
+       "https://openalex.org/P4310319965"
+      ],
+      "host_organization_lineage_names": [
+       "Springer Science+Business Media",
+       "Springer Nature"
+      ],
+      "type": "book series"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Lecture Notes in Computer Science",
+     "raw_type": "book-chapter"
+    },
+    "doi": "https://doi.org/10.1007/978-981-97-5555-4_31"
+   }
+  },
+  {
+   "id": "W4411551861",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4411551861",
+    "display_name": "Reconstruct PFCAD Models with Dual-Transformer and Continuation Attention",
+    "publication_year": 2025,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/cscwd64889.2025.11033229",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/cscwd64889.2025.11033229",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "2025 28th International Conference on Computer Supported Cooperative Work in Design (CSCWD)",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1109/cscwd64889.2025.11033229"
+   }
+  },
+  {
+   "id": "W4415536780",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W4415536780",
+    "display_name": "Target-Guided Bayesian Flow Networks for Quantitatively Constrained CAD Generation",
+    "publication_year": 2025,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://arxiv.org/pdf/2510.25163",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1145/3746027.3755052",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1145/3746027.3755052",
+     "pdf_url": null,
+     "source": null,
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Proceedings of the 33rd ACM International Conference on Multimedia",
+     "raw_type": "proceedings-article"
+    },
+    "doi": "https://doi.org/10.1145/3746027.3755052"
+   }
+  },
+  {
+   "id": "W7140201147",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7140201147",
+    "display_name": "CADRec-Net: Reconstruct CAD Design From B-Rep to Support Reuse and Redesign",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/mcg.2026.3677191",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/mcg.2026.3677191",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S105380075",
+      "display_name": "IEEE Computer Graphics and Applications",
+      "issn_l": "0272-1716",
+      "issn": [
+       "0272-1716",
+       "1558-1756"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319808",
+      "host_organization_name": "Institute of Electrical and Electronics Engineers",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319808"
+      ],
+      "host_organization_lineage_names": [
+       "Institute of Electrical and Electronics Engineers"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "IEEE Computer Graphics and Applications",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1109/mcg.2026.3677191"
+   }
+  },
+  {
+   "id": "W7143465547",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7143465547",
+    "display_name": "CADrawer: Autoregressive CAD Generation from 3D Sketches",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "green",
+     "oa_url": "https://inria.hal.science/hal-05625659v1/document",
+     "any_repository_has_fulltext": true
+    },
+    "primary_location": {
+     "id": "doi:10.1111/cgf.70352",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1111/cgf.70352",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S67831204",
+      "display_name": "Computer Graphics Forum",
+      "issn_l": "0167-7055",
+      "issn": [
+       "0167-7055",
+       "1467-8659"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320595",
+      "host_organization_name": "Wiley",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320595"
+      ],
+      "host_organization_lineage_names": [
+       "Wiley"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer Graphics Forum",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1111/cgf.70352"
+   }
+  },
+  {
+   "id": "W7146937103",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7146937103",
+    "display_name": "Interactive CAD Reverse Modeling via Variational Curve Approximation",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/tvcg.2026.3679473",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/tvcg.2026.3679473",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S84775595",
+      "display_name": "IEEE Transactions on Visualization and Computer Graphics",
+      "issn_l": "1077-2626",
+      "issn": [
+       "1077-2626",
+       "1941-0506",
+       "2160-9306"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "doyens",
+       "cwts-core"
+      ],
+      "host_organization": "https://openalex.org/P4310319808",
+      "host_organization_name": "Institute of Electrical and Electronics Engineers",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319808"
+      ],
+      "host_organization_lineage_names": [
+       "Institute of Electrical and Electronics Engineers"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "IEEE Transactions on Visualization and Computer Graphics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1109/tvcg.2026.3679473"
+   }
+  },
+  {
+   "id": "W7164820286",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7164820286",
+    "display_name": "Mind-CAD: An interpretable multimodal framework for image-guided CAD DSL generation and editing",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.cad.2026.104126",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.cad.2026.104126",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210171473",
+      "display_name": "Computer-Aided Design",
+      "issn_l": "0010-4485",
+      "issn": [
+       "0010-4485",
+       "1879-2685"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer-Aided Design",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.cad.2026.104126"
+   }
+  },
+  {
+   "id": "W7167664818",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7167664818",
+    "display_name": "CL-JL: Cross-Level Joint Learning for Hierarchical 3D CAD Model Generation",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1007/978-981-92-2487-6_4",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1007/978-981-92-2487-6_4",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S106296714",
+      "display_name": "Lecture notes in computer science",
+      "issn_l": "0302-9743",
+      "issn": [
+       "0302-9743",
+       "1611-3349"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319900",
+      "host_organization_name": "Springer Science+Business Media",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319900",
+       "https://openalex.org/P4310319965"
+      ],
+      "host_organization_lineage_names": [
+       "Springer Science+Business Media",
+       "Springer Nature"
+      ],
+      "type": "book series"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Lecture Notes in Computer Science",
+     "raw_type": "book-chapter"
+    },
+    "doi": "https://doi.org/10.1007/978-981-92-2487-6_4"
+   }
+  },
+  {
+   "id": "W7169827574",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7169827574",
+    "display_name": "LiCoCAD: A Lightweight Model\u2013LLM Collaborative Framework for CAD Reverse Engineering From Point Clouds",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1109/tetc.2026.3707250",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1109/tetc.2026.3707250",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S2496326734",
+      "display_name": "IEEE Transactions on Emerging Topics in Computing",
+      "issn_l": "2168-6750",
+      "issn": [
+       "2168-6750",
+       "2376-4562"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310319808",
+      "host_organization_name": "Institute of Electrical and Electronics Engineers",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310319808"
+      ],
+      "host_organization_lineage_names": [
+       "Institute of Electrical and Electronics Engineers"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "IEEE Transactions on Emerging Topics in Computing",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1109/tetc.2026.3707250"
+   }
+  },
+  {
+   "id": "W7170174485",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7170174485",
+    "display_name": "A Three-Layer Runtime Constraint Verification Framework with Self-Correction for AI-Generated Parametric CAD Models",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": true,
+     "oa_status": "gold",
+     "oa_url": "https://doi.org/10.3390/app16157396",
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.3390/app16157396",
+     "is_oa": true,
+     "landing_page_url": "https://doi.org/10.3390/app16157396",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210205812",
+      "display_name": "Applied Sciences",
+      "issn_l": "2076-3417",
+      "issn": [
+       "2076-3417"
+      ],
+      "is_oa": true,
+      "is_in_doaj": true,
+      "is_core": true,
+      "host_organization": "https://openalex.org/P4310310987",
+      "host_organization_name": "Multidisciplinary Digital Publishing Institute",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310310987"
+      ],
+      "host_organization_lineage_names": [
+       "Multidisciplinary Digital Publishing Institute"
+      ],
+      "type": "journal"
+     },
+     "license": "cc-by",
+     "license_id": "https://openalex.org/licenses/cc-by",
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Applied Sciences",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.3390/app16157396"
+   }
+  },
+  {
+   "id": "W7213285790",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W7213285790",
+    "display_name": "KDH-CAD: Knowledge\u2013data hybrid CAD learning under data scarcity\u2014A case study on part classification",
+    "publication_year": 2026,
+    "cited_by_count": 0,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.cad.2026.104158",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.cad.2026.104158",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S4210171473",
+      "display_name": "Computer-Aided Design",
+      "issn_l": "0010-4485",
+      "issn": [
+       "0010-4485",
+       "1879-2685"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core"
+      ],
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Computer-Aided Design",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.cad.2026.104158"
+   }
+  },
+  {
+   "id": "W2050794345",
+   "seeds_cited": 2,
+   "work": {
+    "id": "https://openalex.org/W2050794345",
+    "display_name": "Ontology-based feature mapping and verification between CAD systems",
+    "publication_year": 2012,
+    "cited_by_count": 52,
+    "open_access": {
+     "is_oa": false,
+     "oa_status": "closed",
+     "oa_url": null,
+     "any_repository_has_fulltext": false
+    },
+    "primary_location": {
+     "id": "doi:10.1016/j.aei.2012.11.008",
+     "is_oa": false,
+     "landing_page_url": "https://doi.org/10.1016/j.aei.2012.11.008",
+     "pdf_url": null,
+     "source": {
+      "id": "https://openalex.org/S112141509",
+      "display_name": "Advanced Engineering Informatics",
+      "issn_l": "1474-0346",
+      "issn": [
+       "1474-0346",
+       "1873-5320"
+      ],
+      "is_oa": false,
+      "is_in_doaj": false,
+      "is_core": true,
+      "listed_in": [
+       "cwts-core",
+       "jufo-1",
+       "norway-1"
+      ],
+      "host_organization": "https://openalex.org/P4310320990",
+      "host_organization_name": "Elsevier BV",
+      "host_organization_lineage": [
+       "https://openalex.org/P4310320990"
+      ],
+      "host_organization_lineage_names": [
+       "Elsevier BV"
+      ],
+      "type": "journal"
+     },
+     "license": null,
+     "license_id": null,
+     "version": "publishedVersion",
+     "is_accepted": true,
+     "is_published": true,
+     "raw_source_name": "Advanced Engineering Informatics",
+     "raw_type": "journal-article"
+    },
+    "doi": "https://doi.org/10.1016/j.aei.2012.11.008"
+   }
+  }
+ ]
+}

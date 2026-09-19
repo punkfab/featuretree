@@ -1,0 +1,222 @@
+{
+  "corpus": "/home/dan/Downloads/NIST-PMI-STEP-Files/AP203 geometry only",
+  "results": [
+    {
+      "part": "nist_ctc_01_asme1_rd.stp",
+      "status": "VERIFIED",
+      "dvol_pct": 0.1,
+      "dsize_mm": 0.0,
+      "vol_orig": 14642823.6,
+      "vol_ir": 14627973.5,
+      "features": 51,
+      "method": "extrude",
+      "recovered": {
+        "pockets": 11,
+        "holes": 10,
+        "residual_lumps": 2
+      },
+      "warnings": [
+        "20 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
+        "multi-axis recovery: +11 pocket(s), +10 cross-hole(s); 2 residual lump(s) (chamfers/fillets) left uncut"
+      ],
+      "decomp": {
+        "overcut": 19035.917867375538,
+        "uncut": 4185.8908948060125,
+        "net": -14850.026972569525,
+        "total": 23221.80876218155,
+        "overlap_pct": 99.86999831150888,
+        "cancellation": 1.5637553255004923
+      },
+      "seconds": 15.7
+    },
+    {
+      "part": "nist_ctc_02_asme1_rc.stp",
+      "status": "ERROR",
+      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
+      "seconds": 66.38
+    },
+    {
+      "part": "nist_ctc_03_asme1_rc.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 41.46,
+      "dsize_mm": 132.54,
+      "vol_orig": 331938.3,
+      "vol_ir": 194306.1,
+      "features": 16,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
+        "45 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+      ],
+      "decomp": {
+        "overcut": 331725.5976998828,
+        "uncut": 194093.44836812414,
+        "net": -137632.14933175864,
+        "total": 525819.0460680069,
+        "overlap_pct": 0.06407047218213592,
+        "cancellation": 3.8204667195927753
+      },
+      "seconds": 6.12
+    },
+    {
+      "part": "nist_ctc_04_asme1_rd.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 2.43,
+      "dsize_mm": 390.0,
+      "vol_orig": 17519087.7,
+      "vol_ir": 17094067.9,
+      "features": 270,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "159 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+      ],
+      "decomp": {
+        "overcut": 10683762.923169877,
+        "uncut": 10258743.134907834,
+        "net": -425019.78826204315,
+        "total": 20942506.05807771,
+        "overlap_pct": 39.01644250094926,
+        "cancellation": 49.27419060584009
+      },
+      "seconds": 37.24
+    },
+    {
+      "part": "nist_ctc_05_asme1_rd.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 51.8,
+      "dsize_mm": 349.25,
+      "vol_orig": 12694921.7,
+      "vol_ir": 6119246.9,
+      "features": 106,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "53 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+      ],
+      "decomp": {
+        "overcut": 12443325.607832275,
+        "uncut": 5867650.7479742095,
+        "net": -6575674.859858065,
+        "total": 18310976.355806485,
+        "overlap_pct": 1.9818643045820934,
+        "cancellation": 2.7846535520768927
+      },
+      "seconds": 11.61
+    },
+    {
+      "part": "nist_ftc_06_asme1_rd.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 31.45,
+      "dsize_mm": 98.825,
+      "vol_orig": 3323546.1,
+      "vol_ir": 2278284.9,
+      "features": 41,
+      "method": "extrude",
+      "recovered": {
+        "pockets": 15,
+        "holes": 4,
+        "residual_lumps": 5
+      },
+      "warnings": [
+        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
+        "57 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
+        "multi-axis recovery: +15 pocket(s), +4 cross-hole(s); 5 residual lump(s) (chamfers/fillets) left uncut"
+      ],
+      "decomp": {
+        "overcut": 2283755.2228415883,
+        "uncut": 1238494.0230294475,
+        "net": -1045261.1998121408,
+        "total": 3522249.245871036,
+        "overlap_pct": 31.28558551001987,
+        "cancellation": 3.369731170069329
+      },
+      "seconds": 8.73
+    },
+    {
+      "part": "nist_ftc_07_asme1_rd.stp",
+      "status": "ERROR",
+      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
+      "seconds": 8.43
+    },
+    {
+      "part": "nist_ftc_08_asme1_rc.stp",
+      "status": "PARTIAL",
+      "dvol_pct": 52.55,
+      "dsize_mm": 19.558,
+      "vol_orig": 503592.2,
+      "vol_ir": 238954.1,
+      "features": 218,
+      "method": "extrude",
+      "recovered": {
+        "pockets": 14,
+        "holes": 16,
+        "residual_lumps": 3
+      },
+      "warnings": [
+        "75 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
+        "multi-axis recovery: +14 pocket(s), +16 cross-hole(s); 3 residual lump(s) (chamfers/fillets) left uncut"
+      ],
+      "decomp": {
+        "overcut": 465644.9251517388,
+        "uncut": 24962.12117169524,
+        "net": -440682.80398004357,
+        "total": 490607.04632343404,
+        "overlap_pct": 7.535313703958933,
+        "cancellation": 1.1132883831465574
+      },
+      "seconds": 48.27
+    },
+    {
+      "part": "nist_ftc_09_asme1_rd.stp",
+      "status": "VERIFIED",
+      "dvol_pct": 0.19,
+      "dsize_mm": 0.0,
+      "vol_orig": 136445.1,
+      "vol_ir": 136706.4,
+      "features": 80,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z"
+      ],
+      "decomp": {
+        "overcut": 135270.0332828985,
+        "uncut": 135531.2820619158,
+        "net": 261.2487790172745,
+        "total": 270801.3153448143,
+        "overlap_pct": 0.8612046165182863,
+        "cancellation": 1036.5649032446127
+      },
+      "seconds": 5.05
+    },
+    {
+      "part": "nist_ftc_10_asme1_rb.stp",
+      "status": "ERROR",
+      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
+      "seconds": 8.52
+    },
+    {
+      "part": "nist_ftc_11_asme1_rb.stp",
+      "status": "VERIFIED",
+      "dvol_pct": 0.0,
+      "dsize_mm": 0.0,
+      "vol_orig": 5129.4,
+      "vol_ir": 5129.4,
+      "features": 2,
+      "method": "revolve",
+      "recovered": null,
+      "warnings": [],
+      "decomp": {
+        "overcut": 0.016221171660617983,
+        "uncut": 4.3127329263370484e-08,
+        "net": -0.01622112853328872,
+        "total": 0.016221214787947247,
+        "overlap_pct": 99.99968375998162,
+        "cancellation": 1.000005317426488
+      },
+      "seconds": 1.58
+    }
+  ]
+}
