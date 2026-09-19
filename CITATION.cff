@@ -4,7 +4,8 @@ type: software
 title: "featuretree: round-trip editable feature trees from a neutral IR, for AI- and code-generated CAD"
 authors:
   - family-names: Newcome
-    given-names: Dan
+    given-names: Daniel
+    orcid: "https://orcid.org/0009-0000-6015-8713"
 version: "0.1.0"
 repository-code: "https://github.com/punkfab/featuretree"
 url: "https://github.com/punkfab/featuretree"
