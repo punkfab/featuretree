@@ -121,17 +121,33 @@ def main():
     md += [f"| {a} | {b} | {c} |" for a, b, c in NOT_RUN]
     open(os.path.join(FIG, "corpus_table.md"), "w").write("\n".join(md) + "\n")
 
+    # The HTML is the COMPACT variant for narrow pages (the blog): the Markdown above stays
+    # complete. The NIST set is implied by the CTC/FTC prefix, wall-clock is dropped, and cells
+    # are shortened so a 760 px column does not wrap part names.
     e = html.escape
+    short = {"Part": "Part", "Verdict": "Verdict", "Fails": "Fails", "Volume error": "Vol. error",
+             "Extent error": "Extent error (mm)", "IoU (%)": "IoU (%)", "Features": "Features",
+             "How recovered": "Recovered as"}
+    def cell(r, c):
+        v = r[c]
+        if c == "Fails":
+            v = {"volume + extents": "both"}.get(v, v)
+        elif c == "Extent error":
+            v = f"{float(v.split()[0]):.1f}"
+        elif c == "Volume error":
+            v = f"{float(v.rstrip('%')):.2f}%"
+        elif c == "How recovered":
+            v = (v.replace("extrude ∥", "extrude ").replace(" pockets", " pockets")
+                  .replace("+", "").replace(" cross-holes", " holes"))
+        v = e(v)
+        if c in ("Verdict", "IoU (%)") and r["Verdict"] == "VERIFIED":
+            v = f"<strong>{v}</strong>"
+        nowrap = ' style="white-space:nowrap"' if c in ("Part", "IoU (%)", "Volume error") else ""
+        return f"<td{nowrap}>{v}</td>"
     h = ['<div class="table-wrap"><table>', "<thead><tr>"
-         + "".join(f"<th>{e(c)}</th>" for c in cols) + "</tr></thead>", "<tbody>"]
+         + "".join(f"<th>{e(short[c])}</th>" for c in short) + "</tr></thead>", "<tbody>"]
     for r in rows:
-        tds = []
-        for c in cols:
-            v = e(r[c])
-            if c in ("Verdict", "IoU (%)") and r["Verdict"] == "VERIFIED":
-                v = f"<strong>{v}</strong>"
-            tds.append(f"<td>{v}</td>")
-        h.append("<tr>" + "".join(tds) + "</tr>")
+        h.append("<tr>" + "".join(cell(r, c) for c in short) + "</tr>")
     h.append("</tbody></table></div>")
     h.append('<div class="table-wrap"><table>')
     h.append("<thead><tr><th>Published by NIST, not run</th><th>NIST set</th><th>Why</th></tr></thead><tbody>")

@@ -1,17 +1,17 @@
 <div class="table-wrap"><table>
-<thead><tr><th>Part</th><th>NIST set</th><th>Verdict</th><th>Fails</th><th>Volume error</th><th>Extent error</th><th>IoU (%)</th><th>Features</th><th>How recovered</th><th>Time</th></tr></thead>
+<thead><tr><th>Part</th><th>Verdict</th><th>Fails</th><th>Vol. error</th><th>Extent error (mm)</th><th>IoU (%)</th><th>Features</th><th>Recovered as</th></tr></thead>
 <tbody>
-<tr><td>CTC-01</td><td>Combined</td><td><strong>VERIFIED</strong></td><td>—</td><td>0.14%</td><td>0.00 mm</td><td><strong>99.82 ± 0.07</strong></td><td>54</td><td>extrude ∥Z · +14 pockets, +10 cross-holes</td><td>24 s</td></tr>
-<tr><td>CTC-02</td><td>Combined</td><td>PARTIAL</td><td>volume + extents</td><td>62.19%</td><td>267.69 mm</td><td>≥ 3.9</td><td>64</td><td>extrude ∥Y · 2 regions</td><td>90 s</td></tr>
-<tr><td>CTC-03</td><td>Combined</td><td>PARTIAL</td><td>volume + extents</td><td>41.46%</td><td>132.54 mm</td><td>≥ 6.5</td><td>16</td><td>extrude ∥Y</td><td>5 s</td></tr>
-<tr><td>CTC-04</td><td>Combined</td><td>PARTIAL</td><td>volume + extents</td><td>2.43%</td><td>390.00 mm</td><td>≥ 25.0</td><td>270</td><td>extrude ∥Z</td><td>81 s</td></tr>
-<tr><td>CTC-05</td><td>Combined</td><td>PARTIAL</td><td>volume + extents</td><td>51.80%</td><td>349.25 mm</td><td>≥ 8.2</td><td>106</td><td>extrude ∥Z</td><td>11 s</td></tr>
-<tr><td>FTC-06</td><td>Fully-toleranced</td><td>PARTIAL</td><td>volume + extents</td><td>31.85%</td><td>98.83 mm</td><td>≥ 39.3</td><td>44</td><td>extrude ∥Y · +17 pockets, +5 cross-holes</td><td>12 s</td></tr>
-<tr><td>FTC-07</td><td>Fully-toleranced</td><td>PARTIAL</td><td>volume + extents</td><td>63.41%</td><td>30.25 mm</td><td>≥ 30.3</td><td>52</td><td>extrude ∥X · 2 regions</td><td>18 s</td></tr>
-<tr><td>FTC-08</td><td>Fully-toleranced</td><td>PARTIAL</td><td>volume</td><td>32.61%</td><td>0.00 mm</td><td>≥ 53.3</td><td>24</td><td>extrude ∥X · 2 regions</td><td>63 s</td></tr>
-<tr><td>FTC-09</td><td>Fully-toleranced</td><td><strong>VERIFIED</strong></td><td>—</td><td>0.19%</td><td>0.00 mm</td><td><strong>99.67 ± 0.05</strong></td><td>80</td><td>extrude ∥Y</td><td>5 s</td></tr>
-<tr><td>FTC-10</td><td>Fully-toleranced</td><td>PARTIAL</td><td>volume + extents</td><td>20.80%</td><td>18.00 mm</td><td>≥ 46.5</td><td>24</td><td>extrude ∥Z</td><td>26 s</td></tr>
-<tr><td>FTC-11</td><td>Fully-toleranced</td><td><strong>VERIFIED</strong></td><td>—</td><td>0.00%</td><td>0.00 mm</td><td><strong>100.00 ± 0.01</strong></td><td>2</td><td>revolve</td><td>3 s</td></tr>
+<tr><td style="white-space:nowrap">CTC-01</td><td><strong>VERIFIED</strong></td><td>—</td><td style="white-space:nowrap">0.14%</td><td>0.0</td><td style="white-space:nowrap"><strong>99.82 ± 0.07</strong></td><td>54</td><td>extrude Z · 14 pockets, 10 holes</td></tr>
+<tr><td style="white-space:nowrap">CTC-02</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">62.19%</td><td>267.7</td><td style="white-space:nowrap">≥ 3.9</td><td>64</td><td>extrude Y · 2 regions</td></tr>
+<tr><td style="white-space:nowrap">CTC-03</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">41.46%</td><td>132.5</td><td style="white-space:nowrap">≥ 6.5</td><td>16</td><td>extrude Y</td></tr>
+<tr><td style="white-space:nowrap">CTC-04</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">2.43%</td><td>390.0</td><td style="white-space:nowrap">≥ 25.0</td><td>270</td><td>extrude Z</td></tr>
+<tr><td style="white-space:nowrap">CTC-05</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">51.80%</td><td>349.2</td><td style="white-space:nowrap">≥ 8.2</td><td>106</td><td>extrude Z</td></tr>
+<tr><td style="white-space:nowrap">FTC-06</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">31.85%</td><td>98.8</td><td style="white-space:nowrap">≥ 39.3</td><td>44</td><td>extrude Y · 17 pockets, 5 holes</td></tr>
+<tr><td style="white-space:nowrap">FTC-07</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">63.41%</td><td>30.2</td><td style="white-space:nowrap">≥ 30.3</td><td>52</td><td>extrude X · 2 regions</td></tr>
+<tr><td style="white-space:nowrap">FTC-08</td><td>PARTIAL</td><td>volume</td><td style="white-space:nowrap">32.61%</td><td>0.0</td><td style="white-space:nowrap">≥ 53.3</td><td>24</td><td>extrude X · 2 regions</td></tr>
+<tr><td style="white-space:nowrap">FTC-09</td><td><strong>VERIFIED</strong></td><td>—</td><td style="white-space:nowrap">0.19%</td><td>0.0</td><td style="white-space:nowrap"><strong>99.67 ± 0.05</strong></td><td>80</td><td>extrude Y</td></tr>
+<tr><td style="white-space:nowrap">FTC-10</td><td>PARTIAL</td><td>both</td><td style="white-space:nowrap">20.80%</td><td>18.0</td><td style="white-space:nowrap">≥ 46.5</td><td>24</td><td>extrude Z</td></tr>
+<tr><td style="white-space:nowrap">FTC-11</td><td><strong>VERIFIED</strong></td><td>—</td><td style="white-space:nowrap">0.00%</td><td>0.0</td><td style="white-space:nowrap"><strong>100.00 ± 0.01</strong></td><td>2</td><td>revolve</td></tr>
 </tbody></table></div>
 <div class="table-wrap"><table>
 <thead><tr><th>Published by NIST, not run</th><th>NIST set</th><th>Why</th></tr></thead><tbody>

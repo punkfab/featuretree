@@ -82,7 +82,7 @@ def shade(tris, base):
     return np.clip(base[None, :] * f[:, None], 0, 1)
 
 
-def draw(ax, tris, base, title, view, frame=None):
+def draw(ax, tris, base, title, view, frame=None, fontsize=10.5):
     pc = Poly3DCollection(tris, facecolors=shade(tris, base), linewidths=0)
     ax.add_collection3d(pc)
 
@@ -91,7 +91,7 @@ def draw(ax, tris, base, title, view, frame=None):
     ax.set_box_aspect(np.maximum(hi - lo, 1e-6), zoom=1.05)
     ax.view_init(elev=view[0], azim=view[1])
     ax.set_axis_off()
-    ax.set_title(title, fontsize=10.5, pad=0, linespacing=1.35)
+    ax.set_title(title, fontsize=fontsize, pad=0, linespacing=1.35)
 
 
 ALL_PARTS = [
@@ -181,7 +181,7 @@ def main():
     per_row = 2 if args.all else 1                       # part-pairs per figure row
     nrows = -(-len(rows) // per_row)
     ncols = 2 * per_row
-    fig = plt.figure(figsize=(4.5 * ncols, (2.75 if args.all else 3.3) * nrows))
+    fig = plt.figure(figsize=(4.5 * ncols, (3.0 if args.all else 3.3) * nrows))
     for i, (label, view, orig, rec, verdict, dvol, nfeat, iou_pct, iou_ci) in enumerate(rows):
         a1 = fig.add_subplot(nrows, ncols, 2 * i + 1, projection="3d")
         a2 = fig.add_subplot(nrows, ncols, 2 * i + 2, projection="3d")
@@ -190,12 +190,17 @@ def main():
         # VERIFIED parts are effectively exact; a PARTIAL's IoU is a floor, so say so
         iou_txt = (f"IoU {iou_pct:.2f}±{iou_ci:.2f}%" if verdict == "VERIFIED"
                    else f"IoU ≥ {iou_pct:.0f}%") if iou_pct is not None else ""
-        draw(a1, orig, C_ORIG, f"{label}  ·  original STEP", view, frame)
-        draw(a2, rec, C_REC, f"{label}  ·  recovered, {nfeat} features\n"
-                             f"{verdict}  ·  Δvol {dvol}%  ·  {iou_txt}", view, frame)
+        fs = 17 if args.all else 10.5     # the gallery is shown at ~1/4 size in a blog column
+        draw(a1, orig, C_ORIG, f"{label}  ·  original" if args.all else f"{label}  ·  original STEP",
+             view, frame, fs)
+        if args.all:   # short labels: the gallery sits under the full table, which has the rest
+            title = f"{label}  ·  {nfeat} features\n{verdict}  ·  {iou_txt}"
+        else:
+            title = f"{label}  ·  recovered, {nfeat} features\n{verdict}  ·  Δvol {dvol}%  ·  {iou_txt}"
+        draw(a2, rec, C_REC, title, view, frame, fs)
 
     if args.all:
-        fig.subplots_adjust(left=0.0, right=1.0, top=0.975, bottom=0.0, wspace=0.0, hspace=0.16)
+        fig.subplots_adjust(left=0.0, right=1.0, top=0.955, bottom=0.0, wspace=0.0, hspace=0.18)
     else:
         fig.subplots_adjust(left=0.0, right=1.0, top=0.965, bottom=0.0, wspace=0.0, hspace=0.12)
     fig.savefig(out_path, dpi=150 if args.all else 170, facecolor="white")
