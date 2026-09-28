@@ -4,36 +4,55 @@
     {
       "part": "nist_ctc_01_asme1_rd.stp",
       "status": "VERIFIED",
-      "dvol_pct": 0.1,
+      "dvol_pct": 0.14,
       "dsize_mm": 0.0,
       "vol_orig": 14642823.6,
-      "vol_ir": 14627973.5,
-      "features": 51,
+      "vol_ir": 14622488.2,
+      "features": 54,
       "method": "extrude",
       "recovered": {
-        "pockets": 11,
+        "pockets": 14,
         "holes": 10,
         "residual_lumps": 2
       },
       "warnings": [
         "20 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
-        "multi-axis recovery: +11 pocket(s), +10 cross-hole(s); 2 residual lump(s) (chamfers/fillets) left uncut"
+        "multi-axis recovery: +14 pocket(s), +10 cross-hole(s); 2 residual lump(s) (chamfers/fillets) left uncut"
       ],
       "decomp": {
-        "overcut": 19035.917867375538,
-        "uncut": 4185.8908948060125,
-        "net": -14850.026972569525,
-        "total": 23221.80876218155,
-        "overlap_pct": 99.86999831150888,
-        "cancellation": 1.5637553255004923
+        "overcut": 20397.03871867992,
+        "uncut": 61.64112110435963,
+        "net": -20335.39759757556,
+        "total": 20458.67983978428,
+        "overlap_pct": 99.86070283071604,
+        "cancellation": 1.0060624456255243
       },
-      "seconds": 15.7
+      "seconds": 24.46
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
-      "status": "ERROR",
-      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
-      "seconds": 66.38
+      "status": "PARTIAL",
+      "dvol_pct": 62.19,
+      "dsize_mm": 267.692,
+      "vol_orig": 47100535.5,
+      "vol_ir": 17808401.8,
+      "features": 64,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
+        "303 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
+        "cross-section is 2 disjoint region(s) -> one pad each"
+      ],
+      "decomp": {
+        "overcut": 46744662.38284435,
+        "uncut": 8548551.191826075,
+        "net": -38196111.191018276,
+        "total": 55293213.57467043,
+        "overlap_pct": 0.7555606454221128,
+        "cancellation": 1.4476136928743808
+      },
+      "seconds": 89.98
     },
     {
       "part": "nist_ctc_03_asme1_rc.stp",
@@ -57,7 +76,7 @@
         "overlap_pct": 0.06407047218213592,
         "cancellation": 3.8204667195927753
       },
-      "seconds": 6.12
+      "seconds": 5.11
     },
     {
       "part": "nist_ctc_04_asme1_rd.stp",
@@ -80,7 +99,7 @@
         "overlap_pct": 39.01644250094926,
         "cancellation": 49.27419060584009
       },
-      "seconds": 37.24
+      "seconds": 81.45
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
@@ -103,70 +122,86 @@
         "overlap_pct": 1.9818643045820934,
         "cancellation": 2.7846535520768927
       },
-      "seconds": 11.61
+      "seconds": 11.13
     },
     {
       "part": "nist_ftc_06_asme1_rd.stp",
       "status": "PARTIAL",
-      "dvol_pct": 31.45,
+      "dvol_pct": 31.85,
       "dsize_mm": 98.825,
       "vol_orig": 3323546.1,
-      "vol_ir": 2278284.9,
-      "features": 41,
+      "vol_ir": 2265026.1,
+      "features": 44,
       "method": "extrude",
       "recovered": {
-        "pockets": 15,
-        "holes": 4,
-        "residual_lumps": 5
+        "pockets": 17,
+        "holes": 5,
+        "residual_lumps": 4
       },
       "warnings": [
         "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
         "57 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
-        "multi-axis recovery: +15 pocket(s), +4 cross-hole(s); 5 residual lump(s) (chamfers/fillets) left uncut"
+        "multi-axis recovery: +17 pocket(s), +5 cross-hole(s); 4 residual lump(s) (chamfers/fillets) left uncut"
       ],
       "decomp": {
-        "overcut": 2283755.2228415883,
-        "uncut": 1238494.0230294475,
-        "net": -1045261.1998121408,
-        "total": 3522249.245871036,
-        "overlap_pct": 31.28558551001987,
-        "cancellation": 3.369731170069329
+        "overcut": 2283755.222823533,
+        "uncut": 1225235.257959282,
+        "net": -1058519.9648642512,
+        "total": 3508990.4807828153,
+        "overlap_pct": 31.28558551056311,
+        "cancellation": 3.3149969743204815
       },
-      "seconds": 8.73
+      "seconds": 11.52
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
-      "status": "ERROR",
-      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
-      "seconds": 8.43
+      "status": "PARTIAL",
+      "dvol_pct": 63.41,
+      "dsize_mm": 30.245,
+      "vol_orig": 1726247.6,
+      "vol_ir": 631554.1,
+      "features": 52,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "extrude axis (1.0, 0.0, 0.0) -> rotated onto Z",
+        "152 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
+        "cross-section is 2 disjoint region(s) -> one pad each"
+      ],
+      "decomp": {
+        "overcut": 1603412.4665915729,
+        "uncut": 192941.9417822417,
+        "net": -1410470.5248093312,
+        "total": 1796354.4083738145,
+        "overlap_pct": 7.115729751662279,
+        "cancellation": 1.2735852162643722
+      },
+      "seconds": 17.72
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
       "status": "PARTIAL",
-      "dvol_pct": 52.55,
-      "dsize_mm": 19.558,
+      "dvol_pct": 32.61,
+      "dsize_mm": 0.0,
       "vol_orig": 503592.2,
-      "vol_ir": 238954.1,
-      "features": 218,
+      "vol_ir": 339390.5,
+      "features": 24,
       "method": "extrude",
-      "recovered": {
-        "pockets": 14,
-        "holes": 16,
-        "residual_lumps": 3
-      },
+      "recovered": null,
       "warnings": [
-        "75 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
-        "multi-axis recovery: +14 pocket(s), +16 cross-hole(s); 3 residual lump(s) (chamfers/fillets) left uncut"
+        "extrude axis (1.0, 0.0, 0.0) -> rotated onto Z",
+        "176 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
+        "cross-section is 2 disjoint region(s) -> one pad each"
       ],
       "decomp": {
-        "overcut": 465644.9251517388,
-        "uncut": 24962.12117169524,
-        "net": -440682.80398004357,
-        "total": 490607.04632343404,
-        "overlap_pct": 7.535313703958933,
-        "cancellation": 1.1132883831465574
+        "overcut": 498722.2486443758,
+        "uncut": 164825.3082364088,
+        "net": -333896.940407967,
+        "total": 663547.5568807847,
+        "overlap_pct": 0.967037803040008,
+        "cancellation": 1.9872825311607796
       },
-      "seconds": 48.27
+      "seconds": 62.65
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
@@ -189,13 +224,30 @@
         "overlap_pct": 0.8612046165182863,
         "cancellation": 1036.5649032446127
       },
-      "seconds": 5.05
+      "seconds": 5.3
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
-      "status": "ERROR",
-      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
-      "seconds": 8.52
+      "status": "PARTIAL",
+      "dvol_pct": 20.8,
+      "dsize_mm": 18.0,
+      "vol_orig": 188318.1,
+      "vol_ir": 149147.4,
+      "features": 24,
+      "method": "extrude",
+      "recovered": null,
+      "warnings": [
+        "105 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+      ],
+      "decomp": {
+        "overcut": 81739.63307703548,
+        "uncut": 42568.96851799777,
+        "net": -39170.664559037716,
+        "total": 124308.60159503325,
+        "overlap_pct": 56.59490642090769,
+        "cancellation": 3.173512703816304
+      },
+      "seconds": 26.31
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",
@@ -216,7 +268,7 @@
         "overlap_pct": 99.99968375998162,
         "cancellation": 1.000005317426488
       },
-      "seconds": 1.58
+      "seconds": 2.94
     }
   ]
 }

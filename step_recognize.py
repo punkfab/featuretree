@@ -45,6 +45,14 @@ import b3d_emit
 
 EPS = 1e-3
 ANG = 1e-2           # direction tolerance: |dot|<ANG == perpendicular, >1-ANG == parallel
+MAX_REGIONS = 8      # cap on disjoint cross-section regions emitted as separate pads
+
+# Fraction of faces allowed to be NON-conforming before an axis is dropped as an extrude candidate.
+# This is a RECALL knob, not a correctness knob: verification (_verify) is downstream and independent,
+# so loosening it can only turn a refusal into a PARTIAL or VERIFIED — it cannot manufacture a false
+# accept. Threaded / heavily-filleted parts (NIST FTC-07, FTC-10) carry so much torus/cone/sphere area
+# that a tight gate rejects them before the profile is ever examined.
+AXIS_BAD_FRAC = 0.75
 VOL_TOL = 0.005      # 0.5% volume agreement -> "verified"
 DIM_TOL = 0.05       # mm bbox-size agreement
 RECOVER_PASSES = 4   # multi-axis residual-carve passes (each re-decomposes what's left)
@@ -107,7 +115,7 @@ def _extrude_axes(solid):
             continue
         seen.append(a.normalized())
         scored.append((a.normalized(), _extrude_nonconforming(solid, a)))
-    lim = 0.4 * len(faces)
+    lim = AXIS_BAD_FRAC * len(faces)
     return sorted([(a, b) for a, b in scored if b <= lim], key=lambda t: t[1])
 
 
@@ -500,22 +508,42 @@ def _extrude_along(orig, name, axis, n_bad):
     # fragmented ends (a plate whose bottom is broken into islands still yields one clean outline).
     # Sample a few heights (not just one fraction) so the section doesn't land exactly on a feature
     # plane (a pocket floor) and fragment; take the first height giving one clean region.
-    sec = None
-    for frac in (0.4, 0.27, 0.6, 0.5, 0.72, 0.33):
+    FRACS = (0.4, 0.27, 0.6, 0.5, 0.72, 0.33)
+    secs = None
+    for frac in FRACS:
         zc = base_z + frac * thick
         faces = solid.intersect(Plane.XY.offset(zc) * Rectangle(bb.size.X + 50, bb.size.Y + 50)).faces()
         if len(faces) == 1:
-            sec = faces[0]
+            secs = [faces[0]]
             break
-    if sec is None:
-        raise ValueError("cross-section is disjoint at every sampled height — not one extruded profile")
-    outer = sec.outer_wire()
-    outline = _classify_wire(outer, warnings)
-    if outline is None:
-        raise ValueError("outline not recognizable (lines + circular arcs only; has splines/ellipses)")
 
-    feats = [_sketch_from_outline("outline", outline),
-             IR.pad("body", "outline", length=round(thick, 4))]
+    # MULTI-REGION FALLBACK. A section that is disjoint at every height is not a failure — it is a
+    # part made of several parallel prisms (two bosses on a common axis, a forked bracket). Each
+    # region is its own profile, so emit a sketch+pad per region rather than refusing. Only reached
+    # when NO height gives a single region, so the single-profile path above is unchanged. Require
+    # every region to classify: one freeform lobe still means this axis is the wrong story.
+    if secs is None:
+        for frac in FRACS:
+            zc = base_z + frac * thick
+            faces = solid.intersect(Plane.XY.offset(zc) * Rectangle(bb.size.X + 50, bb.size.Y + 50)).faces()
+            if not (1 < len(faces) <= MAX_REGIONS):
+                continue
+            if all(_classify_wire(f.outer_wire(), []) is not None for f in faces):
+                secs = sorted(faces, key=lambda f: -f.area)
+                warnings.append(f"cross-section is {len(secs)} disjoint region(s) -> one pad each")
+                break
+    if secs is None:
+        raise ValueError("cross-section is disjoint at every sampled height — not one extruded profile")
+
+    # The largest region keeps the name 'body' so face-attached sketches (blind holes) still resolve.
+    feats = []
+    for i, sc in enumerate(secs):
+        outline = _classify_wire(sc.outer_wire(), warnings)
+        if outline is None:
+            raise ValueError("outline not recognizable (lines + circular arcs only; has splines/ellipses)")
+        sk = "outline" if i == 0 else f"outline{i}"
+        feats.append(_sketch_from_outline(sk, outline))
+        feats.append(IR.pad("body" if i == 0 else f"body{i}", sk, length=round(thick, 4)))
 
     # 2a. THROUGH holes = the section's INNER wires that are ACTUALLY through — present near BOTH end
     # faces (a blind pocket whose floor is below the section shows up here too, but only near one face;
@@ -526,15 +554,16 @@ def _extrude_along(orig, name, axis, n_bad):
     def _sig(e):
         return (round(e.arc_center.X, 2), round(e.arc_center.Y, 2), round(e.radius, 2))
     thru_at = _through_centroids(solid, base_z, top_z, bb)
-    captured = {_sig(e) for e in outer.edges().filter_by(GeomType.CIRCLE)}
+    captured = {_sig(e) for sc in secs for e in sc.outer_wire().edges().filter_by(GeomType.CIRCLE)}
     thru_circ, thru_poly = [], []
-    for w in sec.inner_wires():
-        cl = _classify_wire(w, warnings)
-        if cl is None or _wire_xy(w) not in thru_at:
-            continue                          # blind / stepped -> recovery handles it (don't over-cut)
-        captured.update(_sig(e) for e in w.edges().filter_by(GeomType.CIRCLE))
-        (thru_circ if cl[0] == "circle" else thru_poly).append(
-            (cl[1], cl[2], cl[3]) if cl[0] == "circle" else cl[1])
+    for sc in secs:
+        for w in sc.inner_wires():
+            cl = _classify_wire(w, warnings)
+            if cl is None or _wire_xy(w) not in thru_at:
+                continue                      # blind / stepped -> recovery handles it (don't over-cut)
+            captured.update(_sig(e) for e in w.edges().filter_by(GeomType.CIRCLE))
+            (thru_circ if cl[0] == "circle" else thru_poly).append(
+                (cl[1], cl[2], cl[3]) if cl[0] == "circle" else cl[1])
     if thru_circ:
         feats.append(IR.sketch("holes", "XY", circles=thru_circ))
         feats.append(IR.pocket("drill", "holes", through=True))
@@ -557,7 +586,7 @@ def _extrude_along(orig, name, axis, n_bad):
         feats.append(IR.pocket(f"blind{i}", f"blind_sk{i}", through=False, length=round(h["depth"], 4)))
 
     spec = IR.part(name, *feats)
-    return spec, {"method": "extrude", "axis": axis, "warnings": warnings,
+    return spec, {"method": "extrude", "axis": axis, "warnings": warnings, "regions": len(secs),
                   "through_holes": len(thru_circ) + len(thru_poly), "blind_holes": len(blind)}
 
 

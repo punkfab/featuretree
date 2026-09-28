@@ -4,8 +4,8 @@
     {
       "part": "nist_ctc_01_asme1_rd.stp",
       "status": "VERIFIED",
-      "dvol_pct": 0.1,
-      "features": 51,
+      "dvol_pct": 0.14,
+      "features": 54,
       "axis": [
         0.0,
         0.0,
@@ -14,29 +14,37 @@
       "method": "extrude",
       "n_orientations_matching_bbox": 8,
       "best": {
-        "iou": 0.9984145699609069,
+        "iou": 0.9986028245415819,
         "rot": [
           0,
           0,
           0
         ],
-        "vol_rec": 14627973.530411853,
-        "union": 14647009.448279228,
-        "inter": 14623787.639517047,
-        "overcut": 19035.917867375538,
-        "uncut": 4185.8908948060125,
-        "symdiff": 23221.80876218155,
-        "symdiff_pct": 0.15858832602316456,
-        "iou_pct": 99.8414569960907
+        "vol_rec": 14622488.159786846,
+        "union": 14642885.198505526,
+        "inter": 14622426.51866574,
+        "overcut": 20397.03871867992,
+        "uncut": 61.64112110435963,
+        "symdiff": 20458.67983978428,
+        "symdiff_pct": 0.13971813400337602,
+        "iou_pct": 99.8602824541582
       },
       "vol_orig": 14642823.557384422,
-      "seconds": 12.9
+      "seconds": 19.27
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
-      "status": "ERROR",
-      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
-      "seconds": 57.2
+      "status": "PARTIAL",
+      "dvol_pct": 62.19,
+      "features": 64,
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 72.25
     },
     {
       "part": "nist_ctc_03_asme1_rc.stp",
@@ -50,7 +58,7 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 3.62
+      "seconds": 3.72
     },
     {
       "part": "nist_ctc_04_asme1_rd.stp",
@@ -64,7 +72,7 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 26.91
+      "seconds": 54.36
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
@@ -78,13 +86,13 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 8.52
+      "seconds": 8.58
     },
     {
       "part": "nist_ftc_06_asme1_rd.stp",
       "status": "PARTIAL",
-      "dvol_pct": 31.45,
-      "features": 41,
+      "dvol_pct": 31.85,
+      "features": 44,
       "axis": [
         0.0,
         1.0,
@@ -92,27 +100,35 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 6.91
+      "seconds": 8.41
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
-      "status": "ERROR",
-      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
-      "seconds": 7.17
+      "status": "PARTIAL",
+      "dvol_pct": 63.41,
+      "features": 52,
+      "axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 13.83
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
       "status": "PARTIAL",
-      "dvol_pct": 52.55,
-      "features": 218,
+      "dvol_pct": 32.61,
+      "features": 24,
       "axis": [
+        1.0,
         0.0,
-        0.0,
-        1.0
+        0.0
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 37.16
+      "seconds": 44.76
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
@@ -143,13 +159,21 @@
         "iou_pct": 99.68387930093449
       },
       "vol_orig": 136445.10482466174,
-      "seconds": 9.68
+      "seconds": 9.9
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
-      "status": "ERROR",
-      "error": "ValueError: neither a recognizable extrude nor a body of revolution",
-      "seconds": 7.53
+      "status": "PARTIAL",
+      "dvol_pct": 20.8,
+      "features": 24,
+      "axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "method": "extrude",
+      "n_orientations_matching_bbox": 0,
+      "seconds": 18.89
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",
@@ -180,7 +204,7 @@
         "iou_pct": 99.9996837608224
       },
       "vol_orig": 5129.38613642268,
-      "seconds": 2.86
+      "seconds": 3.72
     }
   ]
 }
