@@ -1,6 +1,6 @@
 # featuretree
 
-[![Paper](https://img.shields.io/badge/paper-10.5281%2Fzenodo.22848793-blue)](https://doi.org/10.5281/zenodo.22848793)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22848721.svg)](https://doi.org/10.5281/zenodo.22848721)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Paper](https://img.shields.io/badge/paper-10.5281%2Fzenodo.22848792-blue)](https://doi.org/10.5281/zenodo.22848792)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22848721.svg)](https://doi.org/10.5281/zenodo.22848721)  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Emit an editable feature tree — in FreeCAD *and* Onshape — from a small neutral feature-IR, round-trip human edits back by name, and render the same IR to a build123d solid.**
 
@@ -360,8 +360,13 @@ run `gen.py` / `roundtrip.py` directly), and make sure the FreeCAD AppImage is l
 The method, the NIST evaluation, and an honest account of what it *doesn't* do are written up in:
 
 > **featuretree: Verified Recovery of Editable CAD Feature Trees from STEP, for Open CAD Systems.**
-> Dan Newcome, 2026. Preprint. [`10.5281/zenodo.22848793`](https://doi.org/10.5281/zenodo.22848793)
-> · [PDF](https://doi.org/10.5281/zenodo.22848793) · [source](paper/main.tex)
+> Dan Newcome, 2026. Preprint, v2. [`10.5281/zenodo.22848792`](https://doi.org/10.5281/zenodo.22848792)
+> · [PDF](https://doi.org/10.5281/zenodo.22848792) · [source](paper/main.tex)
+
+The DOI above is the **version-independent concept DOI** and always resolves to the newest version
+(currently v2, `10.5281/zenodo.23024833`; v1 was `10.5281/zenodo.22848793`). v2 reports
+3 VERIFIED / 8 PARTIAL / 0 REFUSED on the NIST corpus and corrects two numbers from v1 — see the
+record's changelog.
 
 The paper makes **no novelty claim** about feature recognition — the technique dates to the 1990s and
 is shipped in several commercial kernels. What it contributes is an *open, verified* implementation,
@@ -382,7 +387,7 @@ If featuretree is useful in your research or product, please cite it (GitHub als
                from {STEP}, for Open {CAD} Systems},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.22848793},
+  doi       = {10.5281/zenodo.22848792},
   note      = {Preprint}
 }
 ```
