@@ -17,6 +17,12 @@ the bbox min corner and compute IoU via the union (inclusion-exclusion):
 Direct OCCT difference/intersection is unreliable on these operands, so
 everything is derived from the union. Report the best-IoU orientation.
 
+CAVEAT on the fallback path. When the prefilter matches nothing (every PARTIAL, whose bbox is wrong
+by construction) we score all 24 orientations under the SAME bbox-min-corner alignment. That is one
+particular registration, not an optimal one, so the IoU reported for a PARTIAL is a LOWER BOUND:
+the true best-aligned overlap can only be higher. It is still the right number for the paper, since
+it cannot flatter the recogniser.
+
 WHY IoU. (1) It is the metric the CAD-program-inference literature reports
 (CSGNet, InverseCSG, BSP-Net, CAPRI-Net), so it makes this work comparable.
 (2) Unlike a scalar volume difference, it is two-sided: over-cut and uncut
@@ -75,19 +81,53 @@ try:
             cands.append((rx, ry, rz, r))
 
     res["n_orientations_matching_bbox"] = len(cands)
+
+    # A PARTIAL reconstruction has the WRONG bounding box by construction (material is missing or
+    # over-cut), so the cheap extent prefilter rejects all 24 orientations and leaves the part with
+    # no IoU at all -- which is exactly the case we most want a number for. Fall back to scoring
+    # every orientation. Costs 24 unions instead of ~8, and only on parts the prefilter emptied.
+    res["prefilter_empty"] = not cands
+    if not cands:
+        cands = [(rx, ry, rz, Rot(rx, ry, rz) * rec0)
+                 for rx, ry, rz in itertools.product((0, 90, 180, 270), repeat=3)]
+    # OCCT will occasionally throw (or hard-crash) on a union for one particular orientation of a
+    # malformed PARTIAL solid. Score each orientation independently so a single bad boolean costs
+    # that orientation, not the whole part -- which is how FTC-06 and FTC-10 were lost previously.
     best = None
+    n_failed = 0
     for rx, ry, rz, r in cands:
-        br = r.bounding_box()
-        r2 = Pos(bo.min.X - br.min.X, bo.min.Y - br.min.Y, bo.min.Z - br.min.Z) * r
-        B = r2.volume
-        u = orig + r2
-        U = sum(s.volume for s in u.solids()) if u.solids() else u.volume
-        inter = A + B - U
-        iou = inter / U if U else 0.0
+        try:
+            br = r.bounding_box()
+            r2 = Pos(bo.min.X - br.min.X, bo.min.Y - br.min.Y, bo.min.Z - br.min.Z) * r
+            B = r2.volume
+            u = orig + r2
+            U = sum(s.volume for s in u.solids()) if u.solids() else u.volume
+            # SANITY GATE on the boolean. A sound union contains BOTH operands, so U >= max(A, B)
+            # and IoU lands in [0, 1]. OCCT sometimes returns a degenerate union whose volume is far
+            # too small, which drives inter = A + B - U wildly positive -- FTC-10 scored an
+            # impossible IoU of 501x this way. Treat any violation as a failed orientation, not data.
+            if not U or B <= 0 or U < max(A, B) * (1 - 1e-6):
+                n_failed += 1
+                continue
+            inter = A + B - U
+            iou = inter / U
+            if not (0.0 <= iou <= 1.0 + 1e-9):
+                n_failed += 1
+                continue
+        except Exception:
+            n_failed += 1
+            continue
         if best is None or iou > best["iou"]:
             best = {"iou": iou, "rot": [rx, ry, rz], "vol_rec": B,
                     "union": U, "inter": inter,
                     "overcut": U - B, "uncut": U - A, "symdiff": (U - B) + (U - A)}
+            # Checkpoint. A bad orientation can take OCCT down with a HARD crash, which no
+            # try/except can catch, so stream the best-so-far: the parent falls back to the last
+            # checkpoint and the part survives with a (still valid) lower bound.
+            ck = dict(best); ck["symdiff_pct"] = 100.0*ck["symdiff"]/A; ck["iou_pct"] = 100.0*ck["iou"]
+            print("@@BEST@@" + json.dumps({**res, "best": ck, "vol_orig": A,
+                                           "checkpoint": True}), flush=True)
+    res["n_orientations_failed"] = n_failed
     if best:
         best["symdiff_pct"] = 100.0 * best["symdiff"] / A
         best["iou_pct"] = 100.0 * best["iou"]
@@ -114,10 +154,14 @@ def main() -> None:
         try:
             p = subprocess.run([sys.executable, "-c", WORKER, f],
                                capture_output=True, text=True, timeout=args.timeout)
+            lines = p.stdout.splitlines()
             row = next((json.loads(l[len("@@JSON@@"):])
-                        for l in p.stdout.splitlines() if l.startswith("@@JSON@@")),
-                       {"part": os.path.basename(f), "status": "ERROR",
-                        "error": (p.stderr.strip().splitlines() or ["no output"])[-1][:200]})
+                        for l in lines if l.startswith("@@JSON@@")), None)
+            if row is None:   # worker died mid-sweep -- keep the last checkpoint if there is one
+                cks = [l for l in lines if l.startswith("@@BEST@@")]
+                row = json.loads(cks[-1][len("@@BEST@@"):]) if cks else {
+                    "part": os.path.basename(f), "status": "ERROR",
+                    "error": (p.stderr.strip().splitlines() or ["no output"])[-1][:200]}
         except subprocess.TimeoutExpired:
             row = {"part": os.path.basename(f), "status": "TIMEOUT"}
         rows.append(row)
@@ -126,7 +170,8 @@ def main() -> None:
               f"dvol={str(row.get('dvol_pct','--')):>7}  "
               f"IoU={(f'{b[chr(105)+chr(111)+chr(117)+chr(95)+chr(112)+chr(99)+chr(116)]:.2f}%' if b.get('iou_pct') is not None else '--'):>9}  "
               f"symdiff={(f'{b[chr(115)+chr(121)+chr(109)+chr(100)+chr(105)+chr(102)+chr(102)+chr(95)+chr(112)+chr(99)+chr(116)]:.2f}%' if b.get('symdiff_pct') is not None else '--'):>9}  "
-              f"rot={b.get('rot','--')!s:<16} nfit={row.get('n_orientations_matching_bbox','--')}")
+              f"rot={b.get('rot','--')!s:<16} nfit={row.get('n_orientations_matching_bbox','--')}"
+              f"{'  (lower bound)' if row.get('prefilter_empty') else ''}")
 
     with open(OUT_JSON, "w") as fh:
         json.dump({"corpus": args.corpus, "results": rows}, fh, indent=2)

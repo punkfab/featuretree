@@ -13,6 +13,8 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 8,
+      "prefilter_empty": false,
+      "n_orientations_failed": 0,
       "best": {
         "iou": 0.9986028245415819,
         "rot": [
@@ -30,7 +32,7 @@
         "iou_pct": 99.8602824541582
       },
       "vol_orig": 14642823.557384422,
-      "seconds": 19.27
+      "seconds": 18.62
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
@@ -44,7 +46,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 72.25
+      "prefilter_empty": true,
+      "n_orientations_failed": 8,
+      "best": {
+        "iou": 0.03794565038827445,
+        "rot": [
+          90,
+          90,
+          270
+        ],
+        "vol_rec": 8904424.301792827,
+        "union": 53957507.09457052,
+        "inter": 2047452.7000334114,
+        "overcut": 45053082.79277769,
+        "uncut": 6856971.601759411,
+        "symdiff": 51910054.3945371,
+        "symdiff_pct": 110.21117669131397,
+        "iou_pct": 3.7945650388274452
+      },
+      "vol_orig": 47100535.492811106,
+      "seconds": 83.36
     },
     {
       "part": "nist_ctc_03_asme1_rc.stp",
@@ -58,7 +79,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 3.72
+      "prefilter_empty": true,
+      "n_orientations_failed": 0,
+      "best": {
+        "iou": 0.5853682417218046,
+        "rot": [
+          0,
+          90,
+          0
+        ],
+        "vol_rec": 194306.12278642366,
+        "union": 331938.2721663914,
+        "inter": 194306.12273821438,
+        "overcut": 137632.14937996777,
+        "uncut": 4.820933099836111e-05,
+        "symdiff": 137632.1494281771,
+        "symdiff_pct": 41.4631758338415,
+        "iou_pct": 58.53682417218046
+      },
+      "vol_orig": 331938.2721181821,
+      "seconds": 6.35
     },
     {
       "part": "nist_ctc_04_asme1_rd.stp",
@@ -72,7 +112,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 54.36
+      "prefilter_empty": true,
+      "n_orientations_failed": 0,
+      "best": {
+        "iou": 0.2516833036903901,
+        "rot": [
+          180,
+          180,
+          90
+        ],
+        "vol_rec": 17094067.915560707,
+        "union": 27653285.393623166,
+        "inter": 6959870.225760289,
+        "overcut": 10559217.478062458,
+        "uncut": 10134197.689800419,
+        "symdiff": 20693415.167862877,
+        "symdiff_pct": 118.1192509433438,
+        "iou_pct": 25.168330369039012
+      },
+      "vol_orig": 17519087.703822747,
+      "seconds": 66.98
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
@@ -86,7 +145,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 8.58
+      "prefilter_empty": true,
+      "n_orientations_failed": 0,
+      "best": {
+        "iou": 0.11419057254919315,
+        "rot": [
+          90,
+          180,
+          0
+        ],
+        "vol_rec": 6119246.870237612,
+        "union": 16885952.065890968,
+        "inter": 1928216.5344423205,
+        "overcut": 10766705.195653357,
+        "uncut": 4191030.335795291,
+        "symdiff": 14957735.531448647,
+        "symdiff_pct": 117.82455890207302,
+        "iou_pct": 11.419057254919315
+      },
+      "vol_orig": 12694921.730095677,
+      "seconds": 14.04
     },
     {
       "part": "nist_ftc_06_asme1_rd.stp",
@@ -100,7 +178,25 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 8.41
+      "prefilter_empty": true,
+      "best": {
+        "iou": 0.22858668571018467,
+        "rot": [
+          0,
+          0,
+          0
+        ],
+        "vol_rec": 2265026.1059162878,
+        "union": 4548781.328739821,
+        "inter": 1039790.8479570057,
+        "overcut": 2283755.222823533,
+        "uncut": 1225235.257959282,
+        "symdiff": 3508990.4807828153,
+        "symdiff_pct": 105.57971534177423,
+        "iou_pct": 22.858668571018466
+      },
+      "vol_orig": 3323546.070780539,
+      "checkpoint": true
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
@@ -114,7 +210,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 13.83
+      "prefilter_empty": true,
+      "n_orientations_failed": 0,
+      "best": {
+        "iou": 0.1536973291983905,
+        "rot": [
+          90,
+          90,
+          270
+        ],
+        "vol_rec": 315777.05436058517,
+        "union": 1769982.9772071475,
+        "inter": 272041.6563233542,
+        "overcut": 1454205.9228465622,
+        "uncut": 43735.39803723106,
+        "symdiff": 1497941.3208837933,
+        "symdiff_pct": 86.77441978537594,
+        "iou_pct": 15.369732919839048
+      },
+      "vol_orig": 1726247.5791699165,
+      "seconds": 19.76
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
@@ -128,7 +243,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 44.76
+      "prefilter_empty": true,
+      "n_orientations_failed": 6,
+      "best": {
+        "iou": 0.2792807353842152,
+        "rot": [
+          90,
+          270,
+          270
+        ],
+        "vol_rec": 169695.2349452257,
+        "union": 526301.5315369425,
+        "inter": 146985.87876147602,
+        "overcut": 356606.29659171676,
+        "uncut": 22709.35618374968,
+        "symdiff": 379315.65277546644,
+        "symdiff_pct": 75.32199095616103,
+        "iou_pct": 27.928073538421522
+      },
+      "vol_orig": 503592.1753531928,
+      "seconds": 54.32
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
@@ -142,6 +276,8 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 8,
+      "prefilter_empty": false,
+      "n_orientations_failed": 0,
       "best": {
         "iou": 0.9968387930093449,
         "rot": [
@@ -159,7 +295,7 @@
         "iou_pct": 99.68387930093449
       },
       "vol_orig": 136445.10482466174,
-      "seconds": 9.9
+      "seconds": 9.98
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
@@ -173,7 +309,26 @@
       ],
       "method": "extrude",
       "n_orientations_matching_bbox": 0,
-      "seconds": 18.89
+      "prefilter_empty": true,
+      "n_orientations_failed": 11,
+      "best": {
+        "iou": 0.7434634805200587,
+        "rot": [
+          180,
+          180,
+          270
+        ],
+        "vol_rec": 149147.40213995543,
+        "union": 193560.38862270053,
+        "inter": 143905.0802162481,
+        "overcut": 44412.986482745095,
+        "uncut": 5242.321923707321,
+        "symdiff": 49655.308406452416,
+        "symdiff_pct": 26.36778790099903,
+        "iou_pct": 74.34634805200588
+      },
+      "vol_orig": 188318.0666989932,
+      "seconds": 47.61
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",
@@ -187,6 +342,8 @@
       ],
       "method": "revolve",
       "n_orientations_matching_bbox": 16,
+      "prefilter_empty": false,
+      "n_orientations_failed": 8,
       "best": {
         "iou": 0.9999968376082241,
         "rot": [
@@ -204,7 +361,7 @@
         "iou_pct": 99.9996837608224
       },
       "vol_orig": 5129.38613642268,
-      "seconds": 3.72
+      "seconds": 3.74
     }
   ]
 }
