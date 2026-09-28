@@ -8,8 +8,9 @@ IMPLAUSIBLE. It cannot catch a degenerate union that is wrong but plausible, and
 that happened: FTC-10 was published at IoU 74.35% for a registration whose
 bounding boxes overlap too little to allow more than ~27%.
 
-This script uses only point-in-solid classification (BRepClass3d_SolidClassifier):
-no booleans anywhere. Points are drawn uniformly in the union of the two
+The measurement itself lives in the library module iou_check.py (tested in
+tests/test_iou_check.py); this script only runs it over the corpus. It uses only
+point-in-solid classification (BRepClass3d_SolidClassifier): no Booleans anywhere. Points are drawn uniformly in the union of the two
 bounding boxes; IoU = #(in A and in B) / #(in A or in B), and the box volume
 cancels. The estimate carries a binomial confidence interval.
 
@@ -37,69 +38,27 @@ IOU_IN = os.path.join("paper", "figures", "iou_results.json")
 OUT = os.path.join("paper", "figures", "iou_mc_results.json")
 
 WORKER = r'''
-import itertools, json, math, os, sys
-import numpy as np
+import json, os, sys
 sys.path.insert(0, os.getcwd())
-from OCP.BRepClass3d import BRepClass3d_SolidClassifier
-from OCP.gp import gp_Pnt
-from OCP.TopAbs import TopAbs_IN
-import b3d_emit, step_recognize as sr
-from build123d import Compound, Pos, Rot, import_step
+import b3d_emit, iou_check, step_recognize as sr
+from build123d import import_step
 
 path, harness_rot, n_coarse, n_fine = sys.argv[1], json.loads(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
-
-def whole(o):
-    s = o.solids() if hasattr(o, "solids") else []
-    return (s[0] if len(s) == 1 else Compound(list(s))) if s else o
-
-def inside(shape, pts):
-    clfs = [BRepClass3d_SolidClassifier(s.wrapped) for s in shape.solids()]
-    out = np.zeros(len(pts), dtype=bool)
-    for i, (x, y, z) in enumerate(pts):
-        p = gp_Pnt(float(x), float(y), float(z))
-        for c in clfs:
-            c.Perform(p, 1e-6)
-            if c.State() == TopAbs_IN:
-                out[i] = True
-                break
-    return out
-
-def register(rec, orig, rot):
-    r = Rot(*rot) * rec
-    bo, br = orig.bounding_box(), r.bounding_box()
-    return Pos(bo.min.X - br.min.X, bo.min.Y - br.min.Y, bo.min.Z - br.min.Z) * r
-
-def mc_iou(orig, reg, n, seed):
-    bo, br = orig.bounding_box(), reg.bounding_box()
-    lo = np.minimum([bo.min.X, bo.min.Y, bo.min.Z], [br.min.X, br.min.Y, br.min.Z])
-    hi = np.maximum([bo.max.X, bo.max.Y, bo.max.Z], [br.max.X, br.max.Y, br.max.Z])
-    pts = np.random.default_rng(seed).uniform(lo, hi, size=(n, 3))
-    a, b = inside(orig, pts), inside(reg, pts)
-    u, i = int((a | b).sum()), int((a & b).sum())
-    if u == 0:
-        return 0.0, 0.0
-    p = i / u
-    return p, 1.96 * math.sqrt(max(p * (1 - p), 1e-12) / u)   # 95% binomial half-width
 
 res = {"part": os.path.basename(path)}
 spec, rep = sr.recognize(path)
 res["status"] = "VERIFIED" if rep.get("verified") else "PARTIAL"
 out = b3d_emit.emit(spec)
-rec = whole(out[0] if isinstance(out, tuple) else out)
-orig = whole(import_step(path))
+rec = out[0] if isinstance(out, tuple) else out
+orig = import_step(path)
 
 if harness_rot is not None:
-    p, ci = mc_iou(orig, register(rec, orig, harness_rot), n_fine, 1)
+    p, ci = iou_check.iou(orig, iou_check.register(rec, orig, harness_rot), n=n_fine, seed=1)
     res["at_harness_rot"] = {"rot": harness_rot, "iou_pct": 100 * p, "ci_pct": 100 * ci}
     print("@@PROG@@" + json.dumps(res), flush=True)
 
-best = None
-for rot in itertools.product((0, 90, 180, 270), repeat=3):
-    p, _ = mc_iou(orig, register(rec, orig, rot), n_coarse, 2)
-    if best is None or p > best[1]:
-        best = (list(rot), p)
-p, ci = mc_iou(orig, register(rec, orig, best[0]), n_fine, 3)
-res["best"] = {"rot": best[0], "iou_pct": 100 * p, "ci_pct": 100 * ci}
+r = iou_check.registered_iou(orig, rec, n=n_fine, n_search=n_coarse, seed=2)
+res["best"] = {"rot": r["rot"], "iou_pct": 100 * r["iou"], "ci_pct": 100 * r["ci"]}
 print("@@JSON@@" + json.dumps(res), flush=True)
 '''
 

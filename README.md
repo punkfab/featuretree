@@ -160,9 +160,20 @@ print(report["verified"], report["dvol_pct"], report.get("recovered"))
 python3 step_recognize.py part.step --stl out.stl           # recover + write a viewable solid
 python3 step_recognize.py part.step --fcstd out.FCStd       # recover + write an editable FreeCAD tree
 python3 step_recognize.py part.step --emit out.ir.json      # recover + write the IR
+python3 step_recognize.py part.step --iou                   # + Boolean-free IoU against the input
 python3 step_recognize.py --selftest                        # generate fixtures, assert (quick CI)
 python3 -m pytest tests/                                     # full test suite (emit + recognize)
 ```
+
+**Checking a recovery independently.** `--iou` (or `iou_check.registered_iou(original, recovered)`
+from Python) measures how much of the input the recovered tree actually reproduces, as
+intersection-over-union, **without any Boolean operations**: it classifies sampled points against
+both solids and reports a 95% interval. Two reasons it exists. The verifier's volume test is
+one-sided — over-cut and uncut material can cancel — and IoU is not. And IoU computed from an
+OpenCASCADE union is untrustworthy on failed recoveries: on the NIST corpus it returned the larger
+operand as the "union", mis-scoring four of eight PARTIAL parts, one by 56 points, while passing
+every range check. For a PARTIAL recovery the figure is a lower bound (best of 24 axis-aligned
+registrations). On NIST CTC-01: `99.81% ± 0.07`.
 
 ### Recovery strategies
 

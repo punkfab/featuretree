@@ -231,7 +231,7 @@ Regenerate with \code{paper/figures/run\_corpus.py} and
 Part & Verdict & {$|\Delta V|/V$ (\%)} & {Features} & {Time (s)} & {IoU (\%)} \\
 \midrule
 CTC-01 & \VERIFIED  &  0.14 &  54 & 24.5 & 99.8 \\
-CTC-02 & \PARTIAL   & 62.19 &  64 & 90.0 &  4.0\rlap{$^\dagger$} \\
+CTC-02 & \PARTIAL   & 62.19 &  64 & 90.0 &  3.9\rlap{$^\dagger$} \\
 CTC-03 & \PARTIAL   & 41.46 &  16 &  5.1 &  6.5\rlap{$^\dagger$} \\
 CTC-04 & \PARTIAL   &  2.43 & 270 & 81.5 & 25.0\rlap{$^\dagger$} \\
 CTC-05 & \PARTIAL   & 51.80 & 106 & 11.1 &  8.2\rlap{$^\dagger$} \\
@@ -261,7 +261,7 @@ to edit.
 bounds, and the direction matters. We search 24 axis-aligned orientations under
 a bounding-box-corner alignment, so the true best-registered overlap is at least
 the figure reported and may be higher. Consequently these numbers establish a
-\emph{floor} on how much of each part was recovered --- \SI{4.0}{\percent} at
+\emph{floor} on how much of each part was recovered --- \SI{3.9}{\percent} at
 worst, \SI{53.3}{\percent} at best --- and we explicitly do \emph{not} claim
 from them that the \PARTIAL{} recoveries are geometrically poor, nor that the
 two verdict classes are separated. Establishing that would need proper

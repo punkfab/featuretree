@@ -150,7 +150,12 @@ python3 paper/figures/iou_corpus.py      # Boolean (OCCT union) IoU  -> iou_resu
 python3 paper/figures/iou_mc_check.py --jobs 11   # Boolean-FREE check -> iou_mc_results.json
 ```
 
-**The paper's IoU column comes from `iou_mc_check.py`, not `iou_corpus.py`.** The
+**The paper's IoU column comes from `iou_mc_check.py`, not `iou_corpus.py`.** The measurement
+itself is the library module `iou_check.py` (tests: `tests/test_iou_check.py`; CLI:
+`step_recognize.py part.step --iou`); the paper script only runs it over the corpus.
+Every input is reduced to its solids first: NIST STEP imports carry stray wires, and
+CTC-01's import bounding box (1170 × 650 mm around an 800 × 450 mm solid) once put a
+VERIFIED part at 20% IoU through the corner alignment. The
 Boolean harness derives IoU from an OCCT union by inclusion–exclusion. On
 PARTIAL parts that union is unreliable in a way no range check catches: it can
 return the larger operand as the "union", which makes IoU equal the volume ratio
@@ -189,6 +194,8 @@ multi-region recoveries (CTC-02, FTC-07, FTC-08) were scored on a single region.
 | `carve_convergence.{pdf,png}` | CTC-01 volume vs features applied | `python3 paper/figures/make_convergence.py` |
 | `recovered_parts.png` | original vs recovered for CTC-01, FTC-10, FTC-07, drawn in the Boolean-free registration | `iou_mc_check.py`, then `python3 paper/figures/render_recovered.py` |
 | `freecad_tree.png` | CTC-01's recovered tree as a native FreeCAD PartDesign document | `python3 paper/figures/freecad_screenshot.py` (needs the FreeCAD AppImage, `xvfb-run`, ImageMagick) |
+| `recovered_all.png` | original vs recovered for **all 11** parts, Boolean-free registration | `python3 paper/figures/render_recovered.py --all` |
+| `corpus_table.{md,html}` | the full NIST set, every verification detail, plus the rows NIST publishes that were not run | `python3 paper/figures/corpus_table.py` (after `run_corpus.py`, `iou_mc_check.py`) |
 
 `freecad_screenshot.py` runs FreeCAD with `FREECAD_USER_HOME` pointed at a
 throwaway directory. Without that it reads the invoking user's real config, and

@@ -22,7 +22,9 @@ The honesty comes from SELF-VERIFICATION: the recognized IR is re-emitted throug
 volume + (rotation-tolerant) bounding box are compared to the original STEP. Several axes can look
 prismatic, so recognize() gathers a candidate per axis and lets verification pick the winner — first
 a base that verifies on its own, else the first whose recovery verifies. Every result is either
-"verified" (provably the same solid within tolerance, Δvol≈0) or PARTIAL with the residual reported.
+"verified" (same volume and extents within tolerance — NOT proof of the same solid: a volume test
+lets over-cut and uncut material cancel; use --iou / iou_check.py for a two-sided check) or PARTIAL
+with the residual reported.
 Out of scope (surfaced as residual, never silently wrong): edge fillets/chamfers, additive bosses,
 lofts/sweeps/freeform, and profiles whose boundary has splines/ellipses (lines + circular arcs only).
 
@@ -30,6 +32,7 @@ lofts/sweeps/freeform, and profiles whose boundary has splines/ellipses (lines +
     python step_recognize.py part.step --stl out.stl      # + write the recovered solid (mesh viewer)
     python step_recognize.py part.step --fcstd out.FCStd  # + write an editable FreeCAD tree
     python step_recognize.py part.step --emit out.ir.json # + write the recovered IR
+    python step_recognize.py part.step --iou              # + Boolean-free IoU vs the input (iou_check.py)
     from step_recognize import recognize;  spec, report = recognize("part.step")
 """
 
@@ -741,6 +744,17 @@ def main():
     for w in report["warnings"]:
         print(f"  ! {w}")
     print(f"  => {tag}" + ("" if v else " — fall back to importing the STEP as one solid"))
+
+    if "--iou" in args:
+        # Two-sided, Boolean-FREE check (see iou_check.py): over-cut and uncut material cannot
+        # cancel as they can in the volume test above, and no OCCT union is trusted.
+        import iou_check
+        rec, _ = b3d_emit.emit(spec)
+        orig = import_step(str(step_path))
+        r = iou_check.registered_iou(orig, rec)
+        print(f"  IoU (Boolean-free, point-sampled): {'>= ' if not v else ''}"
+              f"{100 * r['iou']:.2f}% ± {100 * r['ci']:.2f} (95%)"
+              + ("" if v else "  [lower bound: best of 24 axis-aligned registrations]"))
 
     def _arg(flag):
         return Path(args[args.index(flag) + 1]) if flag in args else None
