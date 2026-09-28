@@ -153,7 +153,7 @@ actually moves between people and programs; this makes them *parametric* again o
 import step_recognize
 spec, report = step_recognize.recognize("part.step")    # spec is a featuretree IR
 print(report["verified"], report["dvol_pct"], report.get("recovered"))
-# True 0.1 {'pockets': 11, 'holes': 10, 'residual_lumps': 2}   # NIST CTC-01
+# True 0.14 {'pockets': 14, 'holes': 10, 'residual_lumps': 2}   # NIST CTC-01
 ```
 
 ```bash
@@ -199,7 +199,7 @@ before the next is trusted:
    designer's exact operations — and anything that doesn't reconstruct is rejected, never faked.
 
 On the NIST CTC-01 test part (multi-level pockets, through-web windows, 12 cross-holes, 8 chamfers)
-this takes a 155%-off base extrude to a **verified** 51-feature tree, and that tree re-emits to the
+this takes a 155%-off base extrude to a **verified** 54-feature tree, and that tree re-emits to the
 **identical volume in both build123d *and* FreeCAD** — the recovered part is genuinely editable in
 either.
 
@@ -213,12 +213,13 @@ either.
   they're left as **sub-tolerance residual**. A chamfered part can verify within tolerance while the
   recovered tree has sharp edges (`recovered.residual_lumps` and a warning disclose it).
 - **The reported Δvol is a NET, and it can hide compensating errors.** On NIST CTC-01 the
-  recovered solid is *smaller* than the original (−0.101%), so the residual is not just uncut
+  recovered solid is *smaller* than the original (−0.139%), so the residual is not just uncut
   chamfers — those would make it *larger*. Decomposing it (`paper/figures/error_decomposition.py`)
-  gives **0.130% over-cut** vs **0.029% uncut**: opposite signs that partially cancel, so the true
-  geometric discrepancy (0.159%) is **1.56× the 0.101% the verifier reports**. VERIFIED means
-  "reproduces the part's volume and extent to within tolerance", *not* "is the part to within
-  tolerance". A two-sided symmetric-difference check would close this gap.
+  gives **0.139% over-cut** vs **0.0004% uncut**, a cancellation factor of **1.01×** today. An
+  earlier recovery of the same part decomposed as 0.130% vs 0.029% — a factor of **1.56×**. Nothing
+  bounds that term, and it moved by half its own value under a change that was not aimed at it.
+  VERIFIED means "reproduces the part's volume and extent to within tolerance", *not* "is the part
+  to within tolerance". A two-sided symmetric-difference check would close this gap.
 - **Additive bosses can't be recovered** (recovery only *subtracts* from the outline envelope). A
   raised post on a base is flagged PARTIAL, not faked.
 - **Splines / ellipses / lofts / sweeps / freeform → PARTIAL.** No faithful sketch-and-pad tree
@@ -364,7 +365,8 @@ The method, the NIST evaluation, and an honest account of what it *doesn't* do a
 
 The paper makes **no novelty claim** about feature recognition — the technique dates to the 1990s and
 is shipped in several commercial kernels. What it contributes is an *open, verified* implementation,
-an evaluation on the NIST MBE corpus that reports an explicit **refusal** class, and a negative result
+an evaluation on the NIST MBE corpus that reports an explicit per-part **verdict** (with a refusal
+class the recogniser will use when geometry falls outside its vocabulary), and a negative result
 about volume-based acceptance. The prior-art scan behind that framing is in
 [`paper/prior-art/FINDINGS.md`](paper/prior-art/FINDINGS.md).
 

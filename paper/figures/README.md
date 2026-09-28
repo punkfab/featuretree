@@ -112,23 +112,29 @@ target `14642823.6`. Regenerates both `.pdf` (used by LaTeX) and `.png`.
 ```bash
 python3 paper/figures/error_decomposition.py
 ```
-Observed 2026-09-19:
+Observed 2026-09-28 (after the multi-region / axis-gate change):
 
 | Component | mm³ | % of part |
 |---|---|---|
-| over-cut (missing from reconstruction) | 19035.9 | 0.1300 |
-| uncut (extra in reconstruction) | 4185.9 | 0.0286 |
-| net, signed (what the verifier sees) | −14850.0 | 0.1014 |
-| **total geometric discrepancy** | **23221.8** | **0.1586** |
+| over-cut (missing from reconstruction) | 20397.0 | 0.1393 |
+| uncut (extra in reconstruction) | 61.6 | 0.0004 |
+| net, signed (what the verifier sees) | −20335.4 | 0.1389 |
+| **total geometric discrepancy** | **20458.7** | **0.1397** |
 
-Overlap `|A∩B|` = 99.870% of `A`. The volume check **understates the true error
-by 1.56×**.
+Overlap `|A∩B|` = 99.861% of `A`. Cancellation factor **1.01×** — on this
+recovery the residual is almost purely over-cut.
+
+> **This number moved, and that is the point.** Observed 2026-09-19, on the
+> recovery produced *before* the axis-gate/multi-region change, the same part
+> decomposed as 19035.9 over-cut vs 4185.9 uncut — a **1.56×** cancellation
+> factor. Nothing in the criterion bounds this term, and it moved by 50% of its
+> own value under a front-end change that was not aimed at it. Re-run this
+> script after ANY recogniser change before quoting the figure.
 
 > **Correction logged.** The repo previously attributed the ~0.1% residual
 > entirely to the part's 8 uncut chamfers. That cannot be right: uncut chamfers
-> would make the reconstruction *larger*, and it is **smaller** (−0.101%).
-> Over-cut (0.130%) actually exceeds uncut material (0.029%); they partially
-> cancel. Fix the prose in `README.md` before release.
+> would make the reconstruction *larger*, and it is **smaller**. Over-cut
+> dominates uncut material throughout. `README.md` has been corrected.
 
 > **Boolean trap.** Direct OCCT `-` and `&` between the original and the
 > co-registered reconstruction return degenerate results (zero intersection for
