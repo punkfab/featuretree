@@ -46,7 +46,7 @@ res = {"part": os.path.basename(path)}
 t0 = time.time()
 try:
     import b3d_emit, step_recognize as sr
-    from build123d import Pos, import_step
+    from build123d import Compound, Pos, import_step
 
     spec, rep = sr.recognize(path)
     res.update(
@@ -64,9 +64,13 @@ try:
     # Residual decomposition (union / inclusion-exclusion; direct OCCT boolean
     # difference is unreliable on these operands -- see error_decomposition.py).
     try:
+        # ALL solids, not the first. A multi-region recovery emits one solid per region
+        # (FTC-07's two side walls); taking solids()[0] scored those parts on one region.
         def one(o):
             s = o.solids() if hasattr(o, "solids") else []
-            return s[0] if s else o
+            if not s:
+                return o
+            return s[0] if len(s) == 1 else Compound(list(s))
         orig = one(import_step(path))
         out = b3d_emit.emit(spec)
         rec = one(out[0] if isinstance(out, tuple) else out)
