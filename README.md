@@ -354,21 +354,49 @@ run `gen.py` / `roundtrip.py` directly), and make sure the FreeCAD AppImage is l
   edge fillet/chamfer *recognition*, other backends (Fusion API / SolidWorks macro).
 - A SolidWorks `.SLDPRT` can't be written on Linux — that backend would emit a macro.
 
+## Paper
+
+The method, the NIST evaluation, and an honest account of what it *doesn't* do are written up in:
+
+> **featuretree: Verified Recovery of Editable CAD Feature Trees from STEP, for Open CAD Systems.**
+> Dan Newcome, 2026. Preprint. [`10.5281/zenodo.22848793`](https://doi.org/10.5281/zenodo.22848793)
+> · [PDF](https://doi.org/10.5281/zenodo.22848793) · [source](paper/main.tex)
+
+The paper makes **no novelty claim** about feature recognition — the technique dates to the 1990s and
+is shipped in several commercial kernels. What it contributes is an *open, verified* implementation,
+an evaluation on the NIST MBE corpus that reports an explicit **refusal** class, and a negative result
+about volume-based acceptance. The prior-art scan behind that framing is in
+[`paper/prior-art/FINDINGS.md`](paper/prior-art/FINDINGS.md).
+
 ## Citing
 
 If featuretree is useful in your research or product, please cite it (GitHub also offers
 "Cite this repository" from [`CITATION.cff`](CITATION.cff)):
 
 ```bibtex
-@misc{featuretree2026,
-  author       = {Newcome, Dan},
-  title        = {featuretree: Round-trip editable feature trees from a neutral IR,
-                  for AI- and code-generated CAD},
-  year         = {2026},
-  publisher    = {GitHub},
-  journal      = {GitHub repository},
-  howpublished = {\url{https://github.com/punkfab/featuretree}},
-  note         = {First public release 2026-06-26}
+@misc{featuretree-paper-2026,
+  author    = {Newcome, Dan},
+  title     = {featuretree: Verified Recovery of Editable {CAD} Feature Trees
+               from {STEP}, for Open {CAD} Systems},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22848793},
+  note      = {Preprint}
+}
+```
+
+To cite the **software** rather than the paper, use the version-independent concept DOI
+[`10.5281/zenodo.22848721`](https://doi.org/10.5281/zenodo.22848721), which always resolves to the
+latest release:
+
+```bibtex
+@software{featuretree-software-2026,
+  author    = {Newcome, Dan},
+  title     = {featuretree},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.22848721},
+  url       = {https://github.com/punkfab/featuretree}
 }
 ```
 
