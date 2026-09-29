@@ -27,7 +27,7 @@
         "overlap_pct": 99.86070283071604,
         "cancellation": 1.0060624456255243
       },
-      "seconds": 28.92
+      "seconds": 30.63
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
@@ -52,7 +52,7 @@
         "overlap_pct": 3.326419976269351,
         "cancellation": 2.108942103023714
       },
-      "seconds": 93.6
+      "seconds": 99.98
     },
     {
       "part": "nist_ctc_03_asme1_rc.stp",
@@ -76,7 +76,7 @@
         "overlap_pct": 0.06407047218213592,
         "cancellation": 3.8204667195927753
       },
-      "seconds": 12.99
+      "seconds": 14.23
     },
     {
       "part": "nist_ctc_04_asme1_rd.stp",
@@ -99,7 +99,7 @@
         "overlap_pct": 39.01644250094926,
         "cancellation": 49.27419060584009
       },
-      "seconds": 79.17
+      "seconds": 87.05
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
@@ -122,7 +122,7 @@
         "overlap_pct": 1.9818643045820934,
         "cancellation": 2.7846535520768927
       },
-      "seconds": 18.19
+      "seconds": 18.76
     },
     {
       "part": "nist_ftc_06_asme1_rd.stp",
@@ -151,60 +151,58 @@
         "overlap_pct": 31.28558551056311,
         "cancellation": 3.3149969867045934
       },
-      "seconds": 15.86
+      "seconds": 15.41
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
       "status": "PARTIAL",
-      "dvol_pct": 1.8,
-      "dsize_mm": 6.363,
+      "dvol_pct": 0.09,
+      "dsize_mm": 1.517,
       "vol_orig": 1726247.6,
-      "vol_ir": 1695184.2,
-      "features": 21,
+      "vol_ir": 1724635.2,
+      "features": 25,
       "method": "extrude",
       "recovered": {
         "pockets": 9,
         "holes": 8,
-        "residual_lumps": 19
+        "residual_lumps": 25
       },
       "warnings": [
-        "open shell along (0.0, 1.0, 0.0): 18/24 ring slices, cavity 128.27 deep from the top face; draft 1.00 deg outside, 1.00 deg inside",
-        "multi-axis recovery: +9 pocket(s), +8 cross-hole(s); 19 residual lump(s) (chamfers/fillets) left uncut"
+        "open shell along (0.0, 1.0, 0.0): 18/24 ring slices, cavity 128.27 deep from the top face; outline layers: 11.3 mm @ 300.8x211.9, 113.9 mm @ 300.9x212.0 drafted 1.00 deg, 10.6 mm @ 310.1x221.2; draft 1.00 deg outside, 1.00 deg inside",
+        "multi-axis recovery: +9 pocket(s), +8 cross-hole(s); 25 residual lump(s) (chamfers/fillets) left uncut"
       ],
       "decomp": {
-        "overcut": -1695978.0556570299,
-        "uncut": -1727041.4788149896,
-        "net": -31063.42315795971,
-        "total": -3423019.5344720194,
-        "overlap_pct": 198.24651319554974,
-        "cancellation": -110.19453706263222
+        "overcut": 1115871.7887962079,
+        "uncut": 1114259.4193661925,
+        "net": -1612.3694300153293,
+        "total": 2230131.2081624004,
+        "overlap_pct": 35.35853128710622,
+        "cancellation": 1383.1391036365642
       },
-      "seconds": 56.97
+      "seconds": 58.95
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
       "status": "PARTIAL",
-      "dvol_pct": 32.61,
+      "dvol_pct": 3.56,
       "dsize_mm": 0.0,
       "vol_orig": 503592.2,
-      "vol_ir": 339390.5,
-      "features": 24,
+      "vol_ir": 521528.2,
+      "features": 48,
       "method": "extrude",
       "recovered": null,
       "warnings": [
-        "extrude axis (1.0, 0.0, 0.0) -> rotated onto Z",
-        "176 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
-        "cross-section is 2 disjoint region(s) -> one pad each"
+        "open shell along (0.0, 0.0, 1.0): 22/24 ring slices, cavity 44.83 deep from the bottom face; outline layers: 11.2 mm @ 311.6x222.7, 37.0 mm @ 292.0x204.9; 21 floor cutout(s)"
       ],
       "decomp": {
-        "overcut": 484445.6939017883,
-        "uncut": 320243.9884390472,
-        "net": -164201.70546274114,
-        "total": 804689.6823408355,
-        "overlap_pct": 3.8019815216501707,
-        "cancellation": 4.90061707990863
+        "overcut": 1791.7676264082547,
+        "uncut": 19727.804978425673,
+        "net": 17936.037352017418,
+        "total": 21519.572604833927,
+        "overlap_pct": 99.64420264767784,
+        "cancellation": 1.1997952603735762
       },
-      "seconds": 45.62
+      "seconds": 111.77
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
@@ -227,7 +225,7 @@
         "overlap_pct": 0.8612046165182863,
         "cancellation": 1036.5649032446127
       },
-      "seconds": 10.26
+      "seconds": 8.6
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
@@ -250,7 +248,7 @@
         "overlap_pct": 56.59490642090769,
         "cancellation": 3.173512703816304
       },
-      "seconds": 31.43
+      "seconds": 35.19
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",
@@ -271,7 +269,7 @@
         "overlap_pct": 99.99968375998162,
         "cancellation": 1.000005317426488
       },
-      "seconds": 3.25
+      "seconds": 3.16
     }
   ]
 }

@@ -218,6 +218,34 @@ def _is_hole_prism(feat):
     return len(p) == 1 and len(p[0]) == 2 and all(len(v) > 2 and abs(abs(v[2]) - 1) < 0.1 for v in p[0])
 
 
+def _robust_cut(a, b):
+    """a - b, or None. OpenCASCADE sometimes returns a null shape for a Boolean between solids with
+    near-coincident faces (FTC-08's pan, once carving has started); a small fuzzy tolerance usually
+    resolves it. Returning None lets the caller stop carving and KEEP what it has, instead of
+    losing every feature to one failed Boolean."""
+    try:
+        return a - b
+    except Exception:
+        pass
+    try:
+        from build123d import Shape
+        from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
+        from OCP.TopTools import TopTools_ListOfShape
+        op = BRepAlgoAPI_Cut()
+        args, tools = TopTools_ListOfShape(), TopTools_ListOfShape()
+        args.Append(a.wrapped)
+        tools.Append(b.wrapped)
+        op.SetArguments(args)
+        op.SetTools(tools)
+        op.SetFuzzyValue(1e-4)
+        op.Build()
+        if op.IsDone() and not op.Shape().IsNull():
+            return Shape.cast(op.Shape())
+    except Exception:
+        pass
+    return None
+
+
 def _recover_multiaxis(spec, orig, axis, name):
     """Close the residual of a best-effort extrude (outline + through-holes that didn't verify) by
     recovering the machined interior as prism_cuts: (A) floor pockets — every significant intermediate
@@ -261,7 +289,10 @@ def _recover_multiaxis(spec, orig, axis, name):
     if counts["pockets"]:
         part, _ = b3d_emit.emit(IR.part(name, *feats))
     for _p in range(RECOVER_PASSES):
-        comps = [c for c in (part - aligned0).solids() if c.volume > RECOVER_EPS]
+        resid = _robust_cut(part, aligned0)
+        if resid is None:
+            break                  # OCCT could not form the residual: keep what is carved so far
+        comps = [c for c in resid.solids() if c.volume > RECOVER_EPS]
         if not comps:
             break
         added = []
@@ -281,7 +312,9 @@ def _recover_multiaxis(spec, orig, axis, name):
         for pf in added:
             counts["holes" if _is_hole_prism(pf) else "pockets"] += 1
         feats, part = trial, part2
-    counts["residual_lumps"] = len([c for c in (part - aligned0).solids() if c.volume > RECOVER_EPS])
+    resid = _robust_cut(part, aligned0)
+    counts["residual_lumps"] = (len([c for c in resid.solids() if c.volume > RECOVER_EPS])
+                                if resid is not None else -1)     # -1: residual not computable
     return IR.part(name, *feats), counts
 
 
@@ -425,7 +458,8 @@ def _recognize_shell(orig, name, axis):
     if sum(r is not None for r in probe) < 2 and probe2[0] is None:
         raise ValueError("not a shell along this axis (pre-check)")
     zs = [base_z + (k + 0.5) / SHELL_SLICES * thick for k in range(SHELL_SLICES)]
-    rings = [_ring(_slice(solid, bb, z)) for z in zs]
+    secs = [_slice(solid, bb, z) for z in zs]
+    rings = [_ring(f) for f in secs]
     n_ring = sum(r is not None for r in rings)
     if n_ring < SHELL_MIN_RING_FRAC * SHELL_SLICES:
         raise ValueError(f"not a shell along this axis ({n_ring}/{SHELL_SLICES} ring slices)")
@@ -457,67 +491,178 @@ def _recognize_shell(orig, name, axis):
     floor_z = hi if top_open else lo
     depth = (bb.max.Z - floor_z) if top_open else (floor_z - base_z)
 
-    # DRAFT. Fit how the outer outline and the cavity grow with depth across the ring slices.
-    # Molded walls are drafted (FTC-07: ~1 deg inside and out), so the right recovery is a tapered
-    # pad and a tapered pocket, not a straight envelope that fills the walls in.
-    ring_z = [zs[k] for k in ring_idx]
-    def _fit(sizes):
-        n = len(sizes)
-        mz, ms = sum(ring_z) / n, sum(sizes) / n
-        sxx = sum((z - mz) ** 2 for z in ring_z)
-        return sum((z - mz) * (v - ms) for z, v in zip(ring_z, sizes)) / sxx if sxx else 0.0
-    def _half_widths(k, which):
-        w = rings[k][0 if which == "outer" else 1].bounding_box()
-        return (w.size.X + w.size.Y) / 4                 # mean half-width of the loop
-    # robust to a rim lip or floor bosses: fit on the middle 60% of ring slices
-    lo_i, hi_i = int(0.2 * len(ring_idx)), max(int(0.8 * len(ring_idx)), int(0.2 * len(ring_idx)) + 2)
-    mid = ring_idx[lo_i:hi_i]
-    ring_z = [zs[k] for k in mid]
-    out_slope = _fit([_half_widths(k, "outer") for k in mid])      # d(half-width)/dz
-    cav_slope = _fit([_half_widths(k, "cavity") for k in mid])
-    draft_out = math.degrees(math.atan(out_slope))
-    draft_cav = math.degrees(math.atan(cav_slope))
-    drafted = abs(draft_out) > 0.05 or abs(draft_cav) > 0.05
+    # OUTLINE LAYERS. The outer outline as a function of depth is not one thing: FTC-07's is a
+    # 1-degree draft plus a rim lip, FTC-08's is a flange 10 mm deep and then straight walls. Split
+    # it wherever the outline JUMPS between neighbouring slices; each layer becomes its own pad,
+    # stacked on the one below, and is drafted only if its own slices lie on a straight line.
+    # (One straight-line fit across FTC-08's flange step read as an 8-degree "draft".)
+    from build123d import Face, offset, Kind
 
-    # Outline: the pad starts at the bottom plane and grows +Z, so an outline that widens upward is
-    # a NEGATIVE taper (IR convention: positive shrinks). The section AT the bottom can be anything
-    # -- FTC-07's is a 25 mm foot below the floor -- so take the outer loop of a clean wall slice
-    # and carry it down to the bottom plane along the fitted draft: a 2D offset of -dz*tan(draft).
-    eps = min(0.25, 0.01 * thick)
-    if drafted:
-        from build123d import Face, offset, Kind
-        k_ref = mid[0]
-        dz = zs[k_ref] - base_z
-        shifted = offset(Face(rings[k_ref][0]), amount=-dz * out_slope, kind=Kind.ARC)
-        outer_w = (shifted.faces()[0] if hasattr(shifted, "faces") else shifted).outer_wire()
-    else:
-        outer_w = max((r for r in rings if r), key=lambda r: r[2])[0]
-    # Cavity: the pocket starts at the OPEN face and narrows going in by the cavity draft. The
-    # section right at the rim is often not a clean ring (a lip, notches), so as for the outline,
-    # take a clean wall slice's cavity loop and carry it to the open face along the fitted draft.
-    if drafted:
-        from build123d import Face, offset, Kind
+    def _outer(k):
+        return rings[k][0] if rings[k] else max(secs[k], key=lambda f: f.area).outer_wire()
+
+    def _hw(w):
+        b = w.bounding_box()
+        return (b.size.X + b.size.Y) / 4                  # mean half-width of a loop
+
+    def _fit(ks, vals):
+        """(slope, max |residual|) of vals against z over slices ks."""
+        zz = [zs[k] for k in ks]
+        n = len(zz)
+        mz, mv = sum(zz) / n, sum(vals) / n
+        sxx = sum((z - mz) ** 2 for z in zz)
+        slope = sum((z - mz) * (v - mv) for z, v in zip(zz, vals)) / sxx if sxx else 0.0
+        return slope, max(abs(v - (mv + slope * (z - mz))) for z, v in zip(zz, vals))
+
+    # Slices that are NOT rings but sit between ring slices are interruptions -- a slot through a
+    # side wall splits the section into pieces -- and say nothing about the outline; FTC-07's
+    # largest mid-depth piece is an 83 mm fragment. Only rings, and the solid floor-end slices
+    # beyond them, define the outline.
+    valid = [k for k in range(SHELL_SLICES)
+             if rings[k] is not None or not (ring_idx[0] < k < ring_idx[-1])]
+    hws = {k: _hw(_outer(k)) for k in valid}
+
+    # Piecewise-linear segmentation of half-width against depth (Douglas-Peucker): split a run at
+    # its worst deviation from the straight line through its ends until every run is straight
+    # within 0.1 mm. A drafted wall stays ONE layer; a flange or a rim lip splits off even when
+    # its step is small (FTC-07's lip grows 1.2-1.5 mm per slice, barely more than its draft).
+    def _dp(ks):
+        if len(ks) <= 2:
+            return [ks]
+        z0, z1, h0, h1 = zs[ks[0]], zs[ks[-1]], hws[ks[0]], hws[ks[-1]]
+        dev = [abs(hws[k] - (h0 + (h1 - h0) * (zs[k] - z0) / (z1 - z0))) for k in ks]
+        m = max(range(len(ks)), key=lambda i: dev[i])
+        if dev[m] <= 0.1:
+            return [ks]
+        return _dp(ks[:m + 1]) + _dp(ks[m + 1:])      # m is interior: both halves non-empty
+    layers = _dp(valid)
+    # merge runs that sit on one straight line (DP can over-split at the breakpoint itself)
+    fused = [layers[0]]
+    for L in layers[1:]:
+        cand = fused[-1] + L
+        if len(cand) >= 3:
+            sl, rs = _fit(cand, [hws[k] for k in cand])
+            if rs <= 0.1:
+                fused[-1] = cand
+                continue
+        fused.append(L)
+    layers = fused
+    # a one-slice layer is a transition (a chamfer between steps): give it to the LARGER
+    # neighbour, so the stacked pads still contain the part and carving can take the rest
+    merged = []
+    for li, L in enumerate(layers):
+        if len(L) == 1 and len(layers) > 1:
+            nb = [x for x in (li - 1, li + 1) if 0 <= x < len(layers)]
+            big = max(nb, key=lambda x: max(hws[k] for k in layers[x]))
+            if big < li and merged:
+                merged[-1] = sorted(merged[-1] + L)
+                continue
+            layers[big] = sorted(layers[big] + L)
+            continue
+        merged.append(L)
+    layers = merged
+
+    # layer boundaries: bisect where the outline crosses halfway between neighbouring layers
+    def _boundary(ka, kb, ha, hb):
+        lo, hi = zs[ka], zs[kb]
+        mid_h = (ha + hb) / 2
+        for _ in range(10):
+            m = (lo + hi) / 2
+            fs = _slice(solid, bb, m)
+            if not fs:
+                break
+            hm = _hw(max(fs, key=lambda f: f.area).outer_wire())
+            if (hm - mid_h) * (ha - mid_h) > 0:
+                lo = m
+            else:
+                hi = m
+        return (lo + hi) / 2
+    bounds = [base_z]
+    for a, b in zip(layers, layers[1:]):
+        bounds.append(_boundary(a[-1], b[0], hws[a[-1]], hws[b[0]]))
+    bounds.append(bb.max.Z)
+
+    feats, notes, drafts = [], [], []
+    for li, L in enumerate(layers):
+        zb, ze = bounds[li], bounds[li + 1]
+        slope, resid = _fit(L, [hws[k] for k in L]) if len(L) >= 4 else (0.0, 0.0)
+        drafted = len(L) >= 4 and resid < 0.05 and abs(slope) > math.tan(math.radians(0.05))
+        if drafted:
+            # carry a clean slice's loop down to this layer's start plane along the fitted draft
+            k_ref = L[len(L) // 2]
+            sh = offset(Face(_outer(k_ref)), amount=-(zs[k_ref] - zb) * slope, kind=Kind.ARC)
+            wire = (sh.faces()[0] if hasattr(sh, "faces") else sh).outer_wire()
+            taper = round(-math.degrees(math.atan(slope)), 4)
+            drafts.append(math.degrees(math.atan(slope)))
+        else:
+            wire = _outer(max(L, key=lambda k: hws[k]))    # the layer's largest: contains it
+            taper = 0.0
+        poly = _approx_poly(wire)
+        if poly is None:
+            raise ValueError(f"shell layer {li} outline did not close into one loop")
+        sk, pd = ("outline", "body") if li == 0 else (f"outline{li}", f"body{li}")
+        feats.append(IR.sketch(sk, "XY", polys=[poly]) if li == 0 else
+                     IR.sketch(sk, polys=[poly], on={"face_of": "body", "side": "top"}))
+        feats.append(IR.pad(pd, sk, length=round(ze - zb, 4), taper=taper))
+        b = wire.bounding_box()
+        notes.append(f"{ze - zb:.1f} mm @ {b.size.X:.1f}x{b.size.Y:.1f}"
+                     + (f" drafted {math.degrees(math.atan(slope)):.2f} deg" if drafted else ""))
+
+    # CAVITY: one pocket from the open face. Drafted -> a clean slice's loop carried to the open
+    # face along the fitted draft; straight -> the TYPICAL wall-slice cavity (the median of the
+    # middle ring slices), not the smallest, which a floor fillet shrinks for every slice above it.
+    lo_i = int(0.2 * len(ring_idx))
+    mid = ring_idx[lo_i:max(int(0.8 * len(ring_idx)), lo_i + 2)]
+    cav_slope, cav_res = _fit(mid, [_hw(rings[k][1]) for k in mid])
+    cav_drafted = len(mid) >= 4 and cav_res < 0.05 and abs(cav_slope) > math.tan(math.radians(0.05))
+    if cav_drafted:
         k_ref = mid[-1] if top_open else mid[0]
         dz = (bb.max.Z - zs[k_ref]) if top_open else (zs[k_ref] - base_z)
         grow = dz * cav_slope if top_open else -dz * cav_slope    # toward the open face
-        shifted = offset(Face(rings[k_ref][1]), amount=grow, kind=Kind.ARC)
-        cav_w = (shifted.faces()[0] if hasattr(shifted, "faces") else shifted).outer_wire()
+        sh = offset(Face(rings[k_ref][1]), amount=grow, kind=Kind.ARC)
+        cav_w = (sh.faces()[0] if hasattr(sh, "faces") else sh).outer_wire()
     else:
-        cav_w = min((r for r in rings if r), key=lambda r: r[3])[1]   # smallest: never over-cuts
-    outline, hole = _approx_poly(outer_w), _approx_poly(cav_w)
-    if outline is None or hole is None:
-        raise ValueError("shell outline or cavity did not close into one loop")
-    pad_taper = round(-draft_out, 4) if drafted else 0.0
-    # going INTO the part from the open face the cavity shrinks if it widens toward that face
-    pocket_taper = round(draft_cav if top_open else -draft_cav, 4) if drafted else 0.0
+        med = sorted(mid, key=lambda k: _hw(rings[k][1]))[len(mid) // 2]
+        cav_w = rings[med][1]
+    hole = _approx_poly(cav_w)
+    if hole is None:
+        raise ValueError("shell cavity did not close into one loop")
+    draft_cav = math.degrees(math.atan(cav_slope)) if cav_drafted else 0.0
+    pocket_taper = round(draft_cav if top_open else -draft_cav, 4)
     warnings = [f"open shell along {tuple(round(c, 3) for c in axis.to_tuple())}: "
                 f"{n_ring}/{SHELL_SLICES} ring slices, cavity {depth:.2f} deep from the "
-                f"{'top' if top_open else 'bottom'} face"
-                + (f"; draft {draft_out:.2f} deg outside, {draft_cav:.2f} deg inside" if drafted else "")]
-    feats = [IR.sketch("outline", "XY", polys=[outline]),
-             IR.pad("body", "outline", length=round(thick, 4), taper=pad_taper),
-             IR.sketch("cavity_sk", polys=[hole], on={"face_of": "body", "side": "top" if top_open else "bottom"}),
-             IR.pocket("cavity", "cavity_sk", through=False, length=round(depth, 4), taper=pocket_taper)]
+                f"{'top' if top_open else 'bottom'} face; outline layers: " + ", ".join(notes)
+                + (f"; draft {(drafts[0] if drafts else 0.0):.2f} deg outside, {draft_cav:.2f} deg inside"
+                   if drafts or cav_drafted else "")]
+    feats += [IR.sketch("cavity_sk", polys=[hole], on={"face_of": "body", "side": "top" if top_open else "bottom"}),
+              IR.pocket("cavity", "cavity_sk", through=False, length=round(depth, 4), taper=pocket_taper)]
+
+    # FLOOR CUTOUTS. The floor-end slice shows every opening through the floor as an inner loop
+    # (FTC-08's pan floor has 21). Cut each one: through-all when it lies inside the cavity outline
+    # (below it is only the cavity, so nothing else is hit), otherwise blind, one floor deep.
+    floor_th = (bb.max.Z - floor_z) if top_open is False else (floor_z - base_z)
+    fz = (floor_z + bb.max.Z) / 2 if not top_open else (base_z + floor_z) / 2
+    ffs = _slice(solid, bb, fz)
+    n_floor = 0
+    if ffs and floor_th > EPS:
+        cb = cav_w.bounding_box()
+        for w in max(ffs, key=lambda f: f.area).inner_wires():
+            poly = _approx_poly(w)
+            if poly is None:
+                continue
+            wb = w.bounding_box()
+            inside = (wb.min.X >= cb.min.X - EPS and wb.max.X <= cb.max.X + EPS and
+                      wb.min.Y >= cb.min.Y - EPS and wb.max.Y <= cb.max.Y + EPS)
+            sk = f"floor_sk{n_floor}"
+            if inside:
+                feats += [IR.sketch(sk, "XY", polys=[poly]),
+                          IR.pocket(f"floor{n_floor}", sk, through=True)]
+            else:
+                feats += [IR.sketch(sk, polys=[poly], on={"face_of": "body", "side": "bottom" if top_open else "top"}),
+                          IR.pocket(f"floor{n_floor}", sk, through=False, length=round(floor_th, 4))]
+            n_floor += 1
+    if n_floor:
+        warnings[0] += f"; {n_floor} floor cutout(s)"
     return IR.part(name, *feats), {"method": "extrude", "axis": axis, "warnings": warnings,
                                    "shell": True, "through_holes": 0, "blind_holes": 0}
 

@@ -60,8 +60,17 @@ def how_recovered(r):
     sh = re.search(r"open shell along \(([^)]*)\)", w)
     if sh:
         v = [abs(float(x)) for x in sh.group(1).split(",")]
-        d = re.search(r"draft ([-\d.]+) deg outside", w)
-        bits = [f"drafted shell ∥{'XYZ'[v.index(max(v))]}" + (f" ({abs(float(d.group(1))):.1f}°)" if d else "")]
+        ax = "XYZ"[v.index(max(v))]
+        layers = re.search(r"outline layers: ([^;]*)", w)
+        n_layers = len(layers.group(1).split(", ")) if layers else 1
+        d = re.search(r"draft ([-\d.]+) deg outside, ([-\d.]+) deg inside", w)
+        draft = max(abs(float(d.group(1))), abs(float(d.group(2)))) if d else 0.0
+        fc = re.search(r"(\d+) floor cutout", w)
+        bits = [("drafted " if draft else "") + f"shell ∥{ax}" + (f" ({draft:.1f}°)" if draft else "")]
+        if n_layers > 1:
+            bits.append(f"{n_layers} outline layers")
+        if fc:
+            bits.append(f"{fc.group(1)} floor cutouts")
         rec = r.get("recovered") or {}
         if rec.get("pockets") or rec.get("holes"):
             bits.append(f"+{rec.get('pockets', 0)} pockets, +{rec.get('holes', 0)} cross-holes")
