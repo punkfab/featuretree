@@ -204,12 +204,17 @@ changes with depth. Looking at the part from several aspects exposes them.
 Along each principal axis a stack of 24 slices is cut (after a five-slice
 pre-check), and an axis whose slices are mostly \emph{rings} --- one region with
 a large inner loop --- solid at one end and open at the other, is an open shell.
-It is recovered as a designer would draw it: a pad of the outer outline and a
-blind pocket for the cavity, both drafted by an angle fitted to how the ring
-outlines grow with depth. The outlines are taken from clean wall slices and
-carried to the pad and pocket planes along the fitted draft, because the
-sections at the ends are often a foot or a rim lip rather than the wall. What
-remains is handed to the same carving loop.
+It is recovered as a designer would draw it. The outline's size against depth is
+split, by piecewise-linear (Douglas--Peucker) segmentation, into \emph{layers}
+--- a flange, a drafted wall, a rim lip --- and each layer becomes a pad stacked
+on the one below, drafted only if its own slices lie on a straight line. The
+cavity is one blind pocket from the open face, drafted likewise, and every
+opening through the floor, visible as an inner loop of the floor slice, is cut
+directly. Loops are taken from clean wall slices and carried along the fitted
+draft to the plane where each pad or pocket starts, because the sections at the
+ends are often a foot or a rim lip rather than the wall; slices split by a slot
+through a side wall are ignored. What remains is handed to the same carving
+loop.
 
 \paragraph{Registration.} Recovery works in the part's own frame: the chosen
 axis is rotated onto $+Z$ and an extrude is built from $z=0$. The recogniser
@@ -248,7 +253,7 @@ whole. Regenerate with \code{paper/figures/run\_corpus.py} and
 which gate test each \PARTIAL{} part failed, is
 \code{paper/figures/corpus\_table.md}.}
 \label{tab:corpus}
-\begin{tabular}{llS[table-format=2.2]S[table-format=3.0]S[table-format=2.1]S[table-format=3.1]}
+\begin{tabular}{llS[table-format=2.2]S[table-format=3.0]S[table-format=3.1]S[table-format=3.1]}
 \toprule
 Part & Verdict & {$|\Delta V|/V$ (\%)} & {Features} & {Time (s)} & {IoU (\%)} \\
 \midrule
@@ -258,8 +263,8 @@ CTC-03 & \PARTIAL   & 41.46 &  16 & 13.0 & 36.1 \\
 CTC-04 & \PARTIAL   &  2.43 & 270 & 79.2 & 30.8 \\
 CTC-05 & \PARTIAL   & 51.80 & 106 & 18.2 & 14.5 \\
 FTC-06 & \PARTIAL   & 31.85 &  44 & 15.9 & 59.6 \\
-FTC-07 & \PARTIAL   &  1.80 &  21 & 57.0 & 94.9 \\
-FTC-08 & \PARTIAL   & 32.61 &  24 & 45.6 & 52.7 \\
+FTC-07 & \PARTIAL   &  0.09 &  25 & 59.0 & 95.5 \\
+FTC-08 & \PARTIAL   &  3.56 &  48 & 111.8 & 95.9 \\
 FTC-09 & \VERIFIED  &  0.19 &  80 & 10.3 & 99.7 \\
 FTC-10 & \PARTIAL   & 20.80 &  24 & 31.4 & 76.0 \\
 FTC-11 & \VERIFIED  &  0.00 &   2 &  3.3 & 100.0 \\
@@ -281,14 +286,14 @@ to edit.
 
 \paragraph{How good the \PARTIAL{} recoveries are.} Because registration is
 exact, the \PARTIAL{} figures measure how much of each part came back:
-\SI{7.4}{\percent} for CTC-02 up to \SI{94.9}{\percent} for FTC-07. An earlier
+\SI{7.4}{\percent} for CTC-02 up to \SI{95.9}{\percent} for FTC-08. An earlier
 version of this evaluation could only bound them from below, by searching 24
 axis-aligned orientations under a bounding-box-corner alignment, and the bounds
 were loose: FTC-10 was at least \SI{46.5}{\percent} and is \SI{76.0}{\percent},
 CTC-03 at least \SI{6.5}{\percent} and is \SI{36.1}{\percent}. On this corpus
 the verdict classes do not overlap --- every \VERIFIED{} part is above
-\SI{99.7}{\percent} and every \PARTIAL{} part below \SI{95}{\percent} --- but the
-gap is under five points and eleven parts are no basis for a threshold.
+\SI{99.7}{\percent} and every \PARTIAL{} part below \SI{96}{\percent} --- but the
+gap is under four points and eleven parts are no basis for a threshold.
 
 \paragraph{An earlier threshold, not the vocabulary, was the binding
 constraint.} A previous version of this evaluation refused CTC-02, FTC-07 and
@@ -325,11 +330,23 @@ out, a lip at the rim, slots in its side walls and bosses in its corners.
 Across its opening every section is two walls; along it, the section is the
 ring an open box should give, but it changes with depth. The open-shell path
 finds it on the one axis where 18 of 24 slices are rings, fits the
-\SI{1.0}{\degree} draft on both faces, and recovers it as a drafted pad and a
-drafted cavity pocket: two operations, \SI{86.7}{\percent} IoU. Carving the slots
-and bosses takes it to 21 features, a \SI{1.80}{\percent} volume error and
-\SI{94.9}{\percent} IoU, from two stray walls at \SI{63.41}{\percent}. It stays
-\PARTIAL{}, correctly: the rim lip and some details are not recovered.
+\SI{1.0}{\degree} draft on both faces, and splits the outline into three layers
+--- a straight floor band, the drafted wall, and the rim lip. As a drafted pad
+and cavity pocket alone it is \SI{86.7}{\percent} IoU; with the layers,
+\SI{87.7}{\percent}. Carving the slots and bosses takes it to 25 features, a
+\SI{0.09}{\percent} volume error and \SI{95.5}{\percent} IoU, from two stray walls
+at \SI{63.41}{\percent}. It stays \PARTIAL{}, now on extents alone: the rim flares
+to \SI{311.6}{\milli\metre} at its very edge, and the lip layer is taken just below
+it, \SI{1.52}{\milli\metre} narrower.
+
+\paragraph{FTC-08: the same problem the other way up.} FTC-08 is a shallow pan
+that opens downward: a \SI{10}{\milli\metre} flange at the open end, straight
+walls, and a \SI{3.4}{\milli\metre} floor with 21 cutouts. Across its walls it was
+recovered as two L-brackets, \SI{52.7}{\percent} IoU. The shell detector did
+find it along its depth --- but a single straight-line fit across the flange
+step read as an $8^\circ$ ``draft'', which is what layer segmentation replaced.
+Recovered as a flange pad, a wall pad, a cavity pocket and its 21 floor cutouts,
+it is \SI{3.56}{\percent} short on volume at \SI{95.9}{\percent} IoU.
 
 Getting there exposed a latent bug in the carving loop. It aligned the input to
 the rebuilt base by bounding-box corners in all three axes, which is right only
