@@ -1,0 +1,348 @@
+% ============================================================================
+% Related-work survey for the featuretree IR spec / multi-backend paper, 2026-09-29.
+% See ../SURVEY-multivendor.md. Entries already in ../../references.bib (Gupta & Nau,
+% Vandenbrande, Pratt & Kim, Willis, Mun/Han, Rappoport, Shumway, Cascaval, Creo FRT)
+% are NOT repeated here. Each entry carries its verification level:
+%   VERIFIED-FULLTEXT / VERIFIED-METADATA / ABSTRACT-LEVEL / GREY-LIT
+% and a TODO-VERIFY where something was completed from memory or is uncertain.
+% ============================================================================
+
+% ---------------------------------------------------------------- closest work
+% VERIFIED-FULLTEXT (arXiv HTML) + abstract re-checked 2026-09-29. TODO-VERIFY: IoU numbers from the PDF.
+@misc{liu2026cadir,
+  title = {{CADIR}: A Cross-Backend Editable Intermediate Representation for Agentic {CAD} Generation},
+  author = {Liu, Yu and Ni, Jingzhe and Chen, Yiming and Huang, Junqi and Tong, Ruofeng and Tang, Min and Du, Peng},
+  year = {2026}, eprint = {2608.00891}, archivePrefix = {arXiv}, note = {v1 submitted 2026-08-01}}
+% GREY-LIT
+@misc{simplecadapi, title = {{SimpleCADAPI} ({CADIR} implementation)}, author = {Ni, Jingzhe},
+  url = {https://github.com/NiJingzhe/SimpleCADAPI}, urldate = {2026-09-29}}
+
+% ------------------------------------------------ neutral exchange (additions)
+% VERIFIED-METADATA via Crossref. Crossref year 2008 (online first 2007).
+@article{kim2008designintent,
+  author = {Kim, Junhwan and Pratt, Michael J. and Iyer, Raj G. and Sriram, Ram D.},
+  title = {Standardized data exchange of {CAD} models with design intent},
+  journal = {Computer-Aided Design}, volume = {40}, number = {7}, pages = {760--777}, year = {2008},
+  doi = {10.1016/j.cad.2007.06.014}}
+% VERIFIED-METADATA via Crossref
+@techreport{kim2007nistir7433,
+  author = {Kim, Junhwan and Pratt, Michael J. and Iyer, Raj and Sriram, Ram D.},
+  title = {Data exchange of parametric {CAD} models using {ISO} 10303-108},
+  institution = {NIST}, number = {NISTIR 7433}, year = {2007}, doi = {10.6028/NIST.IR.7433}}
+% VERIFIED-METADATA via Crossref
+@article{kim2011procedural2d,
+  author = {Kim, Byung Chul and Mun, Duhwan and Han, Soonhung and Pratt, Michael J.},
+  title = {A method to exchange procedurally represented {2D} {CAD} model data using {ISO} 10303 {STEP}},
+  journal = {Computer-Aided Design}, volume = {43}, number = {12}, pages = {1717--1728}, year = {2011},
+  doi = {10.1016/j.cad.2011.07.006}}
+% ABSTRACT-LEVEL + Crossref. TODO-VERIFY: last four authors, volume/number/pages (completed from memory).
+@article{safdar2020macroparametric,
+  author = {Safdar, Mutahar and Jauhar, Tahir Abbas and Kim, Youngki and Lee, Hanra and Noh, Chiho and Kim, Hyungki and Lee, Inhwan and Kim, Imgyu and Kwon, Soonjo and Han, Soonhung},
+  title = {Feature-based translation of {CAD} models with macro-parametric approach: issues of feature mapping, persistent naming, and constraint translation},
+  journal = {Journal of Computational Design and Engineering}, volume = {7}, number = {5}, pages = {603--614}, year = {2020},
+  doi = {10.1093/jcde/qwaa043}}
+% ABSTRACT-LEVEL + Crossref. TODO-VERIFY: first author (Crossref gave "Kim Y").
+@article{kim2019assembly,
+  author = {Kim, Byung Chul and Lee, Hanra and Safdar, Mutahar and Jauhar, Tahir Abbas and Han, Soonhung},
+  title = {Exchange of parametric assembly models based on neutral assembly constraints},
+  journal = {Concurrent Engineering}, year = {2019}, doi = {10.1177/1063293X19869047}}
+% GREY-LIT (title from search snippet; iso.org 403)
+@misc{iso10303_112,
+  author = {{ISO}},
+  title = {{ISO} 10303-112:2006 Part 112: Integrated application resource: Modelling commands for the exchange of procedurally represented {2D} {CAD} models},
+  year = {2006}, url = {https://www.iso.org/standard/39581.html}, urldate = {2026-09-29}}
+% VERIFIED-METADATA (Crossref + abstract via OpenAlex)
+@article{brunnermeier2002interop,
+  author = {Brunnermeier, Smita B. and Martin, Sheila A.},
+  title = {Interoperability costs in the {US} automotive supply chain},
+  journal = {Supply Chain Management: An International Journal}, volume = {7}, number = {2}, pages = {71--82}, year = {2002},
+  doi = {10.1108/13598540210425821}}
+% GREY-LIT
+@misc{brunnermeier1999interop,
+  author = {Brunnermeier, Smita B. and Martin, Sheila A.},
+  title = {Interoperability Cost Analysis of the {U.S.} Automotive Supply Chain},
+  howpublished = {NIST Planning Report 99-1, prepared by RTI}, year = {1999},
+  url = {https://www.rti.org/sites/default/files/resources/US_Automotive.pdf}, urldate = {2026-09-29}}
+
+% ------------------------------------------------------------ CAD as language
+% VERIFIED-METADATA via Crossref
+@article{machado2019openscad,
+  author = {Machado, Felipe and Malpica, Norberto and Borromeo, Susana},
+  title = {Parametric {CAD} modeling for open source scientific hardware: Comparing {OpenSCAD} and {FreeCAD} Python scripts},
+  journal = {PLOS ONE}, volume = {14}, number = {12}, pages = {e0225795}, year = {2019}, doi = {10.1371/journal.pone.0225795}}
+% VERIFIED-METADATA via Crossref
+@article{nandi2018functional,
+  author = {Nandi, Chandrakana and Wilcox, James R. and Panchekha, Pavel and Blau, Taylor and Grossman, Dan and Tatlock, Zachary},
+  title = {Functional programming for compiling and decompiling computer-aided design},
+  journal = {Proceedings of the ACM on Programming Languages}, volume = {2}, number = {ICFP}, pages = {1--31}, year = {2018},
+  doi = {10.1145/3236794}}
+% VERIFIED-METADATA via Crossref
+@inproceedings{nandi2020szalinski,
+  author = {Nandi, Chandrakana and Willsey, Max and Anderson, Adam and Wilcox, James R. and Darulova, Eva and Grossman, Dan and Tatlock, Zachary},
+  title = {Synthesizing structured {CAD} models with equality saturation and inverse transformations},
+  booktitle = {Proceedings of the 41st ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI)},
+  pages = {31--44}, year = {2020}, doi = {10.1145/3385412.3386012}}
+% VERIFIED-METADATA via Crossref (subtitle from OpenAlex)
+@article{jones2020shapeassembly,
+  author = {Jones, R. Kenny and Barton, Theresa and Xu, Xianghao and Wang, Kai and Jiang, Ellen and Guerrero, Paul and Mitra, Niloy J. and Ritchie, Daniel},
+  title = {{ShapeAssembly}: Learning to Generate Programs for {3D} Shape Structure Synthesis},
+  journal = {ACM Transactions on Graphics}, volume = {39}, number = {6}, pages = {1--20}, year = {2020}, doi = {10.1145/3414685.3417812}}
+% VERIFIED-METADATA via Crossref
+@article{ritchie2023neurosymbolic,
+  author = {Ritchie, Daniel and Guerrero, Paul and Jones, R. Kenny and Mitra, Niloy J. and Schulz, Adriana and Willis, Karl D. D. and Wu, Jiajun},
+  title = {Neurosymbolic Models for Computer Graphics},
+  journal = {Computer Graphics Forum}, volume = {42}, number = {2}, pages = {545--568}, year = {2023}, doi = {10.1111/cgf.14775}}
+% GREY-LIT
+@misc{openscad, title = {{OpenSCAD}: The Programmers Solid {3D} {CAD} Modeller}, url = {https://openscad.org}, urldate = {2026-09-29}}
+@misc{cadquery_selectors, author = {{CadQuery contributors}}, title = {{CadQuery} documentation: String Selectors Reference},
+  url = {https://cadquery.readthedocs.io/en/latest/selectors.html}, urldate = {2026-09-29}}
+@misc{build123d_concepts, author = {{build123d contributors}}, title = {build123d documentation: Key Concepts},
+  url = {https://build123d.readthedocs.io/en/latest/key_concepts.html}, urldate = {2026-09-29}}
+@misc{onshape_featurescript, author = {{Onshape}}, title = {{FeatureScript} Standard Library Documentation},
+  url = {https://cad.onshape.com/FsDoc/library.html}, urldate = {2026-09-29}}
+@misc{onshape_api, author = {{Onshape}}, title = {Onshape {API} Documentation},
+  url = {https://onshape-public.github.io/docs/}, urldate = {2026-09-29}}
+@misc{zoo_kcl, author = {Chalmers, Adam}, title = {{KCL}: A Programming Language for Parametric {CAD}},
+  howpublished = {Zoo research blog}, year = {2025}, note = {2025-05-20},
+  url = {https://zoo.dev/research/introducing-kcl}, urldate = {2026-09-29}}
+@misc{fusion_api, author = {{Autodesk}}, title = {Fusion {API} User's Manual},
+  url = {https://help.autodesk.com/view/fusion360/ENU/?guid=GUID-A92A4B10-3781-4925-94C6-47DA85A4F65A}, urldate = {2026-09-29}}
+@misc{solidworks_api, author = {{Dassault Syst\`emes}}, title = {{SOLIDWORKS} {API} Help},
+  url = {https://help.solidworks.com/2024/english/api/sldworksapiprogguide/Welcome.htm}, urldate = {2026-09-29}}
+
+% ------------------------------------------------ learned construction sequences
+% VERIFIED-METADATA via arXiv + OpenAlex. TODO-VERIFY: peer-reviewed venue (possibly ICML 2020 workshop).
+@misc{seff2020sketchgraphs,
+  author = {Seff, Ari and Ovadia, Yaniv and Zhou, Wenda and Adams, Ryan P.},
+  title = {{SketchGraphs}: A Large-Scale Dataset for Modeling Relational Geometry in Computer-Aided Design},
+  year = {2020}, eprint = {2007.08506}, archivePrefix = {arXiv}}
+% VERIFIED-METADATA via arXiv + OpenAlex
+@misc{ganin2021cadlanguage,
+  author = {Ganin, Yaroslav and Bartunov, Sergey and Li, Yujia and Keller, Ethan and Saliceti, Stefano},
+  title = {Computer-Aided Design as Language}, year = {2021}, eprint = {2105.02769}, archivePrefix = {arXiv}}
+% VERIFIED-METADATA via Semantic Scholar + OpenAlex
+@inproceedings{seff2022vitruvion,
+  author = {Seff, Ari and Zhou, Wenda and Richardson, Nick and Adams, Ryan P.},
+  title = {Vitruvion: A Generative Model of Parametric {CAD} Sketches},
+  booktitle = {International Conference on Learning Representations (ICLR)}, year = {2022}}
+% VERIFIED-METADATA via Crossref
+@inproceedings{wu2021deepcad,
+  author = {Wu, Rundi and Xiao, Chang and Zheng, Changxi},
+  title = {{DeepCAD}: A Deep Generative Network for Computer-Aided Design Models},
+  booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)}, pages = {6752--6762}, year = {2021},
+  doi = {10.1109/ICCV48922.2021.00670}}
+% VERIFIED-METADATA via PMLR
+@inproceedings{xu2022skexgen,
+  author = {Xu, Xiang and Willis, Karl D. D. and Lambourne, Joseph G. and Cheng, Chin-Yi and Jayaraman, Pradeep Kumar and Furukawa, Yasutaka},
+  title = {{SkexGen}: Autoregressive Generation of {CAD} Construction Sequences with Disentangled Codebooks},
+  booktitle = {Proceedings of the 39th International Conference on Machine Learning}, series = {PMLR}, volume = {162},
+  pages = {24698--24724}, year = {2022}}
+% VERIFIED-METADATA via Crossref. TODO-VERIFY: trailing authors (Crossref truncated at six).
+@inproceedings{khan2024text2cad,
+  author = {Khan, Mohammad Sadil and Sinha, Sankalp and Sheikh, Talha Uddin and Stricker, Didier and Ali, Sk Aziz and Afzal, Muhammad Zeshan},
+  title = {{Text2CAD}: Generating Sequential {CAD} Designs from Beginner-to-Expert Level Text Prompts},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS 2024)}, pages = {7552--7579}, year = {2024},
+  doi = {10.52202/079017-0242}}
+% VERIFIED-METADATA via Crossref
+@inproceedings{rukhovich2025cadrecode,
+  author = {Rukhovich, Danila and Dupont, Elona and Mallis, Dimitrios and Cherenkova, Kseniya and Kacem, Anis and Aouada, Djamila},
+  title = {{CAD-Recode}: Reverse Engineering {CAD} Code From Point Clouds},
+  booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)}, pages = {9801--9811}, year = {2025},
+  doi = {10.1109/ICCV51701.2025.00914}}
+
+% ------------------------------------------------------------ persistent naming
+% VERIFIED-METADATA via Crossref (all in this block)
+@article{capoyleas1996generic,
+  author = {Capoyleas, Vasilis and Chen, Xiangping and Hoffmann, Christoph M.},
+  title = {Generic naming in generative, constraint-based design},
+  journal = {Computer-Aided Design}, volume = {28}, number = {1}, pages = {17--26}, year = {1996}, doi = {10.1016/0010-4485(95)00014-3}}
+@article{kripac1997mechanism,
+  author = {Kripac, Jiri},
+  title = {A mechanism for persistently naming topological entities in history-based parametric solid models},
+  journal = {Computer-Aided Design}, volume = {29}, number = {2}, pages = {113--122}, year = {1997}, doi = {10.1016/S0010-4485(96)00040-1}}
+@article{bidarra2000semantic,
+  author = {Bidarra, Rafael and Bronsvoort, Willem F.}, title = {Semantic feature modelling},
+  journal = {Computer-Aided Design}, volume = {32}, number = {3}, pages = {201--225}, year = {2000}, doi = {10.1016/S0010-4485(99)00090-1}}
+@inproceedings{marcheix2002survey,
+  author = {Marcheix, David and Pierra, Guy}, title = {A survey of the persistent naming problem},
+  booktitle = {Proceedings of the Seventh ACM Symposium on Solid Modeling and Applications}, pages = {13--22}, year = {2002},
+  doi = {10.1145/566282.566288}}
+@inproceedings{bidarra2002persistent,
+  author = {Bidarra, Rafael and Bronsvoort, Willem F.}, title = {Persistent naming through persistent entities},
+  booktitle = {Geometric Modeling and Processing (GMP 2002)}, pages = {233--240}, year = {2002}, doi = {10.1109/GMAP.2002.1027515}}
+@article{wang2005geometry,
+  author = {Wang, Yan and Nnaji, Bartholomew O.},
+  title = {Geometry-based semantic {ID} for persistent and interoperable reference in feature-based parametric modeling},
+  journal = {Computer-Aided Design}, volume = {37}, number = {10}, pages = {1081--1093}, year = {2005}, doi = {10.1016/j.cad.2004.11.009}}
+@article{farjana2018mechanisms,
+  author = {Farjana, Shahjadi Hisan and Han, Soonhung},
+  title = {Mechanisms of Persistent Identification of Topological Entities in {CAD} Systems: A Review},
+  journal = {Alexandria Engineering Journal}, volume = {57}, number = {4}, pages = {2837--2849}, year = {2018}, doi = {10.1016/j.aej.2018.01.007}}
+% GREY-LIT
+@misc{occt_ocaf, author = {{Open CASCADE}}, title = {{OCCT} User Guides: {OCAF} -- Naming ({TNaming})},
+  url = {https://occt3d.com/dev/doc/overview/html/occt_user_guides__ocaf.html}, urldate = {2026-09-29}}
+@misc{freecad10_notes, author = {{FreeCAD project}}, title = {{FreeCAD} 1.0 Release Notes}, year = {2024}, note = {Released 2024-11-19},
+  url = {https://freecad.github.io/Website/download/releases/1-0/}, urldate = {2026-09-29}}
+
+% ------------------------------------------------------- LLM / agent CAD generation
+% VERIFIED-FULLTEXT (CAD'26 PDF); journal version 10.14733/cadaps.2027.19-35
+@inproceedings{hepworth2026iterative,
+  author = {Hepworth, Ammon I. and Gauch, John M.},
+  title = {Iterative Generation of Feature-Based {CAD} Models Using an {LLM} With Domain-Specific Constraints},
+  booktitle = {Proceedings of CAD'26}, pages = {7--13}, year = {2026}, doi = {10.14733/cadconfP.2026.7-13}}
+% VERIFIED-FULLTEXT (arXiv HTML); accepted to CVPR 2026 per arXiv comment
+@inproceedings{pyatov2026cadfs,
+  author = {Pyatov, Vladislav and Bobrovskikh, Gleb and Galochkin, Saveliy and Boldyrev, Nikita and Voynov, Oleg and Filippov, Alexander and Ferrer, Gonzalo and Wonka, Peter and Burnaev, Evgeny},
+  title = {{CADFS}: A Big {CAD} Program Dataset and Framework for Computer-Aided Design with Large Language Models},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}, year = {2026}, eprint = {2605.01925}, archivePrefix = {arXiv}}
+% VERIFIED-FULLTEXT (arXiv v1 PDF)
+@misc{makatura2023llmdesign,
+  author = {Makatura, Liane and Foshey, Michael and Wang, Bohan and H{\"a}hnLein, Felix and Ma, Pingchuan and Deng, Bolei and Tjandrasuwita, Megan and Spielberg, Andrew and Owens, Crystal Elaine and Chen, Peter Yichen and Zhao, Allan and Zhu, Amy and Norton, Wil J. and Gu, Edward and Jacob, Joshua and Li, Yifei and Schulz, Adriana and Matusik, Wojciech},
+  title = {How Can Large Language Models Help Humans in Design and Manufacturing?}, year = {2023}, eprint = {2307.14377}, archivePrefix = {arXiv}}
+% VERIFIED-FULLTEXT (arXiv HTML) + ICLR 2025 proceedings page
+@inproceedings{alrashedy2025cadcodeverify,
+  author = {Alrashedy, Kamel and Tambwekar, Pradyumna and Zaidi, Zulfiqar and Langwasser, Megan and Xu, Wei and Gombolay, Matthew},
+  title = {Generating {CAD} Code with Vision-Language Models for {3D} Designs},
+  booktitle = {International Conference on Learning Representations (ICLR)}, year = {2025}, eprint = {2410.05340}, archivePrefix = {arXiv}}
+% VERIFIED-FULLTEXT (arXiv HTML)
+@misc{badagabettu2024query2cad,
+  author = {Badagabettu, Akshay and Yarlagadda, Sai Sravan and Barati Farimani, Amir},
+  title = {{Query2CAD}: Generating {CAD} models using natural language queries}, year = {2024}, eprint = {2406.00144}, archivePrefix = {arXiv}}
+% VERIFIED-METADATA (Crossref) + ABSTRACT-LEVEL. TODO-VERIFY: trailing authors.
+@inproceedings{mallis2025cadassistant,
+  author = {Mallis, Dimitrios and Karadeniz, Ahmet Serdar and Cavada, Sebastian and Rukhovich, Danila and Foteinopoulou, Niki and Cherenkova, Kseniya and Kacem, Anis and Aouada, Djamila},
+  title = {{CAD-Assistant}: Tool-Augmented {VLLMs} as Generic {CAD} Task Solvers},
+  booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)}, year = {2025}, doi = {10.1109/ICCV51701.2025.00684}}
+% ABSTRACT-LEVEL (arXiv)
+@misc{kumar2025genaicad,
+  author = {Kumar, Sumit and Kapoor, Sarthak and Vardhan, Harsh and Zhao, Yao},
+  title = {Generative {AI} for {CAD} Automation: Leveraging Large Language Models for {3D} Modelling}, year = {2025}, eprint = {2508.00843}, archivePrefix = {arXiv}}
+% ABSTRACT-LEVEL (arXiv)
+@misc{xu2024cadmllm,
+  author = {Xu, Jingwei and Wang, Chenyu and Zhao, Zibo and Liu, Wen and Ma, Yi and Gao, Shenghua},
+  title = {{CAD-MLLM}: Unifying Multimodality-Conditioned {CAD} Generation With {MLLM}}, year = {2024}, eprint = {2411.04954}, archivePrefix = {arXiv}}
+% VERIFIED-METADATA via Crossref (issue 7; no page/article number in Crossref)
+@article{doris2026cadcoder,
+  author = {Doris, Anna C. and Alam, Md Ferdous and Heyrani Nobari, Amin and Ahmed, Faez},
+  title = {{CAD-Coder}: An Open-Source Vision-Language Model for Computer-Aided Design Code Generation},
+  journal = {Journal of Mechanical Design}, volume = {148}, number = {7}, year = {2026}, doi = {10.1115/1.4071305}}
+% VERIFIED-FULLTEXT (arXiv HTML)
+@misc{ataei2026zerotocad,
+  author = {Ataei, Mohammadmehdi and Askari, Farzaneh and Rahimi Malekshan, Kamal and Jayaraman, Pradeep Kumar},
+  title = {{Zero-to-CAD}: Agentic Synthesis of Interpretable {CAD} Programs at Million-Scale Without Real Data},
+  year = {2026}, eprint = {2604.24479}, archivePrefix = {arXiv}}
+% ABSTRACT-LEVEL + Crossref. TODO-VERIFY: first names; output language ("CAD program").
+@article{li2024llm4cad,
+  author = {Li, Xingang and Sun, Yuewan and Sha, Zhenghui},
+  title = {{LLM4CAD}: Multimodal Large Language Models for Three-Dimensional Computer-Aided Design Generation},
+  journal = {Journal of Computing and Information Science in Engineering}, year = {2024}, doi = {10.1115/1.4067085}}
+@article{sun2025llm4cadft,
+  author = {Sun, Yuewan and Li, Xingang and Sha, Zhenghui},
+  title = {Large Language Models for Computer-Aided Design Fine Tuned: Dataset and Experiments},
+  journal = {Journal of Mechanical Design}, year = {2025}, doi = {10.1115/1.4067713}}
+% GREY-LIT
+@misc{fusion_mcp, author = {{Autodesk}}, title = {Autodesk Fusion {MCP} Server},
+  url = {https://help.autodesk.com/view/ADSKMCP/ENU/?guid=ADSKMCP_FusionDesktopMcp_autodesk_fusion_mcp_server_html}, urldate = {2026-09-29}}
+@misc{freecad_mcp, author = {{neka-nat}}, title = {freecad-mcp: {FreeCAD} {MCP} server},
+  url = {https://github.com/neka-nat/freecad-mcp}, urldate = {2026-09-29}}
+@misc{cad_agent_hub, title = {{CAD-Agent-Hub}: {MCP} servers for {CATIA}, {SolidWorks}, {NX} and {Fusion}},
+  url = {https://github.com/xizh01/CAD-Agent-Hub}, urldate = {2026-09-29}}
+
+% --------------------------------------------------- measuring exchange quality
+% GREY-LIT (full PDF read; thresholds sec. 4.11)
+@misc{caxif_gvp_2014,
+  author = {Boy, Jochen and Rosch{\'e}, Phil and Cheney, Doug},
+  title = {Recommended Practices for Geometric and Assembly Validation Properties, Release 4.2},
+  howpublished = {CAx Implementor Forum}, year = {2014}, month = oct,
+  url = {https://www.mbx-if.org/home/wp-content/uploads/2024/05/rec_prac_gvp_v42.pdf}, urldate = {2026-09-29}}
+% GREY-LIT. TODO-VERIFY: edition year (ISO lists 2021 and 2022).
+@misc{iso10303_59, author = {{ISO}},
+  title = {{ISO} 10303-59: Part 59: Integrated generic resource: Quality of product shape data},
+  year = {2022}, url = {https://www.iso.org/standard/84678.html}, urldate = {2026-09-29}}
+% VERIFIED-METADATA (Crossref)
+@article{kikuchi2010pdq,
+  author = {Kikuchi, Yoshihito and Hiraoka, Hiroyuki and Otaka, Akihiko and Tanaka, Fumiki and Kobayashi, Kazuya G. and Soma, Atsuto},
+  title = {{PDQ} (Product Data Quality): Representation of Data Quality for Product Data and Specifically for Shape Data},
+  journal = {Journal of Computing and Information Science in Engineering}, volume = {10}, number = {2}, year = {2010}, doi = {10.1115/1.3402615}}
+% VERIFIED-METADATA (Design Society page + OpenAlex)
+@inproceedings{gerbino2004interop,
+  author = {Gerbino, Salvatore and Brondi, Alessandro},
+  title = {Interoperability Issues Among {CAD} Systems: A Benchmarking Study of 7 Commercial {MCAD} Software},
+  booktitle = {Proceedings of DESIGN 2004, the 8th International Design Conference (DS 32)}, pages = {617--626}, year = {2004}}
+% VERIFIED-METADATA (Crossref)
+@article{hoffmann2014queries,
+  author = {Hoffmann, Christoph and Shapiro, Vadim and Srinivasan, Vijay}, title = {Geometric interoperability via queries},
+  journal = {Computer-Aided Design}, volume = {46}, pages = {148--159}, year = {2014}, doi = {10.1016/j.cad.2013.08.027}}
+@article{sap2019invariant,
+  author = {Sap, Duygu and Shapiro, Vadim},
+  title = {On Verification of Interoperability of {CAD} Systems with a Focus on Invariant Properties},
+  journal = {Computer-Aided Design}, volume = {115}, pages = {256--266}, year = {2019}, doi = {10.1016/j.cad.2019.05.004}}
+% ABSTRACT-LEVEL (arXiv)
+@misc{sap2020dtest, author = {Sap, Duygu and Szabo, Daniel P.}, title = {An Automated Approach for the Discovery of Interoperability},
+  year = {2020}, eprint = {2001.10585}, archivePrefix = {arXiv}}
+% VERIFIED-METADATA (Crossref; abstract elided)
+@article{sap2025interop,
+  author = {Sap, Duygu and Szabo, Daniel P.},
+  title = {Representation and system-agnostic automated {CAD} interoperability testing based on model interchangeability},
+  journal = {Journal of Computer Languages}, volume = {85}, pages = {101365}, year = {2025}, doi = {10.1016/j.cola.2025.101365}}
+@article{gonzalezlluch2017survey,
+  author = {Gonz{\'a}lez-Lluch, Carmen and Company, Pedro and Contero, Manuel and Camba, Jorge D. and Plumed, Raquel},
+  title = {A survey on {3D} {CAD} model quality assurance and testing tools},
+  journal = {Computer-Aided Design}, volume = {83}, pages = {64--79}, year = {2017}, doi = {10.1016/j.cad.2016.10.003}}
+@techreport{lipman2017nistpmi,
+  author = {Lipman, Robert R. and Filliben, James J.},
+  title = {Guide to the {NIST} {PMI} {CAD} Models and {CAD} System {PMI} Modeling Capability Verification Testing Results},
+  institution = {National Institute of Standards and Technology}, number = {NIST AMS 100-10}, year = {2017}, doi = {10.6028/NIST.AMS.100-10}}
+@article{lipman2020gdt,
+  author = {Lipman, Robert and Filliben, James}, title = {Testing Implementations of Geometric Dimensioning and Tolerancing in {CAD} Software},
+  journal = {Computer-Aided Design and Applications}, volume = {17}, number = {6}, pages = {1241--1265}, year = {2020}, doi = {10.14733/cadaps.2020.1241-1265}}
+@article{lipman2015conformance,
+  author = {Lipman, Robert and Lubell, Joshua},
+  title = {Conformance checking of {PMI} representation in {CAD} model {STEP} data exchange files},
+  journal = {Computer-Aided Design}, volume = {66}, pages = {14--23}, year = {2015}, doi = {10.1016/j.cad.2015.04.002}}
+@techreport{cheney2015report1,
+  author = {Cheney, Douglas C. and Fischer, Bryan R.},
+  title = {Measuring the {PMI} Modeling Capability in {CAD} Systems: Report 1 -- Combined Test Case Verification},
+  institution = {National Institute of Standards and Technology}, number = {NIST GCR 15-997}, year = {2015}, doi = {10.6028/NIST.GCR.15-997}}
+@techreport{lipman2021sfa,
+  author = {Lipman, Robert R. and Kwon, Soonjo}, title = {{STEP} File Analyzer and Viewer User Guide (Update 7)},
+  institution = {National Institute of Standards and Technology}, number = {NIST AMS 200-12}, year = {2021}, doi = {10.6028/NIST.AMS.200-12}}
+% GREY-LIT
+@misc{nist_mbe_pmi, author = {{National Institute of Standards and Technology}}, title = {{MBE} {PMI} Validation and Conformance Testing Project},
+  url = {https://www.nist.gov/ctl/smart-connected-systems-division/smart-connected-manufacturing-systems-group/mbe-pmi-validation}, urldate = {2026-09-29}}
+
+% ----------------------------------------------------------- metrics and oracles
+% VERIFIED-METADATA (Crossref) unless noted
+@article{requicha1980solids,
+  author = {Requicha, Aristides G.}, title = {Representations for Rigid Solids: Theory, Methods, and Systems},
+  journal = {ACM Computing Surveys}, volume = {12}, number = {4}, pages = {437--464}, year = {1980}, doi = {10.1145/356827.356833}}
+@article{tilove1980smc,
+  author = {Tilove, Robert B.}, title = {Set Membership Classification: A Unified Approach to Geometric Intersection Problems},
+  journal = {IEEE Transactions on Computers}, volume = {C-29}, number = {10}, pages = {874--883}, year = {1980}, doi = {10.1109/TC.1980.1675470}}
+@article{huttenlocher1993hausdorff,
+  author = {Huttenlocher, Daniel P. and Klanderman, Gregory A. and Rucklidge, William J.}, title = {Comparing images using the {Hausdorff} distance},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence}, volume = {15}, number = {9}, pages = {850--863}, year = {1993}, doi = {10.1109/34.232073}}
+@article{kettner2008robustness,
+  author = {Kettner, Lutz and Mehlhorn, Kurt and Pion, Sylvain and Schirra, Stefan and Yap, Chee},
+  title = {Classroom examples of robustness problems in geometric computations},
+  journal = {Computational Geometry}, volume = {40}, number = {1}, pages = {61--78}, year = {2008}, doi = {10.1016/j.comgeo.2007.06.003}}
+@article{zhou2016mesharr,
+  author = {Zhou, Qingnan and Grinspun, Eitan and Zorin, Denis and Jacobson, Alec}, title = {Mesh arrangements for solid geometry},
+  journal = {ACM Transactions on Graphics}, volume = {35}, number = {4}, year = {2016}, doi = {10.1145/2897824.2925901}}
+% VERIFIED-METADATA via dblp/S2 listings seen through search (dblp bot-gated). No DOI.
+@article{mckeeman1998differential,
+  author = {McKeeman, William M.}, title = {Differential Testing for Software},
+  journal = {Digital Technical Journal}, volume = {10}, number = {1}, pages = {100--107}, year = {1998}}
+@inproceedings{yang2011csmith,
+  author = {Yang, Xuejun and Chen, Yang and Eide, Eric and Regehr, John}, title = {Finding and understanding bugs in {C} compilers},
+  booktitle = {Proceedings of the 32nd ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI)},
+  pages = {283--294}, year = {2011}, doi = {10.1145/1993498.1993532}}
+@article{barr2015oracle,
+  author = {Barr, Earl T. and Harman, Mark and McMinn, Phil and Shahbaz, Muzammil and Yoo, Shin}, title = {The Oracle Problem in Software Testing: A Survey},
+  journal = {IEEE Transactions on Software Engineering}, volume = {41}, number = {5}, pages = {507--525}, year = {2015}, doi = {10.1109/TSE.2014.2372785}}
+@article{donaldson2017shader,
+  author = {Donaldson, Alastair F. and Evrard, Hugues and Lascu, Andrei and Thomson, Paul}, title = {Automated testing of graphics shader compilers},
+  journal = {Proceedings of the ACM on Programming Languages}, volume = {1}, number = {OOPSLA}, pages = {1--29}, year = {2017}, doi = {10.1145/3133917}}
+@article{deng2024spatter,
+  author = {Deng, Wenjing and Mang, Qiuyang and Zhang, Chengyu and Rigger, Manuel}, title = {Finding Logic Bugs in Spatial Database Engines via Affine Equivalent Inputs},
+  journal = {Proceedings of the ACM on Management of Data}, volume = {2}, number = {6}, pages = {1--26}, year = {2024}, doi = {10.1145/3698810}}
