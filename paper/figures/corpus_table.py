@@ -57,6 +57,15 @@ def how_recovered(r):
     if r.get("method") == "revolve":
         return "revolve"
     w = " ".join(r.get("warnings", []))
+    sh = re.search(r"open shell along \(([^)]*)\)", w)
+    if sh:
+        v = [abs(float(x)) for x in sh.group(1).split(",")]
+        d = re.search(r"draft ([-\d.]+) deg outside", w)
+        bits = [f"drafted shell ∥{'XYZ'[v.index(max(v))]}" + (f" ({abs(float(d.group(1))):.1f}°)" if d else "")]
+        rec = r.get("recovered") or {}
+        if rec.get("pockets") or rec.get("holes"):
+            bits.append(f"+{rec.get('pockets', 0)} pockets, +{rec.get('holes', 0)} cross-holes")
+        return " · ".join(bits)
     m = re.search(r"extrude axis \(([^)]*)\)", w)
     axis = "Z"
     if m:
@@ -89,8 +98,11 @@ def main():
         b = m.get("best") or m.get("at_harness_rot") or {}
         name, group = label(part)
         verified = r["status"] == "VERIFIED"
-        iou = (f"{b['iou_pct']:.2f} ± {b['ci_pct']:.2f}" if verified
-               else f"≥ {b['iou_pct']:.1f}") if b.get("iou_pct") is not None else "—"
+        # exact registration (the recogniser's own transform undone) makes IoU a measurement;
+        # only a search-registered figure is a lower bound, and is marked as one
+        exact = b.get("registration") == "exact"
+        iou = ((f"{b['iou_pct']:.2f} ± {b['ci_pct']:.2f}" if verified else f"{b['iou_pct']:.1f} ± {b['ci_pct']:.1f}")
+               if exact else f"≥ {b['iou_pct']:.1f}") if b.get("iou_pct") is not None else "—"
         rows.append({
             "Part": name, "NIST set": group, "Verdict": r["status"], "Fails": fails(r),
             "Volume error": f"{r['dvol_pct']:.2f}%",
@@ -106,11 +118,11 @@ def main():
             for p in sorted(runs) if runs[p]["status"] == "PARTIAL"]
     ious = [x for x in ious if x is not None]
     summary = (f"{n} of {n} parts yield an editable tree; {nv} VERIFIED, {n - nv} PARTIAL, "
-               f"0 refused. PARTIAL IoU floors range {min(ious):.1f}–{max(ious):.1f}%.")
+               f"0 refused. PARTIAL IoU ranges {min(ious):.1f}–{max(ious):.1f}%.")
 
     gate = (f"Gate: volume error ≤ {100 * VOL_TOL:g}% and extent error ≤ {DIM_TOL:g} mm. "
-            "IoU is Boolean-free (60 000 sampled points, 95% interval); "
-            "a PARTIAL figure is a lower bound.")
+            "IoU is Boolean-free (60 000 sampled points, 95% interval) and exactly registered: "
+            "the recogniser's own rotation and offset are undone, so it is a measurement, not a bound.")
 
     md = ["| " + " | ".join(cols) + " |", "|" + "---|" * len(cols)]
     for r in rows:

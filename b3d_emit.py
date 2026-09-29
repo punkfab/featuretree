@@ -142,10 +142,13 @@ def emit(spec):
             # absolute-coord prism_cut placed against it). +Z matches the FreeCAD emitter.
             d = -1.0 if (part is not None and z0 < -1e-6
                          and abs(z0 - _face_z(part, "bottom")) < 1e-6) else 1.0
+            taper = f.get("taper", 0.0)
+            if taper and f.get("symmetric"):
+                raise ValueError(f"pad '{f['name']}': taper with symmetric is not supported")
             solid = None
             for fc in faces:
                 s = (extrude(fc, amount=length / 2, both=True) if f.get("symmetric")
-                     else extrude(fc, amount=length, dir=(0, 0, d)))
+                     else extrude(fc, amount=length, dir=(0, 0, d), taper=taper))
                 solid = s if solid is None else solid + s
             part = solid if part is None else part + solid
             params[f["name"]] = {"length": round(float(length), 4)}
@@ -164,7 +167,8 @@ def emit(spec):
                 sign = -1.0 if z0 >= _face_z(part, "top") - 1e-6 else 1.0
                 cutter = None
                 for fc in faces:
-                    s = extrude(fc, amount=sign * depth)
+                    # explicit direction so `taper` always means "shrinks going INTO the part"
+                    s = extrude(fc, amount=depth, dir=(0, 0, sign), taper=f.get("taper", 0.0))
                     cutter = s if cutter is None else cutter + s
                 params[f["name"]] = {"length": round(float(depth), 4), "type": "Length"}
             part = part - cutter

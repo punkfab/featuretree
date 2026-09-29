@@ -35,14 +35,26 @@ def sketch(name, plane="XY", circles=(), rects=(), polys=(), on=None):
             "polys": [[list(p) for p in poly] for poly in polys]}
 
 
-def pad(name, sketch, length, symmetric=False):
-    return {"kind": "pad", "name": name, "sketch": sketch,
-            "length": length, "symmetric": symmetric}
+def pad(name, sketch, length, symmetric=False, taper=0.0):
+    """Extrude a sketch. `taper` (degrees) drafts the walls: POSITIVE shrinks the profile along the
+    extrusion, negative grows it — build123d's convention, which the FreeCAD emitter maps onto
+    PartDesign's TaperAngle. Molded parts carry ~0.5-3 deg of draft so they release from the
+    mould. The key is only written when non-zero, so untapered IR is unchanged."""
+    d = {"kind": "pad", "name": name, "sketch": sketch, "length": length, "symmetric": symmetric}
+    if taper:
+        d["taper"] = float(taper)
+    return d
 
 
-def pocket(name, sketch, through=True, length=None):
-    return {"kind": "pocket", "name": name, "sketch": sketch,
-            "through": through, "length": length}
+def pocket(name, sketch, through=True, length=None, taper=0.0):
+    """Cut a sketch into the solid. `taper` (degrees, blind pockets only): POSITIVE shrinks the
+    profile as the cut goes deeper — the drafted cavity of a molded box."""
+    d = {"kind": "pocket", "name": name, "sketch": sketch, "through": through, "length": length}
+    if taper:
+        if through:
+            raise ValueError("a tapered pocket must be blind (through=False)")
+        d["taper"] = float(taper)
+    return d
 
 
 def fillet(name, radius, select):

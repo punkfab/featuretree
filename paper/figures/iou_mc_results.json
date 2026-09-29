@@ -3,38 +3,21 @@
     {
       "part": "nist_ctc_01_asme1_rd.stp",
       "status": "VERIFIED",
-      "at_harness_rot": {
-        "rot": [
-          0,
-          0,
-          0
-        ],
-        "iou_pct": 99.81656985631305,
-        "ci_pct": 0.06557940484720368
+      "best": {
+        "registration": "exact",
+        "iou_pct": 99.80904274978441,
+        "ci_pct": 0.06715777851118974
       },
       "boolean_iou_pct": 99.8602824541582,
-      "boolean_agrees": true
+      "boolean_agrees": false
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          0,
-          270,
-          270
-        ],
-        "iou_pct": 3.8781163434903045,
-        "ci_pct": 0.3366588236307958
-      },
       "best": {
-        "rot": [
-          0,
-          90,
-          0
-        ],
-        "iou_pct": 3.947475074977709,
-        "ci_pct": 0.3436096720700927
+        "registration": "exact",
+        "iou_pct": 7.441412520064206,
+        "ci_pct": 0.4121716275467823
       },
       "boolean_iou_pct": 11.336476863021758,
       "boolean_agrees": false
@@ -42,23 +25,10 @@
     {
       "part": "nist_ctc_03_asme1_rc.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          0,
-          90,
-          0
-        ],
-        "iou_pct": 0.14265335235378032,
-        "ci_pct": 0.27940106964572253
-      },
       "best": {
-        "rot": [
-          90,
-          0,
-          90
-        ],
-        "iou_pct": 6.525735294117648,
-        "ci_pct": 1.4675820090258789
+        "registration": "exact",
+        "iou_pct": 36.06217616580311,
+        "ci_pct": 3.0296838043077465
       },
       "boolean_iou_pct": 58.53682417218046,
       "boolean_agrees": false
@@ -66,47 +36,21 @@
     {
       "part": "nist_ctc_04_asme1_rd.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          180,
-          180,
-          90
-        ],
-        "iou_pct": 25.03686409437208,
-        "ci_pct": 0.47063158682949385
-      },
       "best": {
-        "rot": [
-          0,
-          0,
-          90
-        ],
-        "iou_pct": 25.014550467146577,
-        "ci_pct": 0.4698211741544878
+        "registration": "exact",
+        "iou_pct": 30.82962155926555,
+        "ci_pct": 0.5123588398707979
       },
       "boolean_iou_pct": 25.168330369039012,
-      "boolean_agrees": true
+      "boolean_agrees": false
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          90,
-          180,
-          0
-        ],
-        "iou_pct": 8.025792289751681,
-        "ci_pct": 0.6237335168571404
-      },
       "best": {
-        "rot": [
-          90,
-          0,
-          0
-        ],
-        "iou_pct": 8.185595567867036,
-        "ci_pct": 0.6323652915967741
+        "registration": "exact",
+        "iou_pct": 14.490238611713666,
+        "ci_pct": 0.8296703977671179
       },
       "boolean_iou_pct": 11.419057254919315,
       "boolean_agrees": false
@@ -114,119 +58,53 @@
     {
       "part": "nist_ftc_06_asme1_rd.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          0,
-          0,
-          0
-        ],
-        "iou_pct": 23.096800656275633,
-        "ci_pct": 0.5290385722510673
-      },
       "best": {
-        "rot": [
-          90,
-          180,
-          0
-        ],
-        "iou_pct": 39.34446278970219,
-        "ci_pct": 0.5294432208227108
+        "registration": "exact",
+        "iou_pct": 59.576708434242384,
+        "ci_pct": 0.569844439227727
       },
       "boolean_iou_pct": 22.858668556735022,
-      "boolean_agrees": true
+      "boolean_agrees": false
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          90,
-          90,
-          270
-        ],
-        "iou_pct": 29.334730225248823,
-        "ci_pct": 0.8338185293528856
-      },
       "best": {
-        "rot": [
-          0,
-          90,
-          0
-        ],
-        "iou_pct": 30.257212374000698,
-        "ci_pct": 0.8393058547205732
+        "registration": "exact",
+        "iou_pct": 94.92542582296355,
+        "ci_pct": 0.4041225001669666
       },
       "boolean_iou_pct": 30.017567394520444,
-      "boolean_agrees": true
+      "boolean_agrees": false
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          90,
-          90,
-          270
-        ],
-        "iou_pct": 52.9082774049217,
-        "ci_pct": 0.9865635569918336
-      },
       "best": {
-        "rot": [
-          0,
-          90,
-          0
-        ],
-        "iou_pct": 53.261967279337505,
-        "ci_pct": 0.9827395314509639
+        "registration": "exact",
+        "iou_pct": 52.73821464393179,
+        "ci_pct": 0.9800004286764321
       },
-      "boolean_iou_pct": 53.212867427834624,
-      "boolean_agrees": true
+      "boolean_iou_pct": 53.212867427834624
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
       "status": "VERIFIED",
-      "at_harness_rot": {
-        "rot": [
-          270,
-          0,
-          0
-        ],
-        "iou_pct": 99.74087627336564,
-        "ci_pct": 0.04431637147878844
-      },
       "best": {
-        "rot": [
-          90,
-          180,
-          180
-        ],
-        "iou_pct": 99.6700191665514,
-        "ci_pct": 0.049965337099051585
+        "registration": "exact",
+        "iou_pct": 99.70424701289483,
+        "ci_pct": 0.04726029307636059
       },
       "boolean_iou_pct": 99.68387930093449,
-      "boolean_agrees": true
+      "boolean_agrees": false
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
       "status": "PARTIAL",
-      "at_harness_rot": {
-        "rot": [
-          180,
-          180,
-          270
-        ],
-        "iou_pct": 1.204519023093537,
-        "ci_pct": 0.1948741677387959
-      },
       "best": {
-        "rot": [
-          0,
-          0,
-          0
-        ],
-        "iou_pct": 46.46333377536136,
-        "ci_pct": 0.5034280900373577
+        "registration": "exact",
+        "iou_pct": 75.96147713502137,
+        "ci_pct": 0.47296878904080697
       },
       "boolean_iou_pct": 74.34634805200588,
       "boolean_agrees": false
@@ -234,26 +112,13 @@
     {
       "part": "nist_ftc_11_asme1_rb.stp",
       "status": "VERIFIED",
-      "at_harness_rot": {
-        "rot": [
-          0,
-          0,
-          270
-        ],
-        "iou_pct": 100.0,
-        "ci_pct": 1.2197936343176479e-06
-      },
       "best": {
-        "rot": [
-          0,
-          0,
-          0
-        ],
-        "iou_pct": 99.99609725637123,
-        "ci_pct": 0.0076492282431367895
+        "registration": "exact",
+        "iou_pct": 100.0,
+        "ci_pct": 1.2212371355782296e-06
       },
       "boolean_iou_pct": 99.9996837608224,
-      "boolean_agrees": true
+      "boolean_agrees": false
     }
   ]
 }

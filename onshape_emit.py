@@ -45,9 +45,13 @@ def emit(spec, doc_id):
             _add_entities(sk, f)
             sketches[f["name"]] = sk
         elif kind == "pad":
+            if f.get("taper"):
+                raise NotImplementedError(f"pad '{f['name']}': taper is not supported by the Onshape backend yet")
             sk = sketches[f["sketch"]]
             ps.add_extrude(faces=sk.faces, distance=f["length"] * SCALE, name=f["name"])
         elif kind == "pocket":
+            if f.get("taper"):
+                raise NotImplementedError(f"pocket '{f['name']}': taper is not supported by the Onshape backend yet")
             sk = sketches[f["sketch"]]
             parts = ps.list_parts()
             depth = (f.get("length") or 1000.0) * SCALE   # through -> overshoot, clipped by the part

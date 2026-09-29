@@ -228,15 +228,16 @@ def _recover_multiaxis(spec, orig, axis, name):
     feats = list(spec["features"])
     counts = {"pockets": 0, "holes": 0, "residual_lumps": 0}
 
-    # Work in the EMITTED base's own frame: emit the base, then translate the axis-aligned original so
-    # its bounding box coincides with it. (The base pad's direction isn't fixed — the outline winding
-    # can send it +Z or -Z — so we can't assume z in [0, thick]; matching bboxes makes recovery
-    # frame-agnostic, and the two share the same outer envelope so min-corner alignment is exact.)
+    # Work in the EMITTED base's own frame. The base sketch uses the aligned part's own X/Y
+    # coordinates and b3d_emit pads it deterministically +Z from z=0, so the two frames differ ONLY
+    # by the part's base height along Z. (This used to align bounding-box corners in X and Y too,
+    # which is right only when the base outline spans the part's full extent; FTC-07's rim lip
+    # overhangs its drafted walls by 3.18 mm, and every carved feature landed 3.18 mm off.)
     part, _ = b3d_emit.emit(IR.part(name, *feats))
     pbb = part.bounding_box()
     aligned = _align_to_z(orig, axis)
     abb = aligned.bounding_box()
-    aligned0 = aligned.translate((pbb.min.X - abb.min.X, pbb.min.Y - abb.min.Y, pbb.min.Z - abb.min.Z))
+    aligned0 = aligned.translate((0.0, 0.0, pbb.min.Z - abb.min.Z))
     base_z0, top_z0 = pbb.min.Z, pbb.max.Z
 
     # (A) floor pockets — every significant intermediate perpendicular-to-axis planar face is a floor.
@@ -314,6 +315,212 @@ def _find_revolve_axis(solid):
         if _is_revolve_about(solid, a):
             return a.normalized()
     return None
+
+
+# ------------------------------------------------------------------ SHELL (open box) recognition
+# An open box, cup or enclosure is not a prism along ANY axis: across its opening you cut two
+# stray walls, along it the section changes with depth (draft, a floor at one end). Looking at
+# it from several aspects is what reveals it: along the opening axis a dense stack of slices is
+# mostly RINGS (one region, one large inner loop), solid at the floor end and open at the other.
+# That is recovered as what a designer would draw — pad the outer outline, pocket the cavity from
+# the open face to the floor — and handed to multi-axis recovery for slots, bosses and holes.
+# The largest outer outline and the SMALLEST cavity are used so the result contains the part:
+# carving can only remove, and it cannot put back what an over-cut took.
+
+SHELL_SLICES = 24
+SHELL_MIN_RING_FRAC = 0.5    # at least half the slices must be rings
+SHELL_MIN_CAVITY = 0.3       # inner loop >= 30% of the outer loop's area
+
+
+def _arc3(p0, pm, p1):
+    """Circle through three 2D points -> (center, radius), or None if collinear."""
+    ax, ay = p0; bx, by = pm; cx, cy = p1
+    d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+    if abs(d) < 1e-12:
+        return None
+    ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d
+    uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d
+    return (ux, uy), math.hypot(ax - ux, ay - uy)
+
+
+def _approx_segments(e, tol, depth=0, t0=0.0, t1=1.0):
+    """Segments (start, end, bulge) approximating edge `e` over [t0, t1]: exact for lines and
+    circular arcs, otherwise circular arcs through (start, mid, end), split until every sub-arc
+    stays within `tol` of the curve at its quarter points. Used for the drafted corner rounds
+    of molded parts, whose sections are ellipses; the rebuild check still judges the result."""
+    a, b, m = e @ t0, e @ t1, e @ ((t0 + t1) / 2)
+    p0, p1, pm = (a.X, a.Y), (b.X, b.Y), (m.X, m.Y)
+    chord = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+    if chord < EPS:
+        return []
+    ux, uy = (p1[0] - p0[0]) / chord, (p1[1] - p0[1]) / chord
+    sag = -uy * (pm[0] - p0[0]) + ux * (pm[1] - p0[1])
+    if e.geom_type in (GeomType.LINE, GeomType.CIRCLE) and t0 == 0.0 and t1 == 1.0:
+        return [(_r2(a), _r2(b), 0.0 if e.geom_type == GeomType.LINE else _edge_bulge(e))]
+    circ = _arc3(p0, pm, p1)
+    ok = True
+    for t in (t0 + (t1 - t0) / 4, t0 + 3 * (t1 - t0) / 4):
+        q = e @ t
+        if circ is None:
+            dev = abs(-uy * (q.X - p0[0]) + ux * (q.Y - p0[1]))
+        else:
+            (cx, cy), r = circ
+            dev = abs(math.hypot(q.X - cx, q.Y - cy) - r)
+        ok = ok and dev <= tol
+    if ok or depth >= 5:
+        bulge = 0.0 if circ is None or abs(sag) < 1e-9 else round(2.0 * sag / chord, 6)
+        return [(_r2(a), _r2(b), bulge)]
+    tm = (t0 + t1) / 2
+    return _approx_segments(e, tol, depth + 1, t0, tm) + _approx_segments(e, tol, depth + 1, tm, t1)
+
+
+def _approx_poly(wire, tol=DIM_TOL):
+    """A closed wire as an ordered (x, y, bulge) loop, conics approximated by arcs."""
+    segs = [s for e in wire.edges() for s in _approx_segments(e, tol)]
+    if not segs:
+        return None
+    order = [(segs[0][0], segs[0][2])]
+    used, tail = {0}, segs[0][1]
+    while len(used) < len(segs):
+        for i, (st, en, bl) in enumerate(segs):
+            if i in used:
+                continue
+            if _close(st, tail):
+                order.append((st, bl)); used.add(i); tail = en; break
+            if _close(en, tail):
+                order.append((en, -bl)); used.add(i); tail = st; break
+        else:
+            return None                                   # did not close into one loop
+    return [[p[0], p[1], b] for (p, b) in order]
+
+
+def _slice(solid, bb, z):
+    return solid.intersect(Plane.XY.offset(z) * Rectangle(bb.size.X + 50, bb.size.Y + 50)).faces()
+
+
+def _ring(faces):
+    """(outer_wire, largest_inner_wire, outer_area, inner_area) if the slice is one region with a
+    large inner loop, else None."""
+    if len(faces) != 1:
+        return None
+    f = faces[0]
+    inners = list(f.inner_wires())
+    if not inners:
+        return None
+    from build123d import Face
+    oa = Face(f.outer_wire()).area
+    big = max(inners, key=lambda w: Face(w).area)
+    ia = Face(big).area
+    return (f.outer_wire(), big, oa, ia) if ia >= SHELL_MIN_CAVITY * oa else None
+
+
+def _recognize_shell(orig, name, axis):
+    """Recognize `orig` as an open shell (box / cup / enclosure) along `axis`, or raise."""
+    solid = _align_to_z(orig, axis)
+    bb = solid.bounding_box()
+    base_z, thick = bb.min.Z, bb.size.Z
+    # cheap pre-check: five slices, most of which must already be rings, before the full stack
+    probe = [_ring(_slice(solid, bb, base_z + f * thick)) for f in (0.3, 0.45, 0.6, 0.75, 0.9)]
+    probe2 = [_ring(_slice(solid, bb, base_z + f * thick)) for f in (0.1,)]
+    if sum(r is not None for r in probe) < 2 and probe2[0] is None:
+        raise ValueError("not a shell along this axis (pre-check)")
+    zs = [base_z + (k + 0.5) / SHELL_SLICES * thick for k in range(SHELL_SLICES)]
+    rings = [_ring(_slice(solid, bb, z)) for z in zs]
+    n_ring = sum(r is not None for r in rings)
+    if n_ring < SHELL_MIN_RING_FRAC * SHELL_SLICES:
+        raise ValueError(f"not a shell along this axis ({n_ring}/{SHELL_SLICES} ring slices)")
+    # open end = the end whose outermost slices are rings; the floor end is where they stop
+    top_open, bot_open = rings[-1] is not None, rings[0] is not None
+    if top_open == bot_open:
+        raise ValueError("cavity is open at both ends or neither — a tube, not an open shell")
+    ring_idx = [k for k, r in enumerate(rings) if r is not None]
+    # floor: just beyond the ring slice FARTHEST from the opening. Slices between it and the
+    # opening may still be non-rings — a slot through a side wall splits the section into several
+    # regions — so the floor is not "the first non-ring from the open end".
+    if top_open:
+        k_far = ring_idx[0]
+        if k_far == 0:
+            raise ValueError("no floor: rings reach both ends")
+        lo, hi = zs[k_far - 1], zs[k_far]
+    else:
+        k_far = ring_idx[-1]
+        if k_far == SHELL_SLICES - 1:
+            raise ValueError("no floor: rings reach both ends")
+        lo, hi = zs[k_far], zs[k_far + 1]
+    for _ in range(12):
+        mid = (lo + hi) / 2
+        is_ring = _ring(_slice(solid, bb, mid)) is not None
+        if top_open:        # rings above the floor: a ring at mid means the floor is below it
+            lo, hi = (lo, mid) if is_ring else (mid, hi)
+        else:               # rings below the floor
+            lo, hi = (mid, hi) if is_ring else (lo, mid)
+    floor_z = hi if top_open else lo
+    depth = (bb.max.Z - floor_z) if top_open else (floor_z - base_z)
+
+    # DRAFT. Fit how the outer outline and the cavity grow with depth across the ring slices.
+    # Molded walls are drafted (FTC-07: ~1 deg inside and out), so the right recovery is a tapered
+    # pad and a tapered pocket, not a straight envelope that fills the walls in.
+    ring_z = [zs[k] for k in ring_idx]
+    def _fit(sizes):
+        n = len(sizes)
+        mz, ms = sum(ring_z) / n, sum(sizes) / n
+        sxx = sum((z - mz) ** 2 for z in ring_z)
+        return sum((z - mz) * (v - ms) for z, v in zip(ring_z, sizes)) / sxx if sxx else 0.0
+    def _half_widths(k, which):
+        w = rings[k][0 if which == "outer" else 1].bounding_box()
+        return (w.size.X + w.size.Y) / 4                 # mean half-width of the loop
+    # robust to a rim lip or floor bosses: fit on the middle 60% of ring slices
+    lo_i, hi_i = int(0.2 * len(ring_idx)), max(int(0.8 * len(ring_idx)), int(0.2 * len(ring_idx)) + 2)
+    mid = ring_idx[lo_i:hi_i]
+    ring_z = [zs[k] for k in mid]
+    out_slope = _fit([_half_widths(k, "outer") for k in mid])      # d(half-width)/dz
+    cav_slope = _fit([_half_widths(k, "cavity") for k in mid])
+    draft_out = math.degrees(math.atan(out_slope))
+    draft_cav = math.degrees(math.atan(cav_slope))
+    drafted = abs(draft_out) > 0.05 or abs(draft_cav) > 0.05
+
+    # Outline: the pad starts at the bottom plane and grows +Z, so an outline that widens upward is
+    # a NEGATIVE taper (IR convention: positive shrinks). The section AT the bottom can be anything
+    # -- FTC-07's is a 25 mm foot below the floor -- so take the outer loop of a clean wall slice
+    # and carry it down to the bottom plane along the fitted draft: a 2D offset of -dz*tan(draft).
+    eps = min(0.25, 0.01 * thick)
+    if drafted:
+        from build123d import Face, offset, Kind
+        k_ref = mid[0]
+        dz = zs[k_ref] - base_z
+        shifted = offset(Face(rings[k_ref][0]), amount=-dz * out_slope, kind=Kind.ARC)
+        outer_w = (shifted.faces()[0] if hasattr(shifted, "faces") else shifted).outer_wire()
+    else:
+        outer_w = max((r for r in rings if r), key=lambda r: r[2])[0]
+    # Cavity: the pocket starts at the OPEN face and narrows going in by the cavity draft. The
+    # section right at the rim is often not a clean ring (a lip, notches), so as for the outline,
+    # take a clean wall slice's cavity loop and carry it to the open face along the fitted draft.
+    if drafted:
+        from build123d import Face, offset, Kind
+        k_ref = mid[-1] if top_open else mid[0]
+        dz = (bb.max.Z - zs[k_ref]) if top_open else (zs[k_ref] - base_z)
+        grow = dz * cav_slope if top_open else -dz * cav_slope    # toward the open face
+        shifted = offset(Face(rings[k_ref][1]), amount=grow, kind=Kind.ARC)
+        cav_w = (shifted.faces()[0] if hasattr(shifted, "faces") else shifted).outer_wire()
+    else:
+        cav_w = min((r for r in rings if r), key=lambda r: r[3])[1]   # smallest: never over-cuts
+    outline, hole = _approx_poly(outer_w), _approx_poly(cav_w)
+    if outline is None or hole is None:
+        raise ValueError("shell outline or cavity did not close into one loop")
+    pad_taper = round(-draft_out, 4) if drafted else 0.0
+    # going INTO the part from the open face the cavity shrinks if it widens toward that face
+    pocket_taper = round(draft_cav if top_open else -draft_cav, 4) if drafted else 0.0
+    warnings = [f"open shell along {tuple(round(c, 3) for c in axis.to_tuple())}: "
+                f"{n_ring}/{SHELL_SLICES} ring slices, cavity {depth:.2f} deep from the "
+                f"{'top' if top_open else 'bottom'} face"
+                + (f"; draft {draft_out:.2f} deg outside, {draft_cav:.2f} deg inside" if drafted else "")]
+    feats = [IR.sketch("outline", "XY", polys=[outline]),
+             IR.pad("body", "outline", length=round(thick, 4), taper=pad_taper),
+             IR.sketch("cavity_sk", polys=[hole], on={"face_of": "body", "side": "top" if top_open else "bottom"}),
+             IR.pocket("cavity", "cavity_sk", through=False, length=round(depth, 4), taper=pocket_taper)]
+    return IR.part(name, *feats), {"method": "extrude", "axis": axis, "warnings": warnings,
+                                   "shell": True, "through_holes": 0, "blind_holes": 0}
+
 
 
 def _recognize_revolve(orig, name):
@@ -425,6 +632,45 @@ def _through_centroids(solid, base_z, top_z, bb):
     return inner_keys(base_z + d) & inner_keys(top_z - d)
 
 
+def input_frame(orig, report):
+    """Map the recovered tree's frame back onto the INPUT's, exactly.
+
+    Recognition rotates the chosen axis onto +Z (_align_to_z) and, for an extrude, builds the base
+    pad from z = 0 where the aligned part starts at its own base height. Undoing exactly that is an
+    exact registration — no orientation search, no corner alignment — so an IoU measured through
+    it is a MEASUREMENT of the recovery, not a lower bound on it. Returns (place, point, direction):
+    place(shape) moves a build123d shape, point/direction map (x, y, z) tuples."""
+    solid = orig.solids()[0] if hasattr(orig, "solids") and orig.solids() else orig
+    a = Vector(*report["extrude_axis"]).normalized()
+    z = Vector(0, 0, 1)
+    rotated = abs(a.dot(z)) <= 1 - ANG                  # mirrors _align_to_z's own test
+    k = a.cross(z).normalized() if rotated else None
+    ang = math.degrees(math.acos(max(-1.0, min(1.0, a.dot(z))))) if rotated else 0.0
+    dz = _align_to_z(solid, a).bounding_box().min.Z if report.get("method") == "extrude" else 0.0
+
+    def place(shape):
+        s = Pos(0, 0, dz) * shape
+        return s.rotate(Axis((0, 0, 0), k.to_tuple()), -ang) if rotated else s
+
+    def _rot(v):                                         # Rodrigues, by -ang about k
+        if not rotated:
+            return v
+        t = math.radians(-ang)
+        c, sn = math.cos(t), math.sin(t)
+        kv = (k.Y * v[2] - k.Z * v[1], k.Z * v[0] - k.X * v[2], k.X * v[1] - k.Y * v[0])
+        kd = k.X * v[0] + k.Y * v[1] + k.Z * v[2]
+        kk = (k.X, k.Y, k.Z)
+        return tuple(v[i] * c + kv[i] * sn + kk[i] * kd * (1 - c) for i in range(3))
+
+    def point(p):
+        return _rot((p[0], p[1], p[2] + dz))
+
+    def direction(v):
+        return _rot(tuple(v))
+
+    return place, point, direction
+
+
 def _report_for(spec, extras, name):
     ax = extras.get("axis")
     return {"name": name, "features": len(spec["features"]), "method": extras.get("method"),
@@ -456,6 +702,13 @@ def recognize(step_path, name=None, verify=True, recover=True):
         cands.append(_recognize_revolve(orig, name))
     except Exception:
         pass
+    # Open shells, looked at along each principal axis (see _recognize_shell). A five-slice
+    # pre-check rejects most parts before the full slice stack is cut.
+    for ax in (Vector(0, 0, 1), Vector(0, 1, 0), Vector(1, 0, 0)):
+        try:
+            cands.append(_recognize_shell(orig, name, ax))
+        except Exception:
+            continue
     if not cands:
         raise ValueError("neither a recognizable extrude nor a body of revolution")
     if not verify:

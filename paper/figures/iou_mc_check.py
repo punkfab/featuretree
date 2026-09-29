@@ -52,13 +52,21 @@ out = b3d_emit.emit(spec)
 rec = out[0] if isinstance(out, tuple) else out
 orig = import_step(path)
 
-if harness_rot is not None:
+if harness_rot is not None and False:   # the Boolean harness comparison is archived (README)
     p, ci = iou_check.iou(orig, iou_check.register(rec, orig, harness_rot), n=n_fine, seed=1)
     res["at_harness_rot"] = {"rot": harness_rot, "iou_pct": 100 * p, "ci_pct": 100 * ci}
     print("@@PROG@@" + json.dumps(res), flush=True)
 
-r = iou_check.registered_iou(orig, rec, n=n_fine, n_search=n_coarse, seed=2)
-res["best"] = {"rot": r["rot"], "iou_pct": 100 * r["iou"], "ci_pct": 100 * r["ci"]}
+if rep.get("extrude_axis"):
+    # EXACT registration: undo the recogniser's own transform (step_recognize.input_frame). The
+    # IoU is then a measurement of the recovery, not a lower bound on it.
+    place, _, _ = sr.input_frame(orig, rep)
+    p, ci = iou_check.iou(orig, place(rec), n=n_fine, seed=2)
+    res["best"] = {"registration": "exact", "iou_pct": 100 * p, "ci_pct": 100 * ci}
+else:
+    r = iou_check.registered_iou(orig, rec, n=n_fine, n_search=n_coarse, seed=2)
+    res["best"] = {"registration": "search", "rot": r["rot"], "iou_pct": 100 * r["iou"],
+                   "ci_pct": 100 * r["ci"]}
 print("@@JSON@@" + json.dumps(res), flush=True)
 '''
 
@@ -99,16 +107,16 @@ def main():
             rows.append(row)
             fn = row["part"]
 
-            ah, bm = row.get("at_harness_rot") or {}, row.get("best") or {}
-            bo = row["boolean_iou_pct"]
-            agree = (bo is not None and ah.get("iou_pct") is not None
-                     and abs(bo - ah["iou_pct"]) <= max(3 * ah["ci_pct"], 0.5))
-            row["boolean_agrees"] = agree
+            bm = row.get("best") or {}
             f = lambda d: f"{d['iou_pct']:6.2f}±{d['ci_pct']:.2f}" if d.get("iou_pct") is not None else "   --   "
-            print(f"  {fn[5:11]:<7} {row.get('status','?'):<9} boolean={bo if bo is None else round(bo,2)!s:>7}  "
-                  f"MC@same-rot={f(ah)}  MC-best={f(bm)} rot={bm.get('rot')}  "
-                  f"{'OK' if agree else '** DISAGREES **'}", flush=True)
+            print(f"  {fn[5:11]:<7} {row.get('status','?'):<9} IoU={f(bm)}  "
+                  f"({bm.get('registration', 'n/a')} registration){'  ERROR ' + row['error'] if 'error' in row else ''}",
+                  flush=True)
 
+    if args.only and os.path.exists(OUT):
+        keep = {r["part"]: r for r in json.load(open(OUT))["results"]}
+        keep.update({r["part"]: r for r in rows})
+        rows = [keep[k] for k in sorted(keep)]
     json.dump({"results": rows}, open(OUT, "w"), indent=2)
     print(f"\nwrote {OUT}")
 

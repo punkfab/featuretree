@@ -54,8 +54,7 @@ def score(geom_path, pmi_path):
     orig = import_step(geom_path)
     bb = iou_check.solid_part(orig).bounding_box()
     desc = intent.describe(spec, extents=(bb.size.X, bb.size.Y, bb.size.Z))
-    reg = iou_check.registered_iou(orig, rec, n=20000, n_search=1500)
-    to_pt, to_dir = iou_check.registration_transform(rec, orig, reg["rot"])
+    _, to_pt, to_dir = sr.input_frame(orig, rep)       # exact: the recogniser's own transform
 
     pmi = read_pmi(pmi_path)
     callouts = hole_callouts(pmi)

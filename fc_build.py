@@ -20,6 +20,11 @@ import Part
 sys.path.insert(0, os.environ.get("FC_LIBDIR", os.path.dirname(os.path.abspath(__file__))))
 import fc_common  # noqa: E402
 
+# IR taper is build123d's convention (positive = the profile shrinks along the extrusion).
+# PartDesign's TaperAngle sign is the opposite way round; see tests/test_taper.py, which builds
+# the same tapered IR in both backends and requires equal volumes.
+FC_TAPER_SIGN = -1.0
+
 
 def _add_rect(sk, w, h, cx, cy):
     hw, hh = w / 2.0, h / 2.0
@@ -108,6 +113,8 @@ def build(spec, out_path):
             p.Profile = sketches[f["sketch"]]
             p.Length = f["length"]
             p.Midplane = bool(f["symmetric"])
+            if f.get("taper"):
+                p.TaperAngle = FC_TAPER_SIGN * f["taper"]
             tip = p
         elif kind == "pocket":
             p = body.newObject("PartDesign::Pocket", f["name"])
@@ -118,6 +125,8 @@ def build(spec, out_path):
                 p.Midplane = True            # cut both ways -> robust without a face attach
             else:
                 p.Length = f["length"]
+                if f.get("taper"):
+                    p.TaperAngle = FC_TAPER_SIGN * f["taper"]
             tip = p
         elif kind == "fillet":
             fl = body.newObject("PartDesign::Fillet", f["name"])
