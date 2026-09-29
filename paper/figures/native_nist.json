@@ -11,13 +11,15 @@
     "valid": false,
     "faces": 172,
     "iou_pct": 21.39,
-    "iou_registered_pct": 23.99
+    "iou_registered_pct": 23.99,
+    "solids": 1
    },
    "onshape": {
     "dvol_pct": -0.0,
     "valid": true,
     "faces": 139,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 10,
    "designer_mix": {
@@ -33,15 +35,17 @@
    "cadmpeg": {
     "dvol_pct": -98.457,
     "valid": false,
-    "faces": 71,
+    "faces": 415,
     "iou_pct": 3.47,
-    "iou_registered_pct": 3.36
+    "iou_registered_pct": 3.36,
+    "solids": 9
    },
    "onshape": {
     "dvol_pct": 0.009,
     "valid": true,
     "faces": 487,
-    "iou_pct": 99.94
+    "iou_pct": 99.94,
+    "solids": 1
    },
    "designer_ops": 42,
    "designer_mix": {
@@ -61,13 +65,15 @@
     "valid": false,
     "faces": 165,
     "iou_pct": 11.14,
-    "iou_registered_pct": 13.02
+    "iou_registered_pct": 13.02,
+    "solids": 1
    },
    "onshape": {
     "dvol_pct": -0.164,
     "valid": true,
     "faces": 139,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 15,
    "designer_mix": {
@@ -82,16 +88,18 @@
    "part": "nist_ctc_04",
    "cadmpeg": {
     "dvol_pct": -100.0,
-    "valid": true,
+    "valid": false,
     "faces": 393,
     "iou_pct": 22.37,
-    "iou_registered_pct": 25.23
+    "iou_registered_pct": 25.23,
+    "solids": 0
    },
    "onshape": {
     "dvol_pct": -0.001,
     "valid": true,
     "faces": 405,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 24,
    "designer_mix": {
@@ -106,16 +114,18 @@
    "part": "nist_ctc_05",
    "cadmpeg": {
     "dvol_pct": -100.0,
-    "valid": true,
+    "valid": false,
     "faces": 162,
     "iou_pct": 6.99,
-    "iou_registered_pct": 8.9
+    "iou_registered_pct": 8.9,
+    "solids": 0
    },
    "onshape": {
     "dvol_pct": -0.0,
     "valid": true,
     "faces": 156,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 17,
    "designer_mix": {
@@ -135,13 +145,15 @@
     "valid": false,
     "faces": 169,
     "iou_pct": 25.83,
-    "iou_registered_pct": 38.98
+    "iou_registered_pct": 38.98,
+    "solids": 1
    },
    "onshape": {
     "dvol_pct": 0.0,
     "valid": true,
     "faces": 144,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 21,
    "designer_mix": {
@@ -158,16 +170,18 @@
    "part": "nist_ftc_07",
    "cadmpeg": {
     "dvol_pct": -100.0,
-    "valid": true,
+    "valid": false,
     "faces": 195,
     "iou_pct": 0.0,
-    "iou_registered_pct": 0.0
+    "iou_registered_pct": 0.0,
+    "solids": 0
    },
    "onshape": {
     "dvol_pct": 0.009,
     "valid": true,
     "faces": 272,
-    "iou_pct": 99.93
+    "iou_pct": 99.93,
+    "solids": 1
    },
    "designer_ops": 28,
    "designer_mix": {
@@ -187,13 +201,15 @@
     "valid": false,
     "faces": 259,
     "iou_pct": 6.95,
-    "iou_registered_pct": 7.73
+    "iou_registered_pct": 7.73,
+    "solids": 1
    },
    "onshape": {
     "dvol_pct": 0.008,
     "valid": true,
     "faces": 247,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 30,
    "designer_mix": {
@@ -211,13 +227,15 @@
     "valid": false,
     "faces": 135,
     "iou_pct": 80.72,
-    "iou_registered_pct": 80.93
+    "iou_registered_pct": 80.93,
+    "solids": 1
    },
    "onshape": {
     "dvol_pct": -0.0,
     "valid": true,
     "faces": 125,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 33,
    "designer_mix": {
@@ -233,16 +251,18 @@
    "part": "nist_ftc_10",
    "cadmpeg": {
     "dvol_pct": -100.0,
-    "valid": true,
+    "valid": false,
     "faces": 203,
     "iou_pct": 26.46,
-    "iou_registered_pct": 32.09
+    "iou_registered_pct": 32.09,
+    "solids": 0
    },
    "onshape": {
     "dvol_pct": 0.001,
     "valid": true,
     "faces": 206,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 19,
    "designer_mix": {
@@ -258,13 +278,15 @@
     "dvol_pct": -0.0,
     "valid": true,
     "faces": 6,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "onshape": {
     "dvol_pct": -0.0,
     "valid": true,
     "faces": 6,
-    "iou_pct": 100.0
+    "iou_pct": 100.0,
+    "solids": 1
    },
    "designer_ops": 1,
    "designer_mix": {
