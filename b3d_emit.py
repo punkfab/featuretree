@@ -180,6 +180,7 @@ def emit(spec):
     planes = {}            # name -> "XY" | "XZ"
     tree = []
     params = {}
+    volumes = []           # solid volume after each feature (None before the first solid)
 
     for f in spec["features"]:
         kind = f["kind"]
@@ -284,8 +285,10 @@ def emit(spec):
             params[f["name"]] = {"depth": round(float(f["depth"]), 4)}
         else:
             raise ValueError(f"unknown feature kind: {kind}")
+        volumes.append(None if part is None else round(float(part.volume), 3))
 
-    result = {"tree": tree, "volume": round(float(part.volume), 1), "params": params}
+    result = {"tree": tree, "volume": round(float(part.volume), 1), "params": params,
+              "volumes": volumes}
     return part, result
 
 

@@ -102,8 +102,9 @@ def part(name, *features):
     return {"name": name, "features": list(features)}
 
 
-def update_from_freecad(spec, params):
-    """Flow human edits (read back from a .FCStd, keyed by feature name) into the IR."""
+def update_from_params(spec, params):
+    """Flow human edits read back from any backend ({feature name: {key: value}} — FreeCAD's
+    fc_read, the Fusion read script, SolidWorks --dump) into the IR, matched by feature name."""
     for f in spec["features"]:
         p = params.get(f["name"])
         if not p:
@@ -112,11 +113,18 @@ def update_from_freecad(spec, params):
             f["length"] = p["length"]
         if f["kind"] == "fillet" and "radius" in p:
             f["radius"] = p["radius"]
+        if f["kind"] == "revolve" and "angle" in p:
+            f["angle"] = p["angle"]
+        if f["kind"] == "prism_cut" and "depth" in p:
+            f["depth"] = p["depth"]
         if f["kind"] == "sketch" and "radii" in p:
             for i, r in enumerate(p["radii"]):
                 if i < len(f["circles"]):
                     f["circles"][i][2] = r
     return spec
+
+
+update_from_freecad = update_from_params     # the original name, kept for existing callers
 
 
 # --- built-in samples (also a smoke test: volume must match a build123d twin) ---

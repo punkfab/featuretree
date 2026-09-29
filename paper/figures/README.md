@@ -252,3 +252,20 @@ FTC-09. A callout partition is a proxy for pattern truth, not the truth: a desig
 two holes of one pattern separate callouts. Drill sizes come from the ASME B94.11M values as
 tabulated on Wikipedia's "Drill bit sizes" (fetched 2026-09-29).
 
+
+---
+
+## NIST native SolidWorks parts: decoders and designer trees (`native_nist.md`)
+
+```bash
+python3 paper/figures/native_nist.py    # -> paper/figures/native_nist.{json,md}
+```
+
+Inputs are outside the repo: NIST's native CAD zip (<https://www.nist.gov/document/nist-ftc-ctc-pmi-cad-models>,
+"SolidWorks MBD 2018" folder, unzipped to `~/Downloads/nist-native/sw` or `$NIST_NATIVE`) and NIST's AP203
+geometry-only STEPs (`$NIST_STEP`). Needs `cadmpeg` on PATH (0.6.0, commit `d0f891c` for the numbers below)
+and the Onshape key pair. Decoded files and IoUs are cached next to the .SLDPRT files; `--fresh` recomputes.
+
+Observed 2026-09-29: Onshape's import matches NIST's STEP on 11/11 parts; cadmpeg's on 1/11 (FTC-11).
+The designer's tree has 1–42 solid operations per part; featuretree's recovered trees are 2–4× longer on
+the CTC parts.

@@ -10,3 +10,6 @@ out/**/*.FCBak
 out/*.FCStd
 out/*.stl
 out/*.FCBak
+
+# Fusion / SolidWorks scripts, their STEP exports and reports (regenerate with script_emit.py)
+out/cad_scripts/

@@ -296,6 +296,9 @@ into the geometry), so the world bounding-box centre — not `.location` — def
 | `fc_common.py` | FreeCAD's Python 3.11 | shared FreeCAD-side helpers |
 | `onshape_client.py` | host Python 3 | Onshape REST client (HMAC) — create a doc, run FeatureScript |
 | `onshape_emit.py` | host Python 3 | emit an IR spec → an Onshape Part Studio (via `onpy`) |
+| `script_emit.py` | host Python 3 | emit an IR spec → a Fusion or SolidWorks build script (`targets/`) |
+| `targets/*.py` | inside Fusion / SolidWorks | the runtime each generated script carries |
+| `cad_verify.py` | host Python 3 | check a target's STEP, `.sldprt` or `.f3d` against the IR (IoU + tree) |
 
 Data passes to the FreeCAD-side scripts via **env vars**, never argv — `freecadcmd` treats extra path
 arguments as documents to open.
@@ -338,6 +341,76 @@ print("https://cad.onshape.com/documents/" + doc["did"])
   profiles (100+ segments) are slow — prefer `circles` over many-sided polygons and simplify outlines.
 - **Free Onshape accounts can only create public documents.**
 - **Not yet:** fillets, face-attached sketches, non-Top planes — build123d / FreeCAD still cover those.
+
+## Fusion and SolidWorks backends (untested inside either program so far)
+
+Neither program can be driven headless from Linux, so `script_emit.py` writes a self-contained script
+that runs *inside* it: the IR as data, the build123d reference volume after every feature, and a
+small runtime in that program's own API. The runtime re-authors each feature natively (named
+sketches, extrudes, cuts with draft, revolves, fillets) and resolves the IR's face / edge queries
+against the live body, the same way the FreeCAD backend does.
+
+```bash
+python3 script_emit.py fusion part.ir.json out/            # -> out/part_fusion/ (a Fusion script folder)
+python3 script_emit.py solidworks part.ir.json out/        # -> out/part_solidworks.py (pywin32, Windows)
+```
+
+- **Fusion:** Utilities → Add-Ins → Scripts → **+**, pick the folder, Run. Builds a new design
+  with a named timeline. Every length, depth, radius and angle is a **user parameter**
+  (`ft_<feature>_<key>`). After editing them, the emitted `featuretree_fusion_read` script writes
+  them out, and `script_emit.py apply part.ir.json part.fusion.params.json` carries them back into
+  the IR by feature name.
+- **SolidWorks:** with SolidWorks open, `python part_solidworks.py` (pip install pywin32). It builds
+  a new part and saves `.SLDPRT` + `.step`. `--dump` reads the active part's `D1@<feature>`
+  dimensions back for `apply`. The IR's +Z is SolidWorks' model +Z, so Z-up parts sit on their back
+  in SolidWorks' Y-up views. The geometry is unaffected.
+
+**Verification.** Each script writes `<part>.<target>.report.json`, which lists every feature with
+its volume against the reference, so the first feature that disagrees is named. Then:
+
+```bash
+python3 cad_verify.py part.fusion.step part.ir.json --report part.fusion.report.json
+python3 cad_verify.py part.SLDPRT part.ir.json      # native file, read with cadmpeg
+python3 cad_verify.py part.f3d part.ir.json
+```
+
+A native `.sldprt` / `.f3d` is read with [cadmpeg](https://github.com/cadmpeg/cadmpeg) (Apache-2.0,
+put it on `PATH` or set `CADMPEG`). That checks two things: the geometry cadmpeg decodes from the
+saved file goes through the same Boolean-free IoU gate, and the file's stored feature history must
+contain each IR feature by name, of the right kind (extrude / cut / revolve / fillet), with the
+right blind length or radius. The second check is the editability claim itself.
+
+**Add `--onshape` for the geometry.** It imports the file with Onshape's commercial translators
+(`onshape_translate.py`; uses the Onshape key pair above; free plans make the upload **public**).
+Onshape's STEP then decides the geometry verdict and cadmpeg's is only reported. We measured both
+decoders on NIST's eleven native SolidWorks 2018 test parts against NIST's own STEP of each part:
+
+| decoder | parts matching NIST's STEP | notes |
+|---|---|---|
+| Onshape (commercial translators) | **11 / 11** | IoU 99.93–100%, volume within 0.17%, same frame |
+| cadmpeg 0.6.0 | 1 / 11 | only the single-revolve FTC-11; the rest 0–81% IoU, invalid solids |
+
+cadmpeg's feature decoding is still useful: it recovered each designer's named FeatureManager
+tree (`Boss-Extrude2`, holes, fillets, drafts, patterns) with 81 of 85 extrude depths. So the
+tree check uses cadmpeg, and the geometry check uses Onshape when it is available. The per-part
+numbers, and a comparison of each designer's tree with the tree featuretree recovers, are in
+[`paper/figures/native_nist.md`](paper/figures/native_nist.md).
+
+```bash
+python3 cad_verify.py part.SLDPRT part.ir.json --onshape   # tree via cadmpeg, geometry via Onshape
+python3 cad_verify.py part.SLDPRT --decoders-only          # no IR: do cadmpeg and Onshape agree?
+```
+
+**What is tested here and what isn't.** The tests replay every script's geometry (loops, arc
+mid-points, nesting, placed-cut frames, the polar-pocket ring) with build123d, independently of
+`b3d_emit`, and it matches the reference volume after every feature, including on a recovered NIST
+part. The vendor API calls themselves have not run yet. Three conventions are unconfirmed:
+
+- Fusion's taper sign (`TAPER_SIGN`);
+- SolidWorks' behaviour with `AddToDB` sketching (`ADD_TO_DB`);
+- the direction of a partial-angle revolve.
+
+A wrong convention shows up as a volume mismatch on the first feature that uses it.
 
 ## Use without Claude Code
 
