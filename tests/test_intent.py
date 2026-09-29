@@ -108,3 +108,18 @@ def test_nist_ctc01_holes_units_and_nominals():
     assert d["units"] == "metric"
     labels = set(d["nominals"].values())
     assert {"20 mm", "25 mm", "35 mm"} <= labels
+
+
+def test_layered_pad_inner_round_loops_are_holes_but_round_bosses_are_not():
+    """A layered tree draws holes as inner loops of each layer's pad sketch; the same hole in two
+    layers is one hole, and a round OUTLINE (a boss) is not a hole."""
+    square = [(-20, -20), (20, -20), (20, 20), (-20, 20)]
+    hole = [[-3.0, 5.0, 1.0], [3.0, 5.0, 1.0]]
+    boss = [[-40.0, 0.0, 1.0], [-30.0, 0.0, 1.0]]
+    spec = IR.part("layers",
+                   IR.sketch("L0_sk", "XY", polys=[square, hole, boss]),
+                   IR.pad("body", "L0_sk", length=5.0),
+                   IR.sketch("L1_sk", polys=[square, hole], on={"face_of": "body", "side": "top"}),
+                   IR.pad("L1", "L1_sk", length=5.0))
+    hs = intent.holes(spec)
+    assert [(h.kind, round(h.diameter, 6), h.center[:2]) for h in hs] == [("layer", 6.0, (0.0, 5.0))]

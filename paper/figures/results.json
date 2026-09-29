@@ -1,0 +1,519 @@
+{
+  "score": {
+    "coverage": "11/11",
+    "verified": 3,
+    "partial": 8,
+    "errors": 0,
+    "false_accepts": 0,
+    "iou_mean": 97.6,
+    "iou_min": 93.5,
+    "parts_ge_95": 10,
+    "parts_ge_99": 4,
+    "within_volume_gate": 6,
+    "within_extent_gate": 9,
+    "seconds_total": 1763.4,
+    "seconds_median": 152.3,
+    "seconds_max": 562.2,
+    "input_faces_total": 2727,
+    "operations_total": 431,
+    "intent_holes": [
+      97,
+      196
+    ],
+    "intent_sizes": [
+      68,
+      74
+    ],
+    "intent_units": [
+      9,
+      11
+    ]
+  },
+  "parts": [
+    {
+      "part": "CTC-01",
+      "set": "Combined",
+      "verdict": "VERIFIED",
+      "vol_err_pct": 0.14,
+      "extent_err_mm": 0.0,
+      "iou_pct": 99.83504398826979,
+      "iou_ci_pct": 0.10768233672348393,
+      "registration": "exact",
+      "gate_iou_pct": 99.726,
+      "reason": null,
+      "input_faces": 139,
+      "input_face_types": {
+        "PLANE": 80,
+        "CYLINDER": 57,
+        "CONE": 2
+      },
+      "operations": 39,
+      "features": 54,
+      "feature_kinds": {
+        "sketch": 15,
+        "pad": 1,
+        "pocket": 14,
+        "prism_cut": 24
+      },
+      "method": "extrude",
+      "seconds": 86.49,
+      "holes": [
+        7,
+        7
+      ],
+      "sizes": [
+        7,
+        7
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": null
+    },
+    {
+      "part": "CTC-02",
+      "set": "Combined",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.63,
+      "extent_err_mm": 0.011,
+      "iou_pct": 93.48249027237354,
+      "iou_ci_pct": 0.7544587485405194,
+      "registration": "exact",
+      "gate_iou_pct": 92.32,
+      "reason": null,
+      "input_faces": 663,
+      "input_face_types": {
+        "PLANE": 129,
+        "CYLINDER": 318,
+        "CONE": 158,
+        "BSPLINE": 34,
+        "SPHERE": 24
+      },
+      "operations": 89,
+      "features": 144,
+      "feature_kinds": {
+        "sketch": 55,
+        "pad": 55,
+        "prism_cut": 34
+      },
+      "method": "layered",
+      "seconds": 562.21,
+      "holes": [
+        2,
+        7
+      ],
+      "sizes": [
+        2,
+        2
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": "volume off 0.63%; overlap 93.5%"
+    },
+    {
+      "part": "CTC-03",
+      "set": "Combined",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.21,
+      "extent_err_mm": 0.036,
+      "iou_pct": 95.1890034364261,
+      "iou_ci_pct": 2.4587846333443255,
+      "registration": "exact",
+      "gate_iou_pct": 94.375,
+      "reason": "volume and extents match but the shapes overlap only 94.38% (< 99.5%): compensating errors",
+      "input_faces": 139,
+      "input_face_types": {
+        "PLANE": 86,
+        "CYLINDER": 53
+      },
+      "operations": 33,
+      "features": 64,
+      "feature_kinds": {
+        "sketch": 31,
+        "pad": 31,
+        "prism_cut": 2
+      },
+      "method": "layered",
+      "seconds": 72.18,
+      "holes": [
+        0,
+        11
+      ],
+      "sizes": [
+        0,
+        0
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": "overlap 95.2%"
+    },
+    {
+      "part": "CTC-04",
+      "set": "Combined",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.14,
+      "extent_err_mm": 0.008,
+      "iou_pct": 99.00874635568513,
+      "iou_ci_pct": 0.23443540082655387,
+      "registration": "exact",
+      "gate_iou_pct": 99.272,
+      "reason": "volume and extents match but the shapes overlap only 99.27% (< 99.5%): compensating errors",
+      "input_faces": 517,
+      "input_face_types": {
+        "CONE": 116,
+        "CYLINDER": 238,
+        "PLANE": 112,
+        "TORUS": 29,
+        "SPHERE": 22
+      },
+      "operations": 93,
+      "features": 108,
+      "feature_kinds": {
+        "sketch": 15,
+        "pad": 15,
+        "prism_cut": 78
+      },
+      "method": "layered",
+      "seconds": 193.91,
+      "holes": [
+        36,
+        41
+      ],
+      "sizes": [
+        30,
+        36
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": "overlap 99.0%"
+    },
+    {
+      "part": "CTC-05",
+      "set": "Combined",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.77,
+      "extent_err_mm": 0.0,
+      "iou_pct": 97.19573752103197,
+      "iou_ci_pct": 0.7663256109505852,
+      "registration": "exact",
+      "gate_iou_pct": 98.05,
+      "reason": null,
+      "input_faces": 208,
+      "input_face_types": {
+        "PLANE": 62,
+        "CYLINDER": 100,
+        "TORUS": 7,
+        "BSPLINE": 9,
+        "SPHERE": 4,
+        "CONE": 26
+      },
+      "operations": 40,
+      "features": 57,
+      "feature_kinds": {
+        "sketch": 17,
+        "pad": 17,
+        "prism_cut": 23
+      },
+      "method": "layered",
+      "seconds": 58.16,
+      "holes": [
+        1,
+        1
+      ],
+      "sizes": [
+        0,
+        0
+      ],
+      "units_ok": false,
+      "false_accept": false,
+      "why_not_verified": "volume off 0.77%; overlap 97.2%"
+    },
+    {
+      "part": "FTC-06",
+      "set": "Fully-toleranced",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.76,
+      "extent_err_mm": 0.0,
+      "iou_pct": 98.16782307025152,
+      "iou_ci_pct": 0.2736936425327321,
+      "registration": "exact",
+      "gate_iou_pct": 97.702,
+      "reason": null,
+      "input_faces": 144,
+      "input_face_types": {
+        "PLANE": 71,
+        "CYLINDER": 58,
+        "CONE": 4,
+        "SPHERE": 5,
+        "TORUS": 6
+      },
+      "operations": 18,
+      "features": 27,
+      "feature_kinds": {
+        "sketch": 9,
+        "pad": 9,
+        "prism_cut": 9
+      },
+      "method": "layered",
+      "seconds": 165.73,
+      "holes": [
+        0,
+        22
+      ],
+      "sizes": [
+        0,
+        0
+      ],
+      "units_ok": false,
+      "false_accept": false,
+      "why_not_verified": "volume off 0.76%; overlap 98.2%"
+    },
+    {
+      "part": "FTC-07",
+      "set": "Fully-toleranced",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.09,
+      "extent_err_mm": 1.517,
+      "iou_pct": 95.35426940046717,
+      "iou_ci_pct": 0.6645897660102879,
+      "registration": "exact",
+      "gate_iou_pct": 96.422,
+      "reason": null,
+      "input_faces": 269,
+      "input_face_types": {
+        "TORUS": 24,
+        "CYLINDER": 106,
+        "PLANE": 73,
+        "CONE": 28,
+        "SPHERE": 18,
+        "BSPLINE": 20
+      },
+      "operations": 21,
+      "features": 29,
+      "feature_kinds": {
+        "sketch": 8,
+        "pad": 3,
+        "pocket": 5,
+        "prism_cut": 13
+      },
+      "method": "extrude",
+      "seconds": 194.08,
+      "holes": [
+        4,
+        27
+      ],
+      "sizes": [
+        0,
+        0
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": "extents off 1.52 mm; overlap 95.4%"
+    },
+    {
+      "part": "FTC-08",
+      "set": "Fully-toleranced",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.26,
+      "extent_err_mm": 0.0,
+      "iou_pct": 98.71031746031747,
+      "iou_ci_pct": 0.40214980491370966,
+      "registration": "exact",
+      "gate_iou_pct": 98.747,
+      "reason": "volume and extents match but the shapes overlap only 98.75% (< 99.5%): compensating errors",
+      "input_faces": 270,
+      "input_face_types": {
+        "CYLINDER": 157,
+        "PLANE": 81,
+        "SPHERE": 20,
+        "TORUS": 12
+      },
+      "operations": 32,
+      "features": 37,
+      "feature_kinds": {
+        "sketch": 5,
+        "pad": 5,
+        "prism_cut": 27
+      },
+      "method": "layered",
+      "seconds": 152.26,
+      "holes": [
+        16,
+        16
+      ],
+      "sizes": [
+        0,
+        0
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": "overlap 98.7%"
+    },
+    {
+      "part": "FTC-09",
+      "set": "Fully-toleranced",
+      "verdict": "VERIFIED",
+      "vol_err_pct": 0.19,
+      "extent_err_mm": 0.0,
+      "iou_pct": 99.66822679068666,
+      "iou_ci_pct": 0.08675244777942517,
+      "registration": "exact",
+      "gate_iou_pct": 99.852,
+      "reason": null,
+      "input_faces": 158,
+      "input_face_types": {
+        "PLANE": 62,
+        "CYLINDER": 88,
+        "CONE": 8
+      },
+      "operations": 40,
+      "features": 80,
+      "feature_kinds": {
+        "sketch": 40,
+        "pad": 1,
+        "pocket": 39
+      },
+      "method": "extrude",
+      "seconds": 18.47,
+      "holes": [
+        29,
+        30
+      ],
+      "sizes": [
+        27,
+        27
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": null
+    },
+    {
+      "part": "FTC-10",
+      "set": "Fully-toleranced",
+      "verdict": "PARTIAL",
+      "vol_err_pct": 0.71,
+      "extent_err_mm": 0.063,
+      "iou_pct": 97.2873829520224,
+      "iou_ci_pct": 0.31283811379297827,
+      "registration": "exact",
+      "gate_iou_pct": 96.599,
+      "reason": null,
+      "input_faces": 214,
+      "input_face_types": {
+        "CYLINDER": 103,
+        "TORUS": 39,
+        "PLANE": 53,
+        "SPHERE": 10,
+        "CONE": 8,
+        "BSPLINE": 1
+      },
+      "operations": 25,
+      "features": 38,
+      "feature_kinds": {
+        "sketch": 13,
+        "pad": 13,
+        "prism_cut": 12
+      },
+      "method": "layered",
+      "seconds": 241.34,
+      "holes": [
+        0,
+        32
+      ],
+      "sizes": [
+        0,
+        0
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": "volume off 0.71%; extents off 0.06 mm; overlap 97.3%"
+    },
+    {
+      "part": "FTC-11",
+      "set": "Fully-toleranced",
+      "verdict": "VERIFIED",
+      "vol_err_pct": 0.0,
+      "extent_err_mm": 0.0,
+      "iou_pct": 100.0,
+      "iou_ci_pct": 2.1188260578687347e-06,
+      "registration": "exact",
+      "gate_iou_pct": 100.0,
+      "reason": null,
+      "input_faces": 6,
+      "input_face_types": {
+        "CYLINDER": 2,
+        "PLANE": 2,
+        "TORUS": 2
+      },
+      "operations": 1,
+      "features": 2,
+      "feature_kinds": {
+        "sketch": 1,
+        "revolve": 1
+      },
+      "method": "revolve",
+      "seconds": 18.52,
+      "holes": [
+        2,
+        2
+      ],
+      "sizes": [
+        2,
+        2
+      ],
+      "units_ok": true,
+      "false_accept": false,
+      "why_not_verified": null
+    }
+  ],
+  "history": [
+    {
+      "commit": "e84737c",
+      "label": "First full run (preprint v1)",
+      "verified": 3,
+      "partial": 5,
+      "refused_or_error": 3,
+      "iou_mean_min": null
+    },
+    {
+      "commit": "591c757",
+      "label": "Axis prefilter relaxed, multi-region sections",
+      "verified": 3,
+      "partial": 8,
+      "refused_or_error": 0,
+      "iou_mean_min": null
+    },
+    {
+      "commit": "2ef8b6a",
+      "label": "Open shells with draft; exact registration",
+      "verified": 3,
+      "partial": 8,
+      "refused_or_error": 0,
+      "iou_mean_min": [
+        61.0,
+        7.4
+      ]
+    },
+    {
+      "commit": "0f5162d",
+      "label": "Shell outline layers, floor cutouts",
+      "verified": 3,
+      "partial": 8,
+      "refused_or_error": 0,
+      "iou_mean_min": [
+        65.0,
+        7.4
+      ]
+    },
+    {
+      "commit": "HEAD",
+      "label": "Layered 2.5D recognition, two-sided (IoU) gate, crash isolation",
+      "verified": 3,
+      "partial": 8,
+      "refused_or_error": 0,
+      "iou_mean_min": [
+        97.6,
+        93.5
+      ]
+    }
+  ]
+}

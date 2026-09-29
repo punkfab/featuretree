@@ -5,8 +5,8 @@
       "status": "VERIFIED",
       "best": {
         "registration": "exact",
-        "iou_pct": 99.80904274978441,
-        "ci_pct": 0.06715777851118974
+        "iou_pct": 99.83504398826979,
+        "ci_pct": 0.10768233672348393
       },
       "boolean_iou_pct": 99.8602824541582
     },
@@ -15,8 +15,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 7.441412520064206,
-        "ci_pct": 0.4121716275467823
+        "iou_pct": 93.48249027237354,
+        "ci_pct": 0.7544587485405194
       },
       "boolean_iou_pct": 11.336476863021758
     },
@@ -25,8 +25,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 36.06217616580311,
-        "ci_pct": 3.0296838043077465
+        "iou_pct": 95.1890034364261,
+        "ci_pct": 2.4587846333443255
       },
       "boolean_iou_pct": 58.53682417218046
     },
@@ -35,8 +35,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 30.82962155926555,
-        "ci_pct": 0.5123588398707979
+        "iou_pct": 99.00874635568513,
+        "ci_pct": 0.23443540082655387
       },
       "boolean_iou_pct": 25.168330369039012
     },
@@ -45,8 +45,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 14.490238611713666,
-        "ci_pct": 0.8296703977671179
+        "iou_pct": 97.19573752103197,
+        "ci_pct": 0.7663256109505852
       },
       "boolean_iou_pct": 11.419057254919315
     },
@@ -55,8 +55,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 59.576708434242384,
-        "ci_pct": 0.569844439227727
+        "iou_pct": 98.16782307025152,
+        "ci_pct": 0.2736936425327321
       },
       "boolean_iou_pct": 22.858668556735022
     },
@@ -65,8 +65,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 95.48047389205792,
-        "ci_pct": 0.3814192776115873
+        "iou_pct": 95.35426940046717,
+        "ci_pct": 0.6645897660102879
       },
       "boolean_iou_pct": 30.017567394520444
     },
@@ -75,8 +75,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 95.88808817295464,
-        "ci_pct": 0.4006510929373665
+        "iou_pct": 98.71031746031747,
+        "ci_pct": 0.40214980491370966
       },
       "boolean_iou_pct": 53.212867427834624
     },
@@ -85,8 +85,8 @@
       "status": "VERIFIED",
       "best": {
         "registration": "exact",
-        "iou_pct": 99.70424701289483,
-        "ci_pct": 0.04726029307636059
+        "iou_pct": 99.66822679068666,
+        "ci_pct": 0.08675244777942517
       },
       "boolean_iou_pct": 99.68387930093449
     },
@@ -95,8 +95,8 @@
       "status": "PARTIAL",
       "best": {
         "registration": "exact",
-        "iou_pct": 75.96147713502137,
-        "ci_pct": 0.47296878904080697
+        "iou_pct": 97.2873829520224,
+        "ci_pct": 0.31283811379297827
       },
       "boolean_iou_pct": 74.34634805200588
     },
@@ -106,7 +106,7 @@
       "best": {
         "registration": "exact",
         "iou_pct": 100.0,
-        "ci_pct": 1.2212371355782296e-06
+        "ci_pct": 2.1188260578687347e-06
       },
       "boolean_iou_pct": 99.9996837608224
     }

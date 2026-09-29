@@ -57,13 +57,47 @@ def _poly_face(poly, plane_obj):
 
 
 def _polys_region(polys, plane_obj):
-    """polys[0] is the outer profile, polys[1:] are holes IN it -> one face (outer minus holes),
-    matching the IR spec and the FreeCAD emitter. None if there are no polys."""
+    """The region the closed polys bound, by NESTING — the same rule FreeCAD's Pad applies to a
+    sketch's closed wires: a poly inside another is a hole in it, an island inside a hole is solid
+    again, and a poly outside every other is a separate region. So "polys[0] outer, polys[1:]
+    holes" still means exactly that, and a layer of several disjoint outlines (four feet, a row of
+    lugs) is several regions in one sketch rather than being mis-read as holes. None if empty."""
     if not polys:
         return None
-    region = _poly_face(polys[0], plane_obj)
-    for hole in polys[1:]:
-        region = region - _poly_face(hole, plane_obj)
+    faces = [_poly_face(p, plane_obj) for p in polys]
+    if len(faces) == 1:
+        return faces[0]
+    loops = [[(q[0], q[1]) for q in p] for p in polys]
+    areas = [abs(f.area) for f in faces]
+
+    def pip(x, y, poly):
+        inside = False
+        for i in range(len(poly)):
+            x1, y1 = poly[i]
+            x2, y2 = poly[(i + 1) % len(poly)]
+            if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+                inside = not inside
+        return inside
+
+    order = sorted(range(len(faces)), key=lambda i: -areas[i])
+    parent, depth = {}, {}
+    for n, i in enumerate(order):
+        x, y = loops[i][0]
+        best = None
+        for j in order[:n]:
+            if areas[j] > areas[i] and pip(x, y, loops[j]) and (best is None or areas[j] < areas[best]):
+                best = j
+        parent[i] = best
+        depth[i] = 0 if best is None else depth[best] + 1
+    region = None
+    for i in order:
+        if depth[i] % 2:
+            continue
+        r = faces[i]
+        for k in order:
+            if parent.get(k) == i:
+                r = r - faces[k]
+        region = r if region is None else region + r
     return region
 
 
@@ -101,6 +135,41 @@ def _resolve_fillet_edges(part, select):
     if want == "top_outer":
         cands = sorted(cands, key=lambda e: -e.radius)[:1]
     return cands
+
+
+def _bool_fuzzy(a, b, op_cls):
+    from build123d import Shape
+    from OCP.TopTools import TopTools_ListOfShape
+    op = op_cls()
+    args, tools = TopTools_ListOfShape(), TopTools_ListOfShape()
+    args.Append(a.wrapped)
+    tools.Append(b.wrapped)
+    op.SetArguments(args)
+    op.SetTools(tools)
+    op.SetFuzzyValue(1e-4)
+    op.Build()
+    if not op.IsDone() or op.Shape().IsNull():
+        raise ValueError("Boolean failed, including with a fuzzy tolerance")
+    return Shape.cast(op.Shape())
+
+
+def _fuse(a, b):
+    """a + b, retried with a small fuzzy tolerance when OpenCASCADE returns a null shape — which
+    it does for solids with near-coincident faces, e.g. layers stacked exactly on each other."""
+    try:
+        return a + b
+    except Exception:
+        from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
+        return _bool_fuzzy(a, b, BRepAlgoAPI_Fuse)
+
+
+def _cut(a, b):
+    """a - b, with the same fuzzy retry as _fuse."""
+    try:
+        return a - b
+    except Exception:
+        from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
+        return _bool_fuzzy(a, b, BRepAlgoAPI_Cut)
 
 
 def emit(spec):
@@ -150,7 +219,7 @@ def emit(spec):
                 s = (extrude(fc, amount=length / 2, both=True) if f.get("symmetric")
                      else extrude(fc, amount=length, dir=(0, 0, d), taper=taper))
                 solid = s if solid is None else solid + s
-            part = solid if part is None else part + solid
+            part = solid if part is None else _fuse(part, solid)
             params[f["name"]] = {"length": round(float(length), 4)}
         elif kind == "pocket":
             faces, z0 = sketches[f["sketch"]]
@@ -171,7 +240,7 @@ def emit(spec):
                     s = extrude(fc, amount=depth, dir=(0, 0, sign), taper=f.get("taper", 0.0))
                     cutter = s if cutter is None else cutter + s
                 params[f["name"]] = {"length": round(float(depth), 4), "type": "Length"}
-            part = part - cutter
+            part = _cut(part, cutter)
         elif kind == "fillet":
             edges = _resolve_fillet_edges(part, f["select"])
             if not edges:
@@ -187,7 +256,7 @@ def emit(spec):
             for fc in faces:
                 s = revolve(fc, Axis.Z, revolution_arc=angle)
                 solid = s if solid is None else solid + s
-            part = solid if part is None else part + solid
+            part = solid if part is None else _fuse(part, solid)
             params[f["name"]] = {"angle": round(float(angle), 4)}
         elif kind == "polar_pocket":
             n, r, L = int(f["count"]), f["radius"], f["length"]
@@ -200,7 +269,7 @@ def emit(spec):
                 # points it along the tangent at azimuth a; Pos drops it on the roller station.
                 cyl = Pos(px, py, z0p) * Rot(0, 0, a) * Rot(90, 0, 0) * Cylinder(r, L)
                 cutter = cyl if cutter is None else cutter + cyl
-            part = part - cutter
+            part = _cut(part, cutter)
             params[f["name"]] = {"count": n, "radius": round(float(r), 4)}
         elif kind == "prism_cut":
             # a profile in the plane {origin, x_dir, normal}, extruded `depth` along +normal, cut.
@@ -211,7 +280,7 @@ def emit(spec):
             pl = Plane(origin=tuple(f["origin"]), x_dir=tuple(f["xdir"]), z_dir=nrm)
             region = _polys_region(f["polys"], pl)
             if region is not None:
-                part = part - extrude(region, amount=f["depth"], dir=nrm)
+                part = _cut(part, extrude(region, amount=f["depth"], dir=nrm, taper=f.get("taper", 0.0)))
             params[f["name"]] = {"depth": round(float(f["depth"]), 4)}
         else:
             raise ValueError(f"unknown feature kind: {kind}")

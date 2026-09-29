@@ -40,13 +40,14 @@ OUT = os.path.join("paper", "figures", "iou_mc_results.json")
 WORKER = r'''
 import json, os, sys
 sys.path.insert(0, os.getcwd())
+sys.path.insert(0, os.path.join(os.getcwd(), "paper", "figures"))
 import b3d_emit, iou_check, step_recognize as sr
 from build123d import import_step
 
 path, harness_rot, n_coarse, n_fine = sys.argv[1], json.loads(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
 
 res = {"part": os.path.basename(path)}
-spec, rep = sr.recognize(path)
+spec, rep = __import__("_recovered").load(path)
 res["status"] = "VERIFIED" if rep.get("verified") else "PARTIAL"
 out = b3d_emit.emit(spec)
 rec = out[0] if isinstance(out, tuple) else out

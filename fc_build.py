@@ -24,6 +24,8 @@ import fc_common  # noqa: E402
 # PartDesign's TaperAngle sign is the opposite way round; see tests/test_taper.py, which builds
 # the same tapered IR in both backends and requires equal volumes.
 FC_TAPER_SIGN = -1.0
+# prism_cut is a REVERSED Pocket, whose taper sign is pinned separately by the same parity test
+FC_PRISM_TAPER_SIGN = -1.0
 
 
 def _add_rect(sk, w, h, cx, cy):
@@ -187,6 +189,8 @@ def build(spec, out_path):
             p.Profile = sk
             p.Length = f["depth"]
             p.Reversed = True                       # cut along +normal (the datum's Z)
+            if f.get("taper"):
+                p.TaperAngle = FC_PRISM_TAPER_SIGN * f["taper"]
             tip = p
         else:
             raise ValueError(f"unknown feature kind: {kind}")

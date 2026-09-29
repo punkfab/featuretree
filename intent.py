@@ -150,6 +150,20 @@ def holes(spec):
             rounds += [c for c in (circle_of(p) for p in sk.get("polys", [])) if c]
             for cx, cy, d in rounds:
                 out.append(Hole(d, (cx, cy, 0.0), (0.0, 0.0, 1.0), kind, depth, f["name"]))
+        elif k == "pad":
+            # A LAYERED tree (step_recognize._recognize_layers) draws each layer's holes as inner
+            # loops of its pad sketch: a round loop nested an odd number of loops deep is a hole
+            # through that layer. The same hole recurs in every layer it passes, so dedupe on axis.
+            polys = sketches.get(f["sketch"], {}).get("polys", [])
+            for i, p in enumerate(polys):
+                c = circle_of(p)
+                if not c:
+                    continue
+                depth_ = sum(1 for j, q in enumerate(polys) if j != i and _inside(c[:2], q))
+                if depth_ % 2 == 1 and not any(h.kind == "layer" and abs(h.diameter - c[2]) < 0.02
+                                               and math.hypot(h.center[0] - c[0], h.center[1] - c[1]) < 0.02
+                                               for h in out):
+                    out.append(Hole(c[2], (c[0], c[1], 0.0), (0.0, 0.0, 1.0), "layer", None, f["name"]))
         elif k == "revolve":
             # A revolved profile's constant-radius straight edges are cylinders about Z: the
             # innermost is a BORE, the outermost the OUTER diameter, anything between a STEP.
@@ -176,6 +190,18 @@ def holes(spec):
                     ctr = tuple(o[i] + u * x[i] + v * y[i] for i in range(3))
                     out.append(Hole(d, ctr, tuple(n), "cut", f["depth"], f["name"]))
     return out
+
+
+def _inside(pt, poly):
+    """Even-odd point-in-polygon on the loop's vertices (arcs taken as chords -- enough to nest
+    a hole inside the outline that contains it)."""
+    x, y = pt
+    n, inside = len(poly), False
+    for m in range(n):
+        (x1, y1), (x2, y2) = poly[m][:2], poly[(m + 1) % n][:2]
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            inside = not inside
+    return inside
 
 
 def _line_dist(p, q, axis):

@@ -42,6 +42,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 sys.path.insert(0, os.getcwd())
+sys.path.insert(0, os.path.join(os.getcwd(), "paper", "figures"))
 
 CORPUS = os.path.expanduser("~/Downloads/NIST-PMI-STEP-Files/AP203 geometry only")
 OUT = os.path.join("paper", "figures", "recovered_parts.png")
@@ -126,7 +127,7 @@ def prepare(fn, out_npz):
         return list(s_) if s_ else [o]
 
     path = os.path.join(CORPUS, fn)
-    spec, rep = sr.recognize(path)
+    spec, rep = __import__("_recovered").load(path)
     out = b3d_emit.emit(spec)
     rec = whole(out[0] if isinstance(out, tuple) else out)
     orig = whole(import_step(path))

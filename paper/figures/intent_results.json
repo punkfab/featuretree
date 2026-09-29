@@ -136,6 +136,855 @@
       }
     },
     {
+      "part": "nist_ctc_02_asme1_rc.stp",
+      "pmi_file": "nist_ctc_02_asme1_ap242-e2.stp",
+      "verified": false,
+      "dvol_pct": 0.63,
+      "pmi": {
+        "dimensions": 14,
+        "tolerances": 22,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K"
+        ],
+        "hole_callouts": 7,
+        "holes": 7
+      },
+      "recovered_holes": 42,
+      "counterbores": 0,
+      "hole_recall": [
+        2,
+        7
+      ],
+      "size_agreement": [
+        2,
+        2
+      ],
+      "units": {
+        "inferred": "metric",
+        "pmi": "metric",
+        "score": {
+          "inch": 65.95,
+          "metric": 109.83
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "patterns": [
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 8.38,
+          "n": 4
+        },
+        {
+          "type": "single",
+          "d": 8.38,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 8.38,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 8.38,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 8.38,
+          "n": 1
+        },
+        {
+          "type": "pair",
+          "d": 52.0,
+          "n": 2
+        },
+        {
+          "type": "pair",
+          "d": 100.0,
+          "n": 2
+        },
+        {
+          "type": "pair",
+          "d": 115.0,
+          "n": 2
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 100.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 52.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 12.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 12.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 22.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 22.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 40.0,
+          "n": 1,
+          "bolt_circle": false
+        }
+      ],
+      "nominals": {
+        "8.38": null,
+        "52.0": "52 mm",
+        "100.0": "100 mm",
+        "115.0": "115 mm"
+      }
+    },
+    {
+      "part": "nist_ctc_03_asme1_rc.stp",
+      "pmi_file": "nist_ctc_03_asme1_ap242-e2.stp",
+      "verified": false,
+      "dvol_pct": 0.21,
+      "pmi": {
+        "dimensions": 18,
+        "tolerances": 12,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "hole_callouts": 7,
+        "holes": 11
+      },
+      "recovered_holes": 0,
+      "counterbores": 0,
+      "hole_recall": [
+        0,
+        11
+      ],
+      "size_agreement": [
+        0,
+        0
+      ],
+      "units": {
+        "inferred": "metric",
+        "pmi": "metric",
+        "score": {
+          "inch": 0.0,
+          "metric": 0.0
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "patterns": [],
+      "callouts": [
+        {
+          "nominal": 0.438,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.438,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.625,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.438,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 2.0,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 1.5,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 1.065,
+          "n": 1,
+          "bolt_circle": true
+        }
+      ],
+      "nominals": {}
+    },
+    {
+      "part": "nist_ctc_04_asme1_rd.stp",
+      "pmi_file": "nist_ctc_04_asme1_ap242-e1.stp",
+      "verified": false,
+      "dvol_pct": 0.14,
+      "pmi": {
+        "dimensions": 13,
+        "tolerances": 6,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H"
+        ],
+        "hole_callouts": 4,
+        "holes": 41
+      },
+      "recovered_holes": 48,
+      "counterbores": 0,
+      "hole_recall": [
+        36,
+        41
+      ],
+      "size_agreement": [
+        30,
+        36
+      ],
+      "units": {
+        "inferred": "metric",
+        "pmi": "metric",
+        "score": {
+          "inch": 2.54,
+          "metric": 78.04
+        }
+      },
+      "grouping": {
+        "tp": 45,
+        "fp": 0,
+        "fn": 405
+      },
+      "patterns": [
+        {
+          "type": "pair",
+          "d": 3.419,
+          "n": 2
+        },
+        {
+          "type": "rectangle",
+          "d": 6.647,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 6.647,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 6.647,
+          "n": 4
+        },
+        {
+          "type": "pair",
+          "d": 10.82,
+          "n": 2
+        },
+        {
+          "type": "pair",
+          "d": 12.1,
+          "n": 2
+        },
+        {
+          "type": "linear",
+          "d": 14.0,
+          "n": 5
+        },
+        {
+          "type": "linear",
+          "d": 14.0,
+          "n": 5
+        },
+        {
+          "type": "linear",
+          "d": 14.0,
+          "n": 3
+        },
+        {
+          "type": "linear",
+          "d": 14.0,
+          "n": 3
+        },
+        {
+          "type": "rectangle",
+          "d": 14.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 14.0,
+          "n": 4
+        },
+        {
+          "type": "single",
+          "d": 14.0,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 14.0,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 14.0,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 14.0,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 14.0,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 14.0,
+          "n": 1
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 6.65,
+          "n": 6,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 14.0,
+          "n": 30,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 20.0,
+          "n": 4,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 10.0,
+          "n": 1,
+          "bolt_circle": false
+        }
+      ],
+      "nominals": {
+        "3.419": null,
+        "6.647": null,
+        "10.82": null,
+        "12.1": "12.1 mm",
+        "14.0": "14 mm"
+      }
+    },
+    {
+      "part": "nist_ctc_05_asme1_rd.stp",
+      "pmi_file": "nist_ctc_05_asme1_ap242-e1.stp",
+      "verified": false,
+      "dvol_pct": 0.77,
+      "pmi": {
+        "dimensions": 28,
+        "tolerances": 10,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "hole_callouts": 1,
+        "holes": 1
+      },
+      "recovered_holes": 23,
+      "counterbores": 0,
+      "hole_recall": [
+        1,
+        1
+      ],
+      "size_agreement": [
+        0,
+        0
+      ],
+      "units": {
+        "inferred": "inch",
+        "pmi": "metric",
+        "score": {
+          "inch": 62.24,
+          "metric": 15.42
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "patterns": [
+        {
+          "type": "single",
+          "d": 7.938,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 7.938,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 7.938,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 7.938,
+          "n": 1
+        },
+        {
+          "type": "rectangle",
+          "d": 19.05,
+          "n": 4
+        },
+        {
+          "type": "polar",
+          "d": 19.05,
+          "n": 6
+        },
+        {
+          "type": "rectangle",
+          "d": 38.1,
+          "n": 4
+        },
+        {
+          "type": "single",
+          "d": 38.1,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 38.1,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 38.1,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 38.1,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 254.0,
+          "n": 1
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 10.0,
+          "n": 1,
+          "bolt_circle": true
+        }
+      ],
+      "nominals": {
+        "7.938": "5/16\"",
+        "19.05": "3/4\"",
+        "38.1": "1-1/2\"",
+        "254.0": "10\""
+      }
+    },
+    {
+      "part": "nist_ftc_06_asme1_rd.stp",
+      "pmi_file": "nist_ftc_06_asme1_ap242-e2.stp",
+      "verified": false,
+      "dvol_pct": 0.76,
+      "pmi": {
+        "dimensions": 45,
+        "tolerances": 27,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K"
+        ],
+        "hole_callouts": 8,
+        "holes": 22
+      },
+      "recovered_holes": 0,
+      "counterbores": 0,
+      "hole_recall": [
+        0,
+        22
+      ],
+      "size_agreement": [
+        0,
+        0
+      ],
+      "units": {
+        "inferred": "inch",
+        "pmi": "metric",
+        "score": {
+          "inch": 17.53,
+          "metric": 2.3
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "patterns": [],
+      "callouts": [
+        {
+          "nominal": 0.563,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.813,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.281,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.4,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.415,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.625,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.25,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.25,
+          "n": 1,
+          "bolt_circle": true
+        }
+      ],
+      "nominals": {}
+    },
+    {
+      "part": "nist_ftc_07_asme1_rd.stp",
+      "pmi_file": "nist_ftc_07_asme1_ap242-e2.stp",
+      "verified": false,
+      "dvol_pct": 0.09,
+      "pmi": {
+        "dimensions": 27,
+        "tolerances": 25,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ],
+        "hole_callouts": 11,
+        "holes": 27
+      },
+      "recovered_holes": 4,
+      "counterbores": 0,
+      "hole_recall": [
+        4,
+        27
+      ],
+      "size_agreement": [
+        0,
+        0
+      ],
+      "units": {
+        "inferred": "inch",
+        "pmi": "inch",
+        "score": {
+          "inch": 16.14,
+          "metric": 0.0
+        }
+      },
+      "grouping": {
+        "tp": 1,
+        "fp": 5,
+        "fn": 0
+      },
+      "patterns": [
+        {
+          "type": "rectangle",
+          "d": 6.35,
+          "n": 4
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 0.25,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.25,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.25,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.25,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.875,
+          "n": 3,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.875,
+          "n": 3,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.173,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.594,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.281,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.438,
+          "n": 4,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.594,
+          "n": 2,
+          "bolt_circle": true
+        }
+      ],
+      "nominals": {
+        "6.35": "1/4\""
+      }
+    },
+    {
+      "part": "nist_ftc_08_asme1_rc.stp",
+      "pmi_file": "nist_ftc_08_asme1_ap242-e2.stp",
+      "verified": false,
+      "dvol_pct": 0.26,
+      "pmi": {
+        "dimensions": 17,
+        "tolerances": 23,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K",
+          "L"
+        ],
+        "hole_callouts": 5,
+        "holes": 16
+      },
+      "recovered_holes": 20,
+      "counterbores": 0,
+      "hole_recall": [
+        16,
+        16
+      ],
+      "size_agreement": [
+        0,
+        0
+      ],
+      "units": {
+        "inferred": "inch",
+        "pmi": "inch",
+        "score": {
+          "inch": 49.81,
+          "metric": 2.3
+        }
+      },
+      "grouping": {
+        "tp": 14,
+        "fp": 5,
+        "fn": 33
+      },
+      "patterns": [
+        {
+          "type": "linear",
+          "d": 5.41,
+          "n": 3
+        },
+        {
+          "type": "linear",
+          "d": 5.41,
+          "n": 3
+        },
+        {
+          "type": "rectangle",
+          "d": 5.41,
+          "n": 4
+        },
+        {
+          "type": "pair",
+          "d": 5.791,
+          "n": 2
+        },
+        {
+          "type": "rectangle",
+          "d": 6.033,
+          "n": 4
+        },
+        {
+          "type": "pair",
+          "d": 6.147,
+          "n": 2
+        },
+        {
+          "type": "pair",
+          "d": 6.35,
+          "n": 2
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 0.237,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.237,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.237,
+          "n": 1,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.213,
+          "n": 10,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 0.25,
+          "n": 2,
+          "bolt_circle": true
+        }
+      ],
+      "nominals": {
+        "5.41": "#3 (0.2130\")",
+        "5.791": "#1 (0.2280\")",
+        "6.033": null,
+        "6.147": "letter C (0.2420\")",
+        "6.35": "1/4\""
+      }
+    },
+    {
       "part": "nist_ftc_09_asme1_rd.stp",
       "pmi_file": "nist_ftc_09_asme1_ap242-e1.stp",
       "verified": true,
@@ -367,6 +1216,138 @@
         "9.137": "0.360\"",
         "19.05": "3/4\""
       }
+    },
+    {
+      "part": "nist_ftc_10_asme1_rb.stp",
+      "pmi_file": "nist_ftc_10_asme1_ap242-e2.stp",
+      "verified": false,
+      "dvol_pct": 0.71,
+      "pmi": {
+        "dimensions": 36,
+        "tolerances": 35,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K",
+          "L"
+        ],
+        "hole_callouts": 16,
+        "holes": 32
+      },
+      "recovered_holes": 0,
+      "counterbores": 0,
+      "hole_recall": [
+        0,
+        32
+      ],
+      "size_agreement": [
+        0,
+        0
+      ],
+      "units": {
+        "inferred": "metric",
+        "pmi": "metric",
+        "score": {
+          "inch": 0.0,
+          "metric": 15.42
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "patterns": [],
+      "callouts": [
+        {
+          "nominal": 6.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 6.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 6.0,
+          "n": 2,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 2.5,
+          "n": 8,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 10.0,
+          "n": 4,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 10.0,
+          "n": 4,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.5,
+          "n": 3,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.5,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 10.0,
+          "n": 4,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 7.0,
+          "n": 4,
+          "bolt_circle": false
+        }
+      ],
+      "nominals": {}
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",

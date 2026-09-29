@@ -48,8 +48,29 @@ try:
     import b3d_emit, step_recognize as sr
     from build123d import Compound, Pos, import_step
 
+    # INPUT complexity, measured before recognition so its time is not counted
+    from collections import Counter
+    _in = import_step(path)
+    _in = _in.solids()[0] if _in.solids() else _in
+    res["input_faces"] = len(_in.faces())
+    res["input_face_types"] = dict(Counter(str(f.geom_type).split(".")[-1] for f in _in.faces()))
+    res["input_edges"] = len(_in.edges())
+    t0 = time.time()                       # recognition time only
     spec, rep = sr.recognize(path)
+    res["recognise_seconds"] = round(time.time() - t0, 2)
+    # persist the recovered tree and its report: every later measurement (IoU, intent, renders)
+    # reads THESE, so all the report's numbers describe the same trees, and none re-recognises
+    _out = os.path.join("paper", "figures", "recovered")
+    os.makedirs(_out, exist_ok=True)
+    with open(os.path.join(_out, os.path.basename(path) + ".json"), "w") as _fh:
+        json.dump({"spec": spec, "report": {k: v for k, v in rep.items() if k != "warnings"} | {"warnings": rep.get("warnings", [])}}, _fh, default=str)
+    kinds = Counter(f["kind"] for f in spec.get("features", []))
     res.update(
+        feature_kinds=dict(kinds),
+        operations=sum(v for k, v in kinds.items() if k != "sketch"),
+        iou_gate_pct=rep.get("iou_pct"),
+        reason=rep.get("reason"),
+        extrude_axis=rep.get("extrude_axis"),
         status="VERIFIED" if rep.get("verified") else "PARTIAL",
         dvol_pct=rep.get("dvol_pct"),
         dsize_mm=rep.get("dsize_mm"),
@@ -97,7 +118,46 @@ print("@@JSON@@" + json.dumps(res))
 '''
 
 
-def run_one(path: str, timeout: int) -> dict:
+# A finished part is CACHED next to its recovered tree, keyed on a hash of the code that produced
+# it: a crash, a timeout elsewhere or a re-run then redoes only parts whose inputs changed, instead
+# of the whole ~20-minute corpus. --fresh ignores the cache.
+CODE = ["step_recognize.py", "b3d_emit.py", "ir.py", "iou_check.py"]
+CACHE_DIR = os.path.join("paper", "figures", "recovered")
+
+
+def code_hash() -> str:
+    import hashlib
+    h = hashlib.sha256(WORKER.encode())
+    for f in CODE:
+        h.update(open(f, "rb").read())
+    return h.hexdigest()[:16]
+
+
+def _row_path(path: str) -> str:
+    return os.path.join(CACHE_DIR, os.path.basename(path) + ".row.json")
+
+
+def cached(path: str, key: str):
+    try:
+        r = json.load(open(_row_path(path)))
+    except (OSError, ValueError):
+        return None
+    return r if r.get("code") == key and r.get("status") in ("VERIFIED", "PARTIAL") else None
+
+
+def run_one(path: str, timeout: int, key: str = "", fresh: bool = True) -> dict:
+    if not fresh:
+        r = cached(path, key)
+        if r is not None:
+            return {**r, "cached": True}
+    r = _run_one(path, timeout)
+    if key and r.get("status") in ("VERIFIED", "PARTIAL"):
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        json.dump({**r, "code": key}, open(_row_path(path), "w"))
+    return r
+
+
+def _run_one(path: str, timeout: int) -> dict:
     t0 = time.time()
     try:
         p = subprocess.run(
@@ -143,7 +203,9 @@ def main() -> None:
     ap.add_argument("--corpus", default=DEFAULT_CORPUS)
     ap.add_argument("--timeout", type=int, default=900)
     ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--fresh", action="store_true", help="ignore cached per-part results")
     args = ap.parse_args()
+    key = code_hash()
 
     files = sorted(
         os.path.join(args.corpus, f)
@@ -157,7 +219,7 @@ def main() -> None:
 
     rows: list[dict] = []
     with cf.ThreadPoolExecutor(max_workers=args.jobs) as ex:
-        futs = {ex.submit(run_one, f, args.timeout): f for f in files}
+        futs = {ex.submit(run_one, f, args.timeout, key, args.fresh): f for f in files}
         for fut in cf.as_completed(futs):
             r = fut.result()
             rows.append(r)
@@ -169,7 +231,7 @@ def main() -> None:
             print(f"  {r['status']:<9} {r['part']:<34} "
                   f"dvol={r.get('dvol_pct','--')!s:>7}  "
                   f"feat={r.get('features','--')!s:>4}  "
-                  f"{r.get('seconds','--')!s:>7}s{extra}")
+                  f"{r.get('seconds','--')!s:>7}s{extra}{'  (cached)' if r.get('cached') else ''}", flush=True)
 
     rows.sort(key=lambda r: r["part"])
     os.makedirs(os.path.dirname(OUT_JSON), exist_ok=True)

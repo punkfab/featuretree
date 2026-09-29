@@ -65,3 +65,27 @@ def test_freecad_taper_matches_build123d(tmp_path):
     _, b3d = b3d_emit.emit(spec)
     fc = gen.emit(spec, str(tmp_path / "t.FCStd"))
     assert abs(fc["volume"] - b3d["volume"]) < 1e-4 * b3d["volume"], (fc["volume"], b3d["volume"])
+
+
+def test_tapered_prism_cut_volume():
+    """A drafted cavity cut from the top: an 80x80 opening narrowing 2 deg over 40 mm."""
+    spec = IR.part("b", IR.sketch("o", polys=[[(0, 0), (100, 0), (100, 100), (0, 100)]]),
+                   IR.pad("body", "o", length=50),
+                   IR.prism_cut("c", origin=(0, 0, 50), normal=(0, 0, -1), xdir=(1, 0, 0), depth=40,
+                                polys=[[(10, -10), (90, -10), (90, -90), (10, -90)]], taper=2.0))
+    _, res = b3d_emit.emit(spec)
+    assert abs(res["volume"] - (100 * 100 * 50 - _frustum(80, 40, 2.0))) < 1.0
+
+
+@pytest.mark.skipif(shutil.which("xvfb-run") is None, reason="FreeCAD parity needs the AppImage")
+def test_freecad_tapered_prism_cut_matches_build123d(tmp_path):
+    """Pins FC_PRISM_TAPER_SIGN (prism_cut is a REVERSED Pocket in FreeCAD). Checked to fail with
+    the sign flipped (FreeCAD 234956 vs build123d 252836 mm^3)."""
+    import gen
+    spec = IR.part("b", IR.sketch("o", polys=[[(0, 0), (100, 0), (100, 100), (0, 100)]]),
+                   IR.pad("body", "o", length=50),
+                   IR.prism_cut("c", origin=(0, 0, 50), normal=(0, 0, -1), xdir=(1, 0, 0), depth=40,
+                                polys=[[(10, -10), (90, -10), (90, -90), (10, -90)]], taper=2.0))
+    _, b3d = b3d_emit.emit(spec)
+    fc = gen.emit(spec, str(tmp_path / "t.FCStd"))
+    assert abs(fc["volume"] - b3d["volume"]) < 1e-4 * b3d["volume"], (fc["volume"], b3d["volume"])

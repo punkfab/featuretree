@@ -3,6 +3,28 @@
   "results": [
     {
       "part": "nist_ctc_01_asme1_rd.stp",
+      "input_faces": 139,
+      "input_face_types": {
+        "PLANE": 80,
+        "CYLINDER": 57,
+        "CONE": 2
+      },
+      "input_edges": 388,
+      "recognise_seconds": 86.49,
+      "feature_kinds": {
+        "sketch": 15,
+        "pad": 1,
+        "pocket": 14,
+        "prism_cut": 24
+      },
+      "operations": 39,
+      "iou_gate_pct": 99.726,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
       "status": "VERIFIED",
       "dvol_pct": 0.14,
       "dsize_mm": 0.0,
@@ -27,185 +49,360 @@
         "overlap_pct": 99.86070283071604,
         "cancellation": 1.0060624456255243
       },
-      "seconds": 30.63
+      "seconds": 88.34
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
+      "input_faces": 663,
+      "input_face_types": {
+        "PLANE": 129,
+        "CYLINDER": 318,
+        "CONE": 158,
+        "BSPLINE": 34,
+        "SPHERE": 24
+      },
+      "input_edges": 1494,
+      "recognise_seconds": 562.21,
+      "feature_kinds": {
+        "sketch": 55,
+        "pad": 55,
+        "prism_cut": 34
+      },
+      "operations": 89,
+      "iou_gate_pct": 92.32,
+      "reason": null,
+      "extrude_axis": [
+        1.0,
+        0.0,
+        0.0
+      ],
       "status": "PARTIAL",
-      "dvol_pct": 62.19,
-      "dsize_mm": 267.692,
+      "dvol_pct": 0.63,
+      "dsize_mm": 0.011,
       "vol_orig": 47100535.5,
-      "vol_ir": 17808401.8,
-      "features": 64,
-      "method": "extrude",
+      "vol_ir": 46804124.8,
+      "features": 144,
+      "method": "layered",
       "recovered": null,
       "warnings": [
-        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
-        "303 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
-        "cross-section is 2 disjoint region(s) -> one pad each"
+        "layered along (1.0, 0.0, 0.0): 55 layer(s), 34 hole run(s) -- 1.9 mm: 2 region(s), 0 hole(s); 25.2 mm: 2 region(s), 0 hole(s); 10.0 mm: 4 region(s), 0 hole(s); 12.0 mm: 3 region(s), 0 hole(s); 21.0 mm: 1 region(s), 0 hole(s); 5.0 mm: 1 region(s), 0 hole(s); 1.9 mm: 9 region(s), 5 hole(s); 6.1 mm: 9 region(s), 5 hole(s); 7.1 mm: 3 region(s), 11 hole(s); 5.9 mm: 2 region(s), 11 hole(s); 6.0 mm: 2 region(s), 11 hole(s); 13.0 mm: 3 region(s), 1 hole(s); 9.0 mm: 3 region(s), 1 hole(s); 9.1 mm: 2 region(s), 1 hole(s); 1.2 mm: 2 region(s), 1 hole(s); 5.2 mm: 2 region(s), 0 hole(s); 3.1 mm: 2 region(s), 0 hole(s); 2.4 mm: 2 region(s), 0 hole(s); 20.1 mm: 2 region(s), 0 hole(s); 3.1 mm: 1 region(s), 0 hole(s); 2.0 mm: 1 region(s), 0 hole(s); 0.8 mm: 1 region(s), 0 hole(s); 2.4 mm: 1 region(s), 0 hole(s); 13.5 mm: 1 region(s), 0 hole(s); 3.1 mm: 1 region(s), 0 hole(s); 14.5 mm: 1 region(s), 0 hole(s); 26.5 mm: 1 region(s), 0 hole(s); 8.0 mm: 1 region(s), 0 hole(s); 41.0 mm: 1 region(s), 0 hole(s); 25.0 mm: 2 region(s), 0 hole(s); 15.0 mm: 2 region(s), 0 hole(s); 40.0 mm: 4 region(s), 0 hole(s); 15.0 mm: 2 region(s), 0 hole(s); 25.0 mm: 2 region(s), 0 hole(s); 41.0 mm: 1 region(s), 0 hole(s); 8.0 mm: 1 region(s), 0 hole(s); 26.5 mm: 1 region(s), 0 hole(s); 33.5 mm: 1 region(s), 0 hole(s); 5.9 mm: 1 region(s), 0 hole(s); 20.0 mm: 2 region(s), 0 hole(s); 10.6 mm: 2 region(s), 0 hole(s); 10.4 mm: 2 region(s), 1 hole(s); 9.0 mm: 3 region(s), 1 hole(s); 12.5 mm: 3 region(s), 1 hole(s); 6.5 mm: 2 region(s), 11 hole(s); 5.5 mm: 7 region(s), 7 hole(s); 7.5 mm: 3 region(s), 11 hole(s); 6.1 mm: 9 region(s), 5 hole(s); 1.9 mm: 9 region(s), 5 hole(s); 5.0 mm: 1 region(s), 0 hole(s); 21.0 mm: 1 region(s), 0 hole(s); 12.0 mm: 3 region(s), 0 hole(s); 10.0 mm: 4 region(s), 0 hole(s); 25.2 mm: 2 region(s), 0 hole(s); 1.9 mm: 2 region(s), 0 hole(s)",
+        "1369 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": 45533773.87124841,
-        "uncut": 16241640.172802947,
-        "net": -29292133.698445458,
-        "total": 61775414.04405136,
-        "overlap_pct": 3.326419976269351,
-        "cancellation": 2.108942103023714
+        "overcut": -46817615.844650775,
+        "uncut": -47114026.58639731,
+        "net": -296410.7417465374,
+        "total": -93931642.4310481,
+        "overlap_pct": 199.3993281706882,
+        "cancellation": -316.89689070502584
       },
-      "seconds": 99.98
+      "seconds": 700.21
     },
     {
       "part": "nist_ctc_03_asme1_rc.stp",
+      "input_faces": 139,
+      "input_face_types": {
+        "PLANE": 86,
+        "CYLINDER": 53
+      },
+      "input_edges": 410,
+      "recognise_seconds": 72.18,
+      "feature_kinds": {
+        "sketch": 31,
+        "pad": 31,
+        "prism_cut": 2
+      },
+      "operations": 33,
+      "iou_gate_pct": 94.375,
+      "reason": "volume and extents match but the shapes overlap only 94.38% (< 99.5%): compensating errors",
+      "extrude_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
       "status": "PARTIAL",
-      "dvol_pct": 41.46,
-      "dsize_mm": 132.54,
+      "dvol_pct": 0.21,
+      "dsize_mm": 0.036,
       "vol_orig": 331938.3,
-      "vol_ir": 194306.1,
-      "features": 16,
-      "method": "extrude",
+      "vol_ir": 331238.3,
+      "features": 64,
+      "method": "layered",
       "recovered": null,
       "warnings": [
-        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
-        "45 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+        "layered along (0.0, 1.0, 0.0): 31 layer(s), 2 hole run(s) -- 13.5 mm: 2 region(s), 0 hole(s); 11.1 mm: 4 region(s), 0 hole(s); 7.1 mm: 2 region(s), 0 hole(s); 18.1 mm: 1 region(s), 0 hole(s); 1.9 mm: 1 region(s), 0 hole(s); 8.3 mm: 1 region(s), 0 hole(s); 28.8 mm: 1 region(s), 0 hole(s); 15.9 mm: 2 region(s), 0 hole(s); 7.8 mm: 1 region(s), 0 hole(s); 20.7 mm: 3 region(s), 0 hole(s); 15.9 mm: 4 region(s), 0 hole(s); 32.0 mm: 3 region(s), 0 hole(s); 12.5 mm: 4 region(s), 0 hole(s); 26.9 mm: 3 region(s), 0 hole(s); 7.5 mm: 4 region(s), 0 hole(s); 10.1 mm: 3 region(s), 0 hole(s); 20.1 mm: 2 region(s), 0 hole(s); 7.9 mm: 3 region(s), 0 hole(s); 42.1 mm: 1 region(s), 0 hole(s); 4.3 mm: 1 region(s), 0 hole(s); 19.1 mm: 2 region(s), 0 hole(s); 19.1 mm: 3 region(s), 0 hole(s); 31.7 mm: 2 region(s), 0 hole(s); 43.1 mm: 1 region(s), 0 hole(s); 7.3 mm: 1 region(s), 0 hole(s); 1.3 mm: 1 region(s), 0 hole(s); 0.6 mm: 1 region(s), 2 hole(s); 19.1 mm: 1 region(s), 0 hole(s); 7.1 mm: 2 region(s), 0 hole(s); 11.1 mm: 4 region(s), 0 hole(s); 13.5 mm: 2 region(s), 0 hole(s)"
       ],
       "decomp": {
-        "overcut": 331725.5976998828,
-        "uncut": 194093.44836812414,
-        "net": -137632.14933175864,
-        "total": 525819.0460680069,
-        "overlap_pct": 0.06407047218213592,
-        "cancellation": 3.8204667195927753
+        "overcut": 328173.21749963256,
+        "uncut": 327473.24154436943,
+        "net": -699.9759552631294,
+        "total": 655646.459044002,
+        "overlap_pct": 1.1342634865584396,
+        "cancellation": 936.6699728957641
       },
-      "seconds": 14.23
+      "seconds": 73.75
     },
     {
       "part": "nist_ctc_04_asme1_rd.stp",
+      "input_faces": 517,
+      "input_face_types": {
+        "CONE": 116,
+        "CYLINDER": 238,
+        "PLANE": 112,
+        "TORUS": 29,
+        "SPHERE": 22
+      },
+      "input_edges": 1204,
+      "recognise_seconds": 193.91,
+      "feature_kinds": {
+        "sketch": 15,
+        "pad": 15,
+        "prism_cut": 78
+      },
+      "operations": 93,
+      "iou_gate_pct": 99.272,
+      "reason": "volume and extents match but the shapes overlap only 99.27% (< 99.5%): compensating errors",
+      "extrude_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
       "status": "PARTIAL",
-      "dvol_pct": 2.43,
-      "dsize_mm": 390.0,
+      "dvol_pct": 0.14,
+      "dsize_mm": 0.008,
       "vol_orig": 17519087.7,
-      "vol_ir": 17094067.9,
-      "features": 270,
-      "method": "extrude",
+      "vol_ir": 17543547.2,
+      "features": 108,
+      "method": "layered",
       "recovered": null,
       "warnings": [
-        "159 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+        "layered along (0.0, 0.0, 1.0): 15 layer(s), 78 hole run(s) -- 10.6 mm: 2 region(s), 0 hole(s); 7.0 mm: 6 region(s), 14 hole(s); 9.5 mm: 10 region(s), 14 hole(s); 10.5 mm: 6 region(s), 16 hole(s); 10.5 mm: 6 region(s), 4 hole(s); 12.5 mm: 4 region(s), 6 hole(s); 16.3 mm: 1 region(s), 6 hole(s); 8.8 mm: 1 region(s), 2 hole(s); 1.1 mm: 1 region(s), 2 hole(s); 13.8 mm: 1 region(s), 0 hole(s); 14.2 mm: 1 region(s), 32 hole(s); 2.4 mm: 1 region(s), 34 hole(s); 2.1 mm: 1 region(s), 34 hole(s); 3.9 mm: 1 region(s), 32 hole(s); 7.5 mm: 1 region(s), 32 hole(s)",
+        "256 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": 10683762.923169877,
-        "uncut": 10258743.134907834,
-        "net": -425019.78826204315,
-        "total": 20942506.05807771,
-        "overlap_pct": 39.01644250094926,
-        "cancellation": 49.27419060584009
+        "overcut": -18021166.671221565,
+        "uncut": -17996707.215536702,
+        "net": 24459.45568486303,
+        "total": -36017873.88675827,
+        "overlap_pct": 202.8658967629305,
+        "cancellation": -1472.554187256435
       },
-      "seconds": 87.05
+      "seconds": 209.61
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
+      "input_faces": 208,
+      "input_face_types": {
+        "PLANE": 62,
+        "CYLINDER": 100,
+        "TORUS": 7,
+        "BSPLINE": 9,
+        "SPHERE": 4,
+        "CONE": 26
+      },
+      "input_edges": 510,
+      "recognise_seconds": 58.16,
+      "feature_kinds": {
+        "sketch": 17,
+        "pad": 17,
+        "prism_cut": 23
+      },
+      "operations": 40,
+      "iou_gate_pct": 98.05,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
       "status": "PARTIAL",
-      "dvol_pct": 51.8,
-      "dsize_mm": 349.25,
+      "dvol_pct": 0.77,
+      "dsize_mm": 0.0,
       "vol_orig": 12694921.7,
-      "vol_ir": 6119246.9,
-      "features": 106,
-      "method": "extrude",
+      "vol_ir": 12792050.6,
+      "features": 57,
+      "method": "layered",
       "recovered": null,
       "warnings": [
-        "53 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+        "layered along (0.0, 0.0, 1.0): 17 layer(s), 23 hole run(s) -- 12.7 mm: 1 region(s), 11 hole(s); 12.7 mm: 3 region(s), 13 hole(s); 20.3 mm: 1 region(s), 5 hole(s); 8.9 mm: 1 region(s), 1 hole(s); 47.0 mm: 1 region(s), 1 hole(s); 25.4 mm: 1 region(s), 0 hole(s); 82.8 mm: 1 region(s), 0 hole(s); 6.4 mm: 1 region(s), 0 hole(s); 3.1 mm: 1 region(s), 0 hole(s); 22.4 mm: 1 region(s), 0 hole(s); 3.1 mm: 1 region(s), 0 hole(s); 2.0 mm: 1 region(s), 0 hole(s); 3.1 mm: 1 region(s), 0 hole(s); 13.5 mm: 1 region(s), 0 hole(s); 3.1 mm: 1 region(s), 0 hole(s); 12.7 mm: 1 region(s), 0 hole(s); 203.2 mm: 1 region(s), 0 hole(s)",
+        "32 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": 12443325.607832275,
-        "uncut": 5867650.7479742095,
-        "net": -6575674.859858065,
-        "total": 18310976.355806485,
-        "overlap_pct": 1.9818643045820934,
-        "cancellation": 2.7846535520768927
+        "overcut": -12663013.146181587,
+        "uncut": -12565884.265931804,
+        "net": 97128.8802497834,
+        "total": -25228897.41211339,
+        "overlap_pct": 199.74865080232482,
+        "cancellation": -259.7466103514526
       },
-      "seconds": 18.76
+      "seconds": 60.74
     },
     {
       "part": "nist_ftc_06_asme1_rd.stp",
-      "status": "PARTIAL",
-      "dvol_pct": 31.85,
-      "dsize_mm": 98.825,
-      "vol_orig": 3323546.1,
-      "vol_ir": 2265026.1,
-      "features": 44,
-      "method": "extrude",
-      "recovered": {
-        "pockets": 17,
-        "holes": 5,
-        "residual_lumps": 3
+      "input_faces": 144,
+      "input_face_types": {
+        "PLANE": 71,
+        "CYLINDER": 58,
+        "CONE": 4,
+        "SPHERE": 5,
+        "TORUS": 6
       },
+      "input_edges": 373,
+      "recognise_seconds": 165.73,
+      "feature_kinds": {
+        "sketch": 9,
+        "pad": 9,
+        "prism_cut": 9
+      },
+      "operations": 18,
+      "iou_gate_pct": 97.702,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "status": "PARTIAL",
+      "dvol_pct": 0.76,
+      "dsize_mm": 0.0,
+      "vol_orig": 3323546.1,
+      "vol_ir": 3348654.3,
+      "features": 27,
+      "method": "layered",
+      "recovered": null,
       "warnings": [
-        "extrude axis (0.0, 1.0, 0.0) -> rotated onto Z",
-        "57 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL",
-        "multi-axis recovery: +17 pocket(s), +5 cross-hole(s); 3 residual lump(s) (chamfers/fillets) left uncut"
+        "layered along (0.0, 1.0, 0.0): 9 layer(s), 9 hole run(s) -- 19.1 mm: 1 region(s), 4 hole(s); 2.3 mm: 1 region(s), 4 hole(s); 10.4 mm: 1 region(s), 4 hole(s); 19.0 mm: 6 region(s), 0 hole(s); 1.3 mm: 13 region(s), 0 hole(s); 18.4 mm: 11 region(s), 0 hole(s); 2.5 mm: 15 region(s), 0 hole(s); 12.1 mm: 9 region(s), 0 hole(s); 12.7 mm: 3 region(s), 1 hole(s)"
       ],
       "decomp": {
-        "overcut": 2283755.222823533,
-        "uncut": 1225235.2609972516,
-        "net": -1058519.9618262816,
-        "total": 3508990.483820785,
-        "overlap_pct": 31.28558551056311,
-        "cancellation": 3.3149969867045934
+        "overcut": 2349511.940082979,
+        "uncut": 2374620.1972332597,
+        "net": 25108.257150280755,
+        "total": 4724132.137316238,
+        "overlap_pct": 29.30707473144211,
+        "cancellation": 188.15053984196643
       },
-      "seconds": 15.41
+      "seconds": 170.03
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
+      "input_faces": 269,
+      "input_face_types": {
+        "TORUS": 24,
+        "CYLINDER": 106,
+        "PLANE": 73,
+        "CONE": 28,
+        "SPHERE": 18,
+        "BSPLINE": 20
+      },
+      "input_edges": 622,
+      "recognise_seconds": 194.08,
+      "feature_kinds": {
+        "sketch": 8,
+        "pad": 3,
+        "pocket": 5,
+        "prism_cut": 13
+      },
+      "operations": 21,
+      "iou_gate_pct": 96.422,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
       "status": "PARTIAL",
       "dvol_pct": 0.09,
       "dsize_mm": 1.517,
       "vol_orig": 1726247.6,
-      "vol_ir": 1724635.2,
-      "features": 25,
+      "vol_ir": 1724637.2,
+      "features": 29,
       "method": "extrude",
       "recovered": {
         "pockets": 9,
-        "holes": 8,
-        "residual_lumps": 25
+        "holes": 4,
+        "residual_lumps": 24
       },
       "warnings": [
-        "open shell along (0.0, 1.0, 0.0): 18/24 ring slices, cavity 128.27 deep from the top face; outline layers: 11.3 mm @ 300.8x211.9, 113.9 mm @ 300.9x212.0 drafted 1.00 deg, 10.6 mm @ 310.1x221.2; draft 1.00 deg outside, 1.00 deg inside",
-        "multi-axis recovery: +9 pocket(s), +8 cross-hole(s); 25 residual lump(s) (chamfers/fillets) left uncut"
+        "open shell along (0.0, 1.0, 0.0): 18/24 ring slices, cavity 128.27 deep from the top face; outline layers: 11.3 mm @ 300.8x211.9, 113.9 mm @ 300.9x212.0 drafted 1.00 deg, 10.6 mm @ 310.1x221.2; draft 1.00 deg outside, 1.00 deg inside; 4 floor cutout(s)",
+        "multi-axis recovery: +9 pocket(s), +4 cross-hole(s); 24 residual lump(s) (chamfers/fillets) left uncut"
       ],
       "decomp": {
-        "overcut": 1115871.7887962079,
-        "uncut": 1114259.4193661925,
-        "net": -1612.3694300153293,
-        "total": 2230131.2081624004,
-        "overlap_pct": 35.35853128710622,
-        "cancellation": 1383.1391036365642
+        "overcut": 1115876.0435910418,
+        "uncut": 1114265.6368172062,
+        "net": -1610.4067738356534,
+        "total": 2230141.6804082477,
+        "overlap_pct": 35.35828481059352,
+        "cancellation": 1384.8312840218096
       },
-      "seconds": 58.95
+      "seconds": 197.62
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
+      "input_faces": 270,
+      "input_face_types": {
+        "CYLINDER": 157,
+        "PLANE": 81,
+        "SPHERE": 20,
+        "TORUS": 12
+      },
+      "input_edges": 705,
+      "recognise_seconds": 152.26,
+      "feature_kinds": {
+        "sketch": 5,
+        "pad": 5,
+        "prism_cut": 27
+      },
+      "operations": 32,
+      "iou_gate_pct": 98.747,
+      "reason": "volume and extents match but the shapes overlap only 98.75% (< 99.5%): compensating errors",
+      "extrude_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
       "status": "PARTIAL",
-      "dvol_pct": 3.56,
+      "dvol_pct": 0.26,
       "dsize_mm": 0.0,
       "vol_orig": 503592.2,
-      "vol_ir": 521528.2,
-      "features": 48,
-      "method": "extrude",
+      "vol_ir": 502281.8,
+      "features": 37,
+      "method": "layered",
       "recovered": null,
       "warnings": [
-        "open shell along (0.0, 0.0, 1.0): 22/24 ring slices, cavity 44.83 deep from the bottom face; outline layers: 11.2 mm @ 311.6x222.7, 37.0 mm @ 292.0x204.9; 21 floor cutout(s)"
+        "layered along (0.0, 0.0, 1.0): 5 layer(s), 27 hole run(s) -- 10.2 mm: 1 region(s), 5 hole(s); 30.2 mm: 1 region(s), 1 hole(s); 4.4 mm: 1 region(s), 1 hole(s); 2.2 mm: 1 region(s), 21 hole(s); 1.3 mm: 1 region(s), 22 hole(s)"
       ],
       "decomp": {
-        "overcut": 1791.7676264082547,
-        "uncut": 19727.804978425673,
-        "net": 17936.037352017418,
-        "total": 21519.572604833927,
-        "overlap_pct": 99.64420264767784,
-        "cancellation": 1.1997952603735762
+        "overcut": 4236.572040954372,
+        "uncut": 2926.1691024101456,
+        "net": -1310.4029385442263,
+        "total": 7162.7411433645175,
+        "overlap_pct": 99.15872957359136,
+        "cancellation": 5.466060043578553
       },
-      "seconds": 111.77
+      "seconds": 155.3
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
+      "input_faces": 158,
+      "input_face_types": {
+        "PLANE": 62,
+        "CYLINDER": 88,
+        "CONE": 8
+      },
+      "input_edges": 454,
+      "recognise_seconds": 18.47,
+      "feature_kinds": {
+        "sketch": 40,
+        "pad": 1,
+        "pocket": 39
+      },
+      "operations": 40,
+      "iou_gate_pct": 99.852,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
       "status": "VERIFIED",
       "dvol_pct": 0.19,
       "dsize_mm": 0.0,
@@ -225,33 +422,78 @@
         "overlap_pct": 0.8612046165182863,
         "cancellation": 1036.5649032446127
       },
-      "seconds": 8.6
+      "seconds": 19.17
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
+      "input_faces": 214,
+      "input_face_types": {
+        "CYLINDER": 103,
+        "TORUS": 39,
+        "PLANE": 53,
+        "SPHERE": 10,
+        "CONE": 8,
+        "BSPLINE": 1
+      },
+      "input_edges": 495,
+      "recognise_seconds": 241.34,
+      "feature_kinds": {
+        "sketch": 13,
+        "pad": 13,
+        "prism_cut": 12
+      },
+      "operations": 25,
+      "iou_gate_pct": 96.599,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
       "status": "PARTIAL",
-      "dvol_pct": 20.8,
-      "dsize_mm": 18.0,
+      "dvol_pct": 0.71,
+      "dsize_mm": 0.063,
       "vol_orig": 188318.1,
-      "vol_ir": 149147.4,
-      "features": 24,
-      "method": "extrude",
+      "vol_ir": 186987.2,
+      "features": 38,
+      "method": "layered",
       "recovered": null,
       "warnings": [
-        "105 face(s) not captured by a single extrude (chamfers / cross-holes / freeform) \u2014 best-effort, expect PARTIAL"
+        "layered along (0.0, 0.0, 1.0): 13 layer(s), 12 hole run(s) -- 5.0 mm: 1 region(s), 4 hole(s); 5.0 mm: 3 region(s), 4 hole(s); 0.8 mm: 3 region(s), 4 hole(s); 1.7 mm: 6 region(s), 4 hole(s); 7.5 mm: 1 region(s), 4 hole(s); 33.5 mm: 1 region(s), 4 hole(s); 5.8 mm: 1 region(s), 4 hole(s); 3.2 mm: 4 region(s), 4 hole(s); 2.5 mm: 3 region(s), 4 hole(s); 3.5 mm: 3 region(s), 4 hole(s); 3.5 mm: 1 region(s), 4 hole(s); 2.0 mm: 3 region(s), 4 hole(s); 1.0 mm: 2 region(s), 4 hole(s)",
+        "88 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": 81739.63307703548,
-        "uncut": 42568.96851799777,
-        "net": -39170.664559037716,
-        "total": 124308.60159503325,
-        "overlap_pct": 56.59490642090769,
-        "cancellation": 3.173512703816304
+        "overcut": -186987.22948056855,
+        "uncut": -188318.0666989932,
+        "net": -1330.8372184246546,
+        "total": -375305.29617956176,
+        "overlap_pct": 199.2933034829038,
+        "cancellation": -282.0069133803006
       },
-      "seconds": 35.19
+      "seconds": 247.82
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",
+      "input_faces": 6,
+      "input_face_types": {
+        "CYLINDER": 2,
+        "PLANE": 2,
+        "TORUS": 2
+      },
+      "input_edges": 12,
+      "recognise_seconds": 18.52,
+      "feature_kinds": {
+        "sketch": 1,
+        "revolve": 1
+      },
+      "operations": 1,
+      "iou_gate_pct": 100.0,
+      "reason": null,
+      "extrude_axis": [
+        0.0,
+        0.0,
+        1.0
+      ],
       "status": "VERIFIED",
       "dvol_pct": 0.0,
       "dsize_mm": 0.0,
@@ -269,7 +511,7 @@
         "overlap_pct": 99.99968375998162,
         "cancellation": 1.000005317426488
       },
-      "seconds": 3.16
+      "seconds": 18.61
     }
   ]
 }

@@ -57,6 +57,10 @@ def how_recovered(r):
     if r.get("method") == "revolve":
         return "revolve"
     w = " ".join(r.get("warnings", []))
+    ly = re.search(r"layered along \(([^)]*)\): (\d+) layer\(s\), (\d+) hole run", w)
+    if ly:
+        v = [abs(float(x)) for x in ly.group(1).split(",")]
+        return f"layered ∥{'XYZ'[v.index(max(v))]} · {ly.group(2)} layers · {ly.group(3)} hole runs"
     sh = re.search(r"open shell along \(([^)]*)\)", w)
     if sh:
         v = [abs(float(x)) for x in sh.group(1).split(",")]

@@ -38,6 +38,7 @@ lofts/sweeps/freeform, and profiles whose boundary has splines/ellipses (lines +
 """
 
 import json
+import os
 import math
 import sys
 from pathlib import Path
@@ -58,6 +59,8 @@ MAX_REGIONS = 8      # cap on disjoint cross-section regions emitted as separate
 # that a tight gate rejects them before the profile is ever examined.
 AXIS_BAD_FRAC = 0.75
 VOL_TOL = 0.005      # 0.5% volume agreement -> "verified"
+IOU_TOL = 0.995      # ...AND >= 99.5% two-sided overlap (see _verify): volume alone lets errors cancel
+IOU_SAMPLES = 12000  # points for that check: ~+-0.2% at 99.5%, a few seconds on a large part
 DIM_TOL = 0.05       # mm bbox-size agreement
 RECOVER_PASSES = 4   # multi-axis residual-carve passes (each re-decomposes what's left)
 RECOVER_EPS = 5.0    # mm^3: ignore boolean slivers / zero-volume sheets in the residual
@@ -407,24 +410,65 @@ def _approx_segments(e, tol, depth=0, t0=0.0, t1=1.0):
     return _approx_segments(e, tol, depth + 1, t0, tm) + _approx_segments(e, tol, depth + 1, tm, t1)
 
 
+def _ordered_edges(wire):
+    """A wire's edges IN ORDER, each with a flag for whether it is traversed reversed. OCCT's
+    BRepTools_WireExplorer knows the order; reconstructing it by matching rounded endpoints both
+    failed on some loops and pushed them into a slow polyline fallback."""
+    from build123d import Edge
+    from OCP.BRepTools import BRepTools_WireExplorer
+    from OCP.TopAbs import TopAbs_REVERSED
+    out = []
+    ex = BRepTools_WireExplorer(wire.wrapped)
+    while ex.More():
+        e = ex.Current()
+        out.append((Edge(e), e.Orientation() == TopAbs_REVERSED))
+        ex.Next()
+    return out
+
+
+def _loop_points(wire):
+    """A cheap ordered point list around a loop: each edge's start and midpoint. Uses EDGE
+    parameters; `wire @ t` re-measures the whole wire's arc length on every call, and ~96,000 such
+    calls were 180 s of a 183 s recognition of CTC-02."""
+    pts = []
+    for e, rev in _ordered_edges(wire):
+        a, m = (e @ 1.0, e @ 0.5) if rev else (e @ 0.0, e @ 0.5)
+        pts += [(a.X, a.Y), (m.X, m.Y)]
+    return pts
+
+
 def _approx_poly(wire, tol=DIM_TOL):
-    """A closed wire as an ordered (x, y, bulge) loop, conics approximated by arcs."""
-    segs = [s for e in wire.edges() for s in _approx_segments(e, tol)]
-    if not segs:
+    """A closed wire as an ordered (x, y, bulge) loop, conics approximated by arcs. Edges are walked
+    in the wire's own order; a reversed edge contributes its segments reversed, bulges negated."""
+    loop = []
+    try:
+        for e, rev in _ordered_edges(wire):
+            segs = _approx_segments(e, tol)
+            if rev:
+                segs = [(en, st, -bl) for (st, en, bl) in reversed(segs)]
+            for st, en, bl in segs:
+                loop.append([st[0], st[1], bl])
+    except Exception:
+        return _polyline(wire)
+    return loop if len(loop) >= 2 else _polyline(wire)
+
+
+def _polyline(wire, max_seg=0.5):
+    """Last resort: straight segments sampled per EDGE (never via wire parameters), at most ~400
+    points per loop, so a fallback outline cannot make every later Boolean crawl."""
+    try:
+        edges = _ordered_edges(wire)
+        per = max(2, min(64, int(400 / max(1, len(edges)))))
+        out = []
+        for e, rev in edges:
+            ts = [i / per for i in range(per)]
+            for t in (ts if not rev else [1 - t for t in ts]):
+                p = _r2(e @ t)
+                if not out or not _close(tuple(out[-1][:2]), p):
+                    out.append([p[0], p[1], 0.0])
+        return out if len(out) >= 3 else None
+    except Exception:
         return None
-    order = [(segs[0][0], segs[0][2])]
-    used, tail = {0}, segs[0][1]
-    while len(used) < len(segs):
-        for i, (st, en, bl) in enumerate(segs):
-            if i in used:
-                continue
-            if _close(st, tail):
-                order.append((st, bl)); used.add(i); tail = en; break
-            if _close(en, tail):
-                order.append((en, -bl)); used.add(i); tail = st; break
-        else:
-            return None                                   # did not close into one loop
-    return [[p[0], p[1], b] for (p, b) in order]
 
 
 def _slice(solid, bb, z):
@@ -668,6 +712,408 @@ def _recognize_shell(orig, name, axis):
 
 
 
+# ------------------------------------------------------------------ LAYERED 2.5D recognition
+# The general form of every case above. Slice the part densely along an axis; each slice is a set
+# of REGIONS, each an outer loop with holes. Split the depth into LAYERS wherever the slices stop
+# agreeing (the number of regions or holes changes, or a size stops varying linearly); build each
+# layer as pads for its outer loops and pockets for its holes over the layer's depth, drafted where
+# the slices fit a straight line. A plain extrude is one layer; a box, pan or housing is rings over
+# a floor layer; floor cutouts are holes in the floor layer; a slot is a layer where a wall splits;
+# a lug on top is a layer of small regions. Cross-axis features are left to carving.
+
+LAYER_SLICES = 32
+
+
+def _section_regions(solid, z):
+    """Regions of the plane section at height z, as [(outer_wire, [hole_wires], outer_area)].
+
+    Built from BRepAlgoAPI_Section's CURVES, not by intersecting the solid with a face: that
+    returned "one region, no holes" for CTC-02's ring sections (and segfaulted on the same part).
+    Loops are nested by containment: even depth = a region's outer loop, odd depth = its hole."""
+    from build123d import Edge, Face, Wire
+    from OCP.BRepAlgoAPI import BRepAlgoAPI_Section
+    from OCP.BRepClass import BRepClass_FaceClassifier
+    from OCP.TopAbs import TopAbs_EDGE, TopAbs_IN
+    from OCP.TopExp import TopExp_Explorer
+    from OCP.TopoDS import TopoDS
+    from OCP.gp import gp_Dir, gp_Pln, gp_Pnt
+
+    sec = BRepAlgoAPI_Section(solid.wrapped, gp_Pln(gp_Pnt(0, 0, z), gp_Dir(0, 0, 1)), True)
+    edges = []
+    ex = TopExp_Explorer(sec.Shape(), TopAbs_EDGE)
+    while ex.More():
+        edges.append(Edge(TopoDS.Edge_s(ex.Current())))
+        ex.Next()
+    if not edges:
+        return []
+    loops = []
+    for w in Wire.combine(edges):
+        if not w.is_closed:
+            continue
+        try:
+            f = Face(w)
+            loops.append((w, f, abs(f.area)))
+        except Exception:
+            continue
+    loops.sort(key=lambda t: -t[2])
+    # nesting by a plain 2D point-in-polygon test on the sampled loops (OCCT's face classifier on a
+    # point lying on the inner loop misreported CTC-02's cavity as a second solid region)
+    polys2d = [_loop_points(w) for w, _, _ in loops]
+
+    def _pip(x, y, poly):
+        inside = False
+        n = len(poly)
+        for i in range(n):
+            x1, y1 = poly[i]
+            x2, y2 = poly[(i + 1) % n]
+            if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+                inside = not inside
+        return inside
+
+    parent, depth = {}, {}
+    for i, (w, f, a) in enumerate(loops):
+        px, py = polys2d[i][0]
+        best = None
+        for j in range(i):                                  # smallest larger loop containing it
+            if loops[j][2] > a and _pip(px, py, polys2d[j]) and (best is None or loops[j][2] < loops[best][2]):
+                best = j
+        parent[i] = best
+        depth[i] = 0 if best is None else depth[best] + 1
+    regions = []
+    for i, (w, f, a) in enumerate(loops):
+        if depth[i] % 2 == 0:
+            holes = [loops[k][0] for k in range(len(loops)) if parent.get(k) == i]
+            regions.append((w, holes, a))
+    return regions
+
+
+def _loop_key(w):
+    b = w.bounding_box()
+    return ((b.min.X + b.max.X) / 2, (b.min.Y + b.max.Y) / 2, (b.size.X + b.size.Y) / 4)
+
+
+def _signature(regs, min_hole=0.0):
+    """Topology of a slice: region count and each region's hole count (largest first)."""
+    return tuple(sorted(((len(h) for _, h, _ in regs)), reverse=True)) + (len(regs),)
+
+
+def _recognize_layers(orig, name, axis):
+    """Recognize `orig` as a stack of 2.5D layers along `axis`. Raises if it cannot."""
+    from build123d import Face, offset, Kind
+    solid = _align_to_z(orig, axis)
+    bb = solid.bounding_box()
+    base_z, thick = bb.min.Z, bb.size.Z
+    # LAYER BOUNDARIES COME FROM THE PART, not from even sampling: the section of a 2.5D part can
+    # only change topology at a face perpendicular to the axis -- a step, a floor, a flange top,
+    # the edge of a slot. Even slices put ~2 of 32 inside FTC-08's 3.4 mm floor and it was folded
+    # into the walls. So the event heights are the perpendicular planar faces' heights, and each
+    # interval between consecutive events is a candidate layer.
+    ev = {round(base_z, 4), round(bb.max.Z, 4)}
+    for f in solid.faces().filter_by(GeomType.PLANE):
+        if abs(abs(_normal(f).normalized().Z) - 1) < ANG:
+            ev.add(round(f.center().Z, 4))
+    ev = sorted(ev)
+    merged_ev = [ev[0]]
+    for z in ev[1:]:
+        if z - merged_ev[-1] > 0.05:
+            merged_ev.append(z)
+    if merged_ev[-1] < bb.max.Z - 0.05:
+        merged_ev.append(bb.max.Z)
+    intervals = [(a, b) for a, b in zip(merged_ev, merged_ev[1:])]
+    if len(intervals) > 60:
+        raise ValueError(f"{len(intervals)} step heights: not a 2.5D part along this axis")
+
+    # ...but flat faces are not the only place the section changes: topology also changes at the
+    # end of a CURVED face -- a boss merging into a wall, a rounded rib -- with no flat face there.
+    # CTC-02 has one interval that is a ring, then two C-shaped walls, then solid, with no flat face
+    # between, and one representative slice made it a 245 mm solid slab. So sample each interval
+    # every ~8 mm, and split it wherever the signature changes, bisecting to the height.
+    cache = {}
+
+    def _sig_at(z):
+        if z not in cache:
+            cache[z] = _signature(_section_regions(solid, z))
+        return cache[z]
+    split = []
+    # a budget of ~240 sections per axis: 8 mm spacing on small parts, coarser on big ones (CTC-02's
+    # side views took 190 s each at a fixed 8 mm)
+    step = max(8.0, thick / 240.0)
+    for a, b in intervals:
+        n = max(2, min(40, int((b - a) / step)))
+        pts = [a + (i + 0.5) * (b - a) / n for i in range(n)]
+        cuts = [a]
+        for z0, z1 in zip(pts, pts[1:]):
+            if _sig_at(z0) != _sig_at(z1):
+                lo, hi = z0, z1
+                for _ in range(10):
+                    m = (lo + hi) / 2
+                    lo, hi = (m, hi) if _sig_at(m) == _sig_at(z0) else (lo, m)
+                cuts.append((lo + hi) / 2)
+        cuts.append(b)
+        split += [(u, v) for u, v in zip(cuts, cuts[1:]) if v - u > 0.05]
+    intervals = split
+    if len(intervals) > 80:
+        raise ValueError(f"{len(intervals)} section changes: not a 2.5D part along this axis")
+    # a few slices per interval: the middle, plus quarter points on long intervals so draft and
+    # curvature (chamfers, fillets) can be told apart from a constant section
+    zs, lay_idx = [], []
+    for a, b in intervals:
+        fr = (0.5,) if b - a < 4.0 else (0.15, 0.38, 0.62, 0.85)
+        ks = []
+        for f in fr:
+            zs.append(a + f * (b - a))
+            ks.append(len(zs) - 1)
+        lay_idx.append(ks)
+    slices = [_section_regions(solid, z) for z in zs]
+    if not any(slices):
+        raise ValueError("empty sections")
+    # An interval whose slices all come back EMPTY has material in it (the part is one solid): the
+    # section failed to close at those heights. Dropping it silently put every layer above it
+    # 17.27 mm low on CTC-02, because pads stack on "the current top face". So retry at other
+    # heights, and if the section still will not close, extend the layer below over the gap --
+    # the stack keeps its true height and the verification gate judges the approximation.
+    for (a, b), ks in zip(intervals, lay_idx):
+        if any(slices[k] for k in ks):
+            continue
+        for f in (0.1, 0.3, 0.7, 0.9, 0.02, 0.98):
+            reg = _section_regions(solid, a + f * (b - a))
+            if reg:
+                zs.append(a + f * (b - a))
+                slices.append(reg)
+                ks[:] = [len(zs) - 1]
+                break
+    layers, bounds_by_layer, gaps = [], [], []
+    for (a, b), ks in zip(intervals, lay_idx):
+        if any(slices[k] for k in ks):
+            layers.append(ks)
+            bounds_by_layer.append((a, b))
+        elif bounds_by_layer:
+            bounds_by_layer[-1] = (bounds_by_layer[-1][0], b)
+            gaps.append((a, b))
+        else:
+            gaps.append((a, b))             # below the first layer: it starts higher
+
+    # Merge neighbouring intervals whose sections are the SAME: a step height elsewhere on the
+    # part (an internal rib's top) splits a wall into intervals that a designer would draw as one
+    # pad. Same topology and every loop within 0.05 mm (centre and size) -> one layer.
+    def _same(ka, kb):
+        ra, rb = slices[ka], slices[kb]
+        if _signature(ra) != _signature(rb):
+            return False
+        la = sorted(_loop_key(w) for r in ra for w in [r[0]] + list(r[1]))
+        lb = sorted(_loop_key(w) for r in rb for w in [r[0]] + list(r[1]))
+        return len(la) == len(lb) and all(max(abs(x - y) for x, y in zip(p, q)) < 0.05 for p, q in zip(la, lb))
+    if not layers:
+        raise ValueError("empty sections")
+    bounds_by_layer[0] = (base_z, bounds_by_layer[0][1])   # pads are built up from the part's base
+    ml, mb = [layers[0]], [bounds_by_layer[0]]
+    for L, bd in zip(layers[1:], bounds_by_layer[1:]):
+        if _same(ml[-1][-1], L[0]) and _same(ml[-1][0], L[-1]):
+            ml[-1] = ml[-1] + L
+            mb[-1] = (mb[-1][0], bd[1])
+        else:
+            ml.append(L)
+            mb.append(bd)
+    layers, bounds_by_layer = ml, mb
+
+    # 5a. PADS: each layer's outer loops, stacked from the bottom
+    def _fit(ks, hs):
+        zz = [zs[k] for k in ks]
+        n = len(zz)
+        mz, mh = sum(zz) / n, sum(hs) / n
+        sxx = sum((z - mz) ** 2 for z in zz)
+        sl = sum((z - mz) * (h - mh) for z, h in zip(zz, hs)) / sxx if sxx else 0.0
+        return sl, max(abs(h - (mh + sl * (z - mz))) for z, h in zip(zz, hs))
+
+    def _nearest(cands, cx, cy, hw=None, tol=None):
+        c = [w for w in cands if hw is None or abs(_loop_key(w)[2] - hw) <= tol]
+        return min(c, key=lambda w: math.hypot(_loop_key(w)[0] - cx, _loop_key(w)[1] - cy)) if c else None
+
+    def _taper_ok(wire, depth, taper):
+        """Test-build a drafted extrusion of this loop: OCCT's tapered extrude (a loft underneath)
+        fails on some outlines, and a spec that cannot be emitted cannot be verified."""
+        try:
+            from build123d import extrude
+            return extrude(Face(wire), amount=depth, taper=taper).volume > 0
+        except Exception:
+            return False
+
+    def _emit_ok(poly, z0, nz, depth, taper):
+        try:
+            from build123d import Plane, extrude
+            from b3d_emit import _polys_region
+            pl = Plane(origin=(0, 0, z0), x_dir=(1, 0, 0), z_dir=(0, 0, nz))
+            reg = _polys_region([poly], pl)
+            return reg is not None and extrude(reg, amount=depth, dir=(0, 0, nz), taper=taper).volume > 0
+        except Exception:
+            return False
+
+    def _median(ws):
+        ws = sorted((w for w in ws if w is not None), key=lambda w: _loop_key(w)[2])
+        return ws[len(ws) // 2] if ws else None
+
+    def _carry(wire, amount):
+        sh = offset(Face(wire), amount=amount, kind=Kind.ARC)
+        return (sh.faces()[0] if hasattr(sh, "faces") else sh).outer_wire()
+
+    # ONE sketch and ONE pad per layer, holding all of its region outlines. Pads are stacked on
+    # "the current top face", so padding a layer's regions one at a time put the second region ON
+    # TOP of the first (FTC-07's four feet sent its floor slab 2.5 mm up and out of the part).
+    feats, notes, skipped = [], [], []
+    # Curves that are not lines or circular arcs (ellipses, conic sections, splines) can only be
+    # APPROXIMATED by the sketch's arcs. That may still verify within tolerance, but the tree then
+    # holds arcs where the designer had, say, an ellipse -- so it is disclosed, never silent.
+    n_approx = sum(1 for sl_ in slices for r in sl_ for w in [r[0]] + list(r[1]) for e in w.edges()
+                   if e.geom_type not in (GeomType.LINE, GeomType.CIRCLE))
+    for li, L in enumerate(layers):
+        zb, ze = bounds_by_layer[li]
+        Lz = ze - zb
+        rep = L[len(L) // 2]
+        if Lz < EPS:
+            continue
+        if not slices[rep]:
+            skipped.append((li, zb, ze, "empty section"))
+            continue
+        outlines, slopes = [], []
+        for ri, (ow, holes, oa) in enumerate(slices[rep]):
+            cx, cy, hw0 = _loop_key(ow)
+            track = [_nearest([r[0] for r in slices[k]], cx, cy) for k in L]
+            sl = None
+            if len(L) >= 4 and all(track):
+                s_, res = _fit(L, [_loop_key(w)[2] for w in track])
+                if res < 0.05:
+                    sl = s_
+            outlines.append((ow, track))
+            slopes.append(sl)
+        # one taper for the whole layer: only when every region fits the same draft
+        drafted = (all(v is not None for v in slopes) and max(slopes) - min(slopes) < 1e-3
+                   and abs(slopes[0]) > math.tan(math.radians(0.05)))
+        polys = []
+        taper = 0.0
+        if drafted:
+            sl = sum(slopes) / len(slopes)
+            taper = round(-math.degrees(math.atan(sl)), 4)
+            try:
+                polys = [_approx_poly(_carry(ow, -(zs[rep] - zb) * sl)) for ow, _ in outlines]
+                if any(p is None for p in polys) or not all(_emit_ok(p, 0.0, 1.0, Lz, taper) for p in polys):
+                    polys = []
+            except Exception:
+                polys = []
+        if not polys:                           # straight: each region's MEDIAN outline
+            taper = 0.0
+            polys = [_approx_poly(_median(tr) or ow) for ow, tr in outlines]
+        polys = [p for p in polys if p is not None]
+        if not polys:
+            skipped.append((li, zb, ze, "outline not approximable"))
+            continue
+        sk = f"L{li}_sk"
+        first = not feats
+        feats.append(IR.sketch(sk, "XY", polys=polys) if first else
+                     IR.sketch(sk, polys=polys, on={"face_of": "body", "side": "top"}))
+        feats.append(IR.pad("body" if first else f"L{li}", sk, length=round(Lz, 4), taper=taper))
+        notes.append(f"{Lz:.1f} mm: {len(slices[rep])} region(s), {sum(len(r[1]) for r in slices[rep])} hole(s)")
+
+    # 5b. HOLES as vertical RUNS: a hole that continues through several layers (a bolt hole through
+    # a flange and the layer above it, a cavity through a wall and its lip) is ONE cut over its
+    # whole run -- as a designer draws it -- placed at its own height with prism_cut. CTC-02 was
+    # 632 features when every layer re-pocketed its holes. A change of size is a new run, so a
+    # counterbore stays a counterbore.
+    # Two holes in adjacent layers are ONE continuing hole only if they MEET at the boundary: the
+    # last slice of the lower layer and the first of the upper agree to 0.3 mm in size and 0.5 mm
+    # in position. (A 10%-of-size tolerance merged FTC-08's smaller flange opening with its wall
+    # cavity, and "smallest along the run" then under-cut every wall.)
+    runs, open_runs = [], []
+    for li, L in enumerate(layers):
+        rep = L[len(L) // 2]
+        nxt = []
+        for h in [h for r in slices[rep] for h in r[1]]:
+            cx, cy, hw = _loop_key(h)
+            first = _nearest([g for rr in slices[L[0]] for g in rr[1]], cx, cy)
+            fk = _loop_key(first) if first is not None else (cx, cy, hw)
+            m = None
+            for r in open_runs:
+                if r["layers"][-1] != li - 1 or r["end"] is None:
+                    continue
+                ek = r["end"]
+                if abs(ek[0] - fk[0]) < 0.5 and abs(ek[1] - fk[1]) < 0.5 and abs(ek[2] - fk[2]) < 0.3:
+                    m = r
+                    break
+            if m is None:
+                m = {"layers": [], "key": (cx, cy, hw)}
+                runs.append(m)
+            m["layers"].append(li)
+            m["key"] = (cx, cy, hw)
+            last = _nearest([g for rr in slices[L[-1]] for g in rr[1]], cx, cy)
+            m["end"] = _loop_key(last) if last is not None else None
+            nxt.append(m)
+        open_runs = nxt
+
+    n_cuts = 0
+    for r in runs:
+        zb, ze = bounds_by_layer[r["layers"][0]][0], bounds_by_layer[r["layers"][-1]][1]
+        ks = [k for li in r["layers"] for k in layers[li]]
+        cx, cy, hw = r["key"]
+        track = [_nearest([h for g in slices[k] for h in g[1]], cx, cy, hw, max(2.0, 0.05 * hw)) for k in ks]
+        drafted = False
+        if len(ks) >= 4 and all(track):
+            sl, res = _fit(ks, [_loop_key(w)[2] for w in track])
+            drafted = res < 0.05 and abs(sl) > math.tan(math.radians(0.05))
+        if drafted:
+            # cut from the end where the hole is LARGER, narrowing into the part
+            kref = ks[len(ks) // 2]
+            ref = track[len(ks) // 2]
+            try:
+                # always cut UPWARD from the run's bottom plane: carry the loop down to it and let
+                # the taper follow the fitted slope (negative = widening as it rises). Cutting down
+                # from the top needs a flipped plane, which mirrors the polygon and its arcs, and
+                # OCCT's tapered extrude failed on exactly that for FTC-07's cavity.
+                wire, z0, nz = _carry(ref, -(zs[kref] - zb) * sl), zb, 1.0
+                taper = round(-math.degrees(math.atan(sl)), 4)
+                drafted = True
+            except Exception:
+                drafted = False
+        if not drafted:                         # the MEDIAN along the run: a floor fillet shrinks
+            wire = _median(track)               # the smallest slice, under-cutting every wall
+            if wire is None:
+                continue
+            z0, nz, taper = zb, 1.0, 0.0
+        poly = _approx_poly(wire)
+        if poly is None:
+            continue
+        if nz < 0:                              # local frame of a -Z plane: v = -y, arcs mirror
+            poly = [[p[0], -p[1], -p[2] if len(p) > 2 else 0.0] for p in poly]
+        if taper and not _emit_ok(poly, z0 - base_z, nz, ze - zb, taper):
+            # test-build EXACTLY what will be emitted (the approximated polygon, on its plane);
+            # if the kernel cannot draft it, cut the median loop straight instead
+            poly = _approx_poly(_median(track))
+            if poly is None:
+                continue
+            z0, nz, taper = zb, 1.0, 0.0
+        # pads are built from z = 0 while slice heights are in the aligned frame: shift by base_z
+        feats.append(IR.prism_cut(f"hole{n_cuts}", origin=(0.0, 0.0, z0 - base_z), normal=(0.0, 0.0, nz),
+                                  xdir=(1.0, 0.0, 0.0), depth=round(ze - zb, 4), polys=[poly], taper=taper))
+        n_cuts += 1
+    if not feats:
+        raise ValueError("no layers")
+    warnings = [f"layered along {tuple(round(c, 3) for c in axis.to_tuple())}: {len(layers)} layer(s), "
+                f"{n_cuts} hole run(s) -- " + "; ".join(notes)]
+    if gaps:
+        warnings.append("section would not close over " + ", ".join(
+            f"{a - base_z:.2f}..{b - base_z:.2f} mm" for a, b in gaps) + " -- the layer below was extended over it")
+    if skipped:
+        # later layers stack on "the current top face", so a dropped layer shortens the whole stack
+        warnings.append("layer(s) dropped, so the stack above them sits low: " + "; ".join(
+            f"L{li} {zb - base_z:.2f}..{ze - base_z:.2f} mm ({why})" for li, zb, ze, why in skipped))
+    if n_approx:
+        warnings.append(f"{n_approx} section curve(s) that are not lines or circular arcs (ellipse, "
+                        f"conic, spline) approximated by arcs within {DIM_TOL} mm -- the tree holds "
+                        "arcs where the design had a freeform curve")
+    # method "layered": registered like an extrude (built from z = 0), but NOT handed to the
+    # carving pass -- its holes are already cut, and carving has no per-step over-cut guard
+    return IR.part(name, *feats), {"method": "layered", "axis": axis, "warnings": warnings,
+                                   "layers": len(layers), "through_holes": 0, "blind_holes": 0}
+
+
 def _recognize_revolve(orig, name):
     """Recognize a body of revolution: find the axis, take the meridian (half-plane section), and
     emit an XZ profile + revolve(360). Returns (spec, extras) or raises."""
@@ -791,7 +1237,8 @@ def input_frame(orig, report):
     rotated = abs(a.dot(z)) <= 1 - ANG                  # mirrors _align_to_z's own test
     k = a.cross(z).normalized() if rotated else None
     ang = math.degrees(math.acos(max(-1.0, min(1.0, a.dot(z))))) if rotated else 0.0
-    dz = _align_to_z(solid, a).bounding_box().min.Z if report.get("method") == "extrude" else 0.0
+    dz = (_align_to_z(solid, a).bounding_box().min.Z
+          if report.get("method") in ("extrude", "layered") else 0.0)
 
     def place(shape):
         s = Pos(0, 0, dz) * shape
@@ -847,13 +1294,21 @@ def recognize(step_path, name=None, verify=True, recover=True):
         cands.append(_recognize_revolve(orig, name))
     except Exception:
         pass
-    # Open shells, looked at along each principal axis (see _recognize_shell). A five-slice
-    # pre-check rejects most parts before the full slice stack is cut.
-    for ax in (Vector(0, 0, 1), Vector(0, 1, 0), Vector(1, 0, 0)):
-        try:
-            cands.append(_recognize_shell(orig, name, ax))
-        except Exception:
-            continue
+    # Open shells (see _recognize_shell) and the general 2.5D form (see _recognize_layers), each
+    # looked at along the three principal axes. These cut hundreds of sections, which is where
+    # OpenCASCADE segfaults on unlucky geometry (CTC-02 died with "no output" in one run of three),
+    # so each runs in its own fresh process -- a crash costs that candidate, not the part -- and
+    # the six run concurrently.
+    from concurrent.futures import ThreadPoolExecutor
+    jobs = [(kind, ax) for kind in ("_shell_file", "_layers_file")
+            for ax in ((0.0, 0.0, 1.0), (0.0, 1.0, 0.0), (1.0, 0.0, 0.0))]
+    # capped: six OCCT processes, each multi-threaded, saturated a 28-core box and it hung
+    with ThreadPoolExecutor(int(os.environ.get("FEATURETREE_JOBS", "3"))) as pool:
+        got = list(pool.map(lambda j: _isolated(j[0], (str(step_path), name, j[1]), fallback=None), jobs))
+    for g in got:
+        if g is not None:
+            spec_, extras_ = g
+            cands.append((spec_, {**extras_, "axis": Vector(*extras_["axis"])}))
     if not cands:
         raise ValueError("neither a recognizable extrude nor a body of revolution")
     if not verify:
@@ -865,30 +1320,39 @@ def recognize(step_path, name=None, verify=True, recover=True):
     reports = []
     for spec, extras in cands:
         report = _report_for(spec, extras, name)
-        report.update(_verify(spec, orig))
+        report.update(_isolated("_verify_file", (spec, str(step_path), report), fallback={
+            "verified": False, "reason": "re-emit crashed the geometry kernel",
+            "vol_orig": round(orig.volume, 1)}))
         if report["verified"]:
             return spec, report
         reports.append((spec, extras, report))
 
     # Pass 2: multi-axis recovery per extrude candidate (rank order); first that verifies wins.
-    best = min(reports, key=lambda c: c[2].get("dvol_pct", 1e9))
+    def _closeness(r):                  # best overlap first; volume error only when unmeasured
+        return (-r["iou_pct"], 0.0) if r.get("iou_pct") is not None else (0.0, r.get("dvol_pct", 1e9))
+    best = min(reports, key=lambda c: _closeness(c[2]))
     if recover:
         for spec, extras, report in reports:
             if extras.get("method") != "extrude" or extras.get("axis") is None:
                 continue
             try:
-                rspec, counts = _recover_multiaxis(spec, orig, extras["axis"], name)
+                got = _isolated("_recover_file", (spec, str(step_path), extras["axis"].to_tuple(), name))
+                if got is None:
+                    continue                      # carving crashed the kernel for this candidate
+                rspec, counts = got
             except Exception:
                 continue
             rreport = _report_for(rspec, extras, name)
-            rreport.update(_verify(rspec, orig))
+            rreport.update(_isolated("_verify_file", (rspec, str(step_path), rreport), fallback={
+                "verified": False, "reason": "re-emit crashed the geometry kernel",
+                "vol_orig": round(orig.volume, 1)}))
             rreport["recovered"] = counts
             rreport["warnings"].append(
                 f"multi-axis recovery: +{counts['pockets']} pocket(s), +{counts['holes']} "
                 f"cross-hole(s); {counts['residual_lumps']} residual lump(s) (chamfers/fillets) left uncut")
             if rreport["verified"]:
                 return rspec, rreport
-            if rreport.get("dvol_pct", 1e9) < best[2].get("dvol_pct", 1e9):
+            if _closeness(rreport) < _closeness(best[2]):
                 best = (rspec, extras, rreport)
     return best[0], best[2]
 
@@ -1026,8 +1490,78 @@ def _cyl_hole(face, base_z, top_z, warnings, outline_arcs=frozenset()):
             "through": through, "side": side, "depth": round(zhi - zlo, 4)}
 
 
-def _verify(spec, solid):
-    """Re-emit the recognized IR and compare volume + bbox size to the original STEP."""
+def _isolated(fn_name, args, fallback=None, timeout=900):
+    """Run step_recognize.<fn_name>(*args) in a FRESH Python process and return its result, or
+    `fallback` if it crashes, errors or times out.
+
+    OpenCASCADE can segfault inside a Boolean on unlucky geometry, and a segfault kills the whole
+    recognition -- every candidate, not just the one that crashed (NIST CTC-02 came back as "no
+    output" after 456 s although each candidate recognised fine alone). A first version FORKED,
+    and deadlocked: forking a process with live threads can copy a lock another thread held, and
+    the child waited on it forever at 0% CPU. A fresh interpreter cannot inherit a held lock; it
+    costs a few seconds of start-up, and the timeout bounds any hang."""
+    import pickle
+    import subprocess
+    code = ("import sys, pickle; sys.path.insert(0, %r); import step_recognize as sr; "
+            "fn, a = pickle.load(sys.stdin.buffer); "
+            "sys.stdout.buffer.write(b'@@PICKLE@@' + pickle.dumps(getattr(sr, fn)(*a)))"
+            % os.path.dirname(os.path.abspath(__file__)))
+    try:
+        p = subprocess.run([sys.executable, "-c", code], input=pickle.dumps((fn_name, args)),
+                           capture_output=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return {**fallback, "reason": f"{fn_name} timed out after {timeout} s"} if isinstance(fallback, dict) else fallback
+    i = p.stdout.find(b"@@PICKLE@@")
+    if i < 0:
+        why = (p.stderr.decode(errors="replace").strip().splitlines() or [f"exit code {p.returncode}"])[-1]
+        return {**fallback, "reason": f"{fn_name}: {why[:200]}"} if isinstance(fallback, dict) else fallback
+    return pickle.loads(p.stdout[i + len(b"@@PICKLE@@"):])
+
+
+def _candidate_file(fn, step_path, name, axis_xyz):
+    """fn(orig, name, axis) in an isolated process; None if it does not apply. The axis goes back
+    as a tuple: OCCT vectors do not pickle."""
+    orig = import_step(str(step_path))
+    orig = orig.solid() if hasattr(orig, "solid") else orig
+    try:
+        spec, extras = fn(orig, name, Vector(*axis_xyz))
+    except Exception:
+        return None
+    return spec, {**extras, "axis": tuple(extras["axis"].to_tuple())}
+
+
+def _shell_file(step_path, name, axis_xyz):
+    return _candidate_file(_recognize_shell, step_path, name, axis_xyz)
+
+
+def _layers_file(step_path, name, axis_xyz):
+    return _candidate_file(_recognize_layers, step_path, name, axis_xyz)
+
+
+def _verify_file(spec, step_path, report):
+    """_verify in an isolated process: re-reads the input from its STEP file."""
+    orig = import_step(str(step_path))
+    orig = orig.solid() if hasattr(orig, "solid") else orig
+    return _verify(spec, orig, report)
+
+
+def _recover_file(spec, step_path, axis_xyz, name):
+    """_recover_multiaxis in an isolated process: re-reads the input from its STEP file."""
+    orig = import_step(str(step_path))
+    orig = orig.solid() if hasattr(orig, "solid") else orig
+    return _recover_multiaxis(spec, orig, Vector(*axis_xyz), name)
+
+
+def _verify(spec, solid, report=None):
+    """Re-emit the recognized IR and compare it to the original STEP: volume, rotation-tolerant
+    bounding box, and -- when both of those pass -- a TWO-SIDED shape test.
+
+    Volume and extents alone are not a sound acceptance test: over-cut and uncut material cancel in
+    a volume difference. When layered recognition multiplied the candidates, two NIST parts passed
+    them at 95.0% and 93.7% overlap (CTC-03, FTC-07) -- false accepts. So a VERIFIED tree must also
+    overlap the input by >= IOU_TOL, measured without Boolean operations (iou_check) through the
+    recogniser's own exact transform (input_frame). It runs only on candidates that already pass
+    the cheap tests, so its cost is paid a handful of times per part."""
     try:
         part, res = b3d_emit.emit(spec)
     except Exception as e:
@@ -1039,10 +1573,27 @@ def _verify(spec, solid):
     dvol = abs(res["volume"] - solid.volume)
     dsize = max(abs(o - n) for o, n in zip(os_, ns_))
     ok = dvol <= VOL_TOL * solid.volume and dsize <= DIM_TOL
-    return {"verified": bool(ok), "vol_orig": round(solid.volume, 1), "vol_ir": res["volume"],
-            "dvol": round(dvol, 2), "dvol_pct": round(100 * dvol / max(solid.volume, 1e-9), 2),
-            "dsize_mm": round(dsize, 3)}
-
+    out = {"verified": bool(ok), "vol_orig": round(solid.volume, 1), "vol_ir": res["volume"],
+           "dvol": round(dvol, 2), "dvol_pct": round(100 * dvol / max(solid.volume, 1e-9), 2),
+           "dsize_mm": round(dsize, 3)}
+    # measured on every NEAR candidate, not only passing ones: when nothing verifies, the returned
+    # PARTIAL is the one that overlaps best. Picking the closest VOLUME instead handed back FTC-08
+    # at 93.5% overlap over a 98.6% sibling -- volume error is where compensating errors hide.
+    if (dvol <= 0.05 * solid.volume) and report is not None and report.get("extrude_axis"):
+        try:
+            import iou_check
+            place, _, _ = input_frame(solid, report)
+            p, ci = iou_check.iou(solid, place(part), n=IOU_SAMPLES)
+            out["iou_pct"], out["iou_ci_pct"] = round(100 * p, 3), round(100 * ci, 3)
+            if ok and p < IOU_TOL:
+                out["verified"] = False
+                out["reason"] = (f"volume and extents match but the shapes overlap only "
+                                 f"{100 * p:.2f}% (< {100 * IOU_TOL:g}%): compensating errors")
+        except Exception as e:                   # an unmeasurable shape is not a verified one
+            if ok:
+                out["verified"] = False
+                out["reason"] = f"two-sided shape test failed to run: {e}"
+    return out
 
 def _fixtures(tmp):
     """Generate known STEP fixtures from IR via b3d_emit: three in-scope prismatic parts +
@@ -1097,6 +1648,19 @@ def _fixtures(tmp):
     p = Path(tmp) / "slot.step"
     export_step(sp.part, str(p))
     paths["slot"] = str(p)
+    # OUT OF SCOPE: a loft from a square to a circle. The section changes SHAPE continuously with
+    # height -- neither prismatic, nor drafted, nor a body of revolution -- so no stack of pads and
+    # pockets reproduces it, and the honest answer is PARTIAL.
+    from build123d import BuildPart as _BP, BuildSketch as _BS, Circle as _C, loft as _loft
+    with _BP() as lp:
+        with _BS(Plane.XY):
+            Rectangle(30, 30)
+        with _BS(Plane.XY.offset(25)):
+            _C(10)
+        _loft()
+    p = Path(tmp) / "loft.step"
+    export_step(lp.part, str(p))
+    paths["loft"] = str(p)
     return paths
 
 
@@ -1104,17 +1668,20 @@ def selftest():
     import tempfile
     paths = _fixtures(tempfile.mkdtemp())
     problems = []
-    for nm in ("plate", "poly", "disc_hole", "off_axis", "dshape", "cone", "slot"):  # in scope -> VERIFY
+    for nm in ("plate", "poly", "disc_hole", "off_axis", "dshape", "cone", "slot",
+               "boxpost"):                                                           # in scope -> VERIFY
         _, rep = recognize(paths[nm])
         print(f"  {nm:10} -> {'VERIFIED' if rep['verified'] else 'PARTIAL'}  "
               f"vol Δ{rep['dvol_pct']}%  (method={rep.get('method')}, thru={rep['through_holes']})")
         if not rep["verified"]:
             problems.append(f"{nm}: expected VERIFIED, got Δ{rep['dvol_pct']}%")
-    _, rep = recognize(paths["boxpost"])             # out of scope -> must be flagged PARTIAL
-    print(f"  {'boxpost':10} -> {'VERIFIED' if rep['verified'] else 'PARTIAL'}  vol Δ{rep['dvol_pct']}%  "
-          "(rect base + additive post — neither a clean extrude nor a revolve)")
+    # boxpost (a base + an additive post) was the out-of-scope case until layered 2.5D recovery;
+    # it now verifies as two stacked layers, and the loft is the part that must NOT verify.
+    _, rep = recognize(paths["loft"])                # out of scope -> must be flagged PARTIAL
+    print(f"  {'loft':10} -> {'VERIFIED' if rep['verified'] else 'PARTIAL'}  vol Δ{rep['dvol_pct']}%  "
+          "(square-to-circle loft — no stack of pads and pockets reproduces it)")
     if rep["verified"]:
-        problems.append("boxpost: must NOT verify (neither extrude nor revolve should fake it)")
+        problems.append("loft: must NOT verify (nothing in the vocabulary can reproduce it)")
     if problems:
         for p in problems:
             print("FAIL:", p)

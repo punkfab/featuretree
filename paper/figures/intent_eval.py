@@ -34,7 +34,15 @@ import sys
 ROOT = os.path.expanduser("~/Downloads/NIST-PMI-STEP-Files")
 GEOM = os.path.join(ROOT, "AP203 geometry only")
 PARTS = [("nist_ctc_01_asme1_rd.stp", "nist_ctc_01_asme1_ap242-e1.stp"),
+         ("nist_ctc_02_asme1_rc.stp", "nist_ctc_02_asme1_ap242-e2.stp"),
+         ("nist_ctc_03_asme1_rc.stp", "nist_ctc_03_asme1_ap242-e2.stp"),
+         ("nist_ctc_04_asme1_rd.stp", "nist_ctc_04_asme1_ap242-e1.stp"),
+         ("nist_ctc_05_asme1_rd.stp", "nist_ctc_05_asme1_ap242-e1.stp"),
+         ("nist_ftc_06_asme1_rd.stp", "nist_ftc_06_asme1_ap242-e2.stp"),
+         ("nist_ftc_07_asme1_rd.stp", "nist_ftc_07_asme1_ap242-e2.stp"),
+         ("nist_ftc_08_asme1_rc.stp", "nist_ftc_08_asme1_ap242-e2.stp"),
          ("nist_ftc_09_asme1_rd.stp", "nist_ftc_09_asme1_ap242-e1.stp"),
+         ("nist_ftc_10_asme1_rb.stp", "nist_ftc_10_asme1_ap242-e2.stp"),
          ("nist_ftc_11_asme1_rb.stp", "nist_ftc_11_asme1_ap242-e2.stp")]
 OUT = os.path.join("paper", "figures", "intent_results.json")
 
@@ -42,6 +50,7 @@ OUT = os.path.join("paper", "figures", "intent_results.json")
 def score(geom_path, pmi_path):
     import math
     sys.path.insert(0, os.getcwd())
+    sys.path.insert(0, os.path.join(os.getcwd(), "paper", "figures"))
     import b3d_emit
     import intent
     import iou_check
@@ -49,7 +58,7 @@ def score(geom_path, pmi_path):
     from build123d import import_step
     from pmi import hole_callouts, read_pmi
 
-    spec, rep = sr.recognize(geom_path)
+    spec, rep = __import__("_recovered").load(geom_path)
     rec, _ = b3d_emit.emit(spec)
     orig = import_step(geom_path)
     bb = iou_check.solid_part(orig).bounding_box()

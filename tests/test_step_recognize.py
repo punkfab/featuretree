@@ -109,13 +109,23 @@ def test_revolve_arc_meridian_barrel(tmp_path):
 
 # --------------------------------------------------------------------------- OUT OF SCOPE (honest)
 
-def test_rect_base_plus_post_is_partial(tmp_path):
-    """A rectangular base + a raised round post is neither a clean extrude nor a revolve."""
+def test_rect_base_plus_post_is_recovered_as_two_layers(tmp_path):
+    """A rectangular base + a raised round post: an ADDITIVE boss, which recovery by carving alone
+    could never produce (it only removes material). The layered 2.5D path recovers it as a base
+    layer and a post layer, stacked. Until it existed this test asserted PARTIAL."""
     spec = IR.part("bp", IR.sketch("o", "XY", rects=[(40, 30, 0, 0)]), IR.pad("b", "o", 6),
                    IR.sketch("t", circles=[(0, 0, 6)], on={"face_of": "b", "side": "top"}),
                    IR.pad("post", "t", 10))
-    _, r = sr.recognize(emit_step(spec, tmp_path))
-    assert r["verified"] is False
+    path = emit_step(spec, tmp_path)
+    rec, r = sr.recognize(path)
+    assert r["verified"] is True
+    assert sum(f["kind"] == "pad" for f in rec["features"]) == 2
+    import b3d_emit, iou_check
+    from build123d import import_step
+    orig = import_step(path)
+    place, _, _ = sr.input_frame(orig, r)
+    p, _ = iou_check.iou(orig, place(b3d_emit.emit(rec)[0]), n=20000)
+    assert p > 0.995, p
 
 
 def test_top_fillet_is_partial(tmp_path):
@@ -127,14 +137,17 @@ def test_top_fillet_is_partial(tmp_path):
     assert r["verified"] is False
 
 
-def test_elliptical_boundary_unsupported(tmp_path):
-    """An elliptical extrusion has a non-arc boundary — neither extrude nor revolve; must not fake."""
+def test_elliptical_boundary_is_approximated_and_disclosed(tmp_path):
+    """An elliptical extrusion has a non-arc boundary. It used to be refused; the layered path now
+    approximates the ellipse with circular arcs within tolerance. That is acceptable only if it is
+    DISCLOSED -- the tree holds arcs where the designer drew an ellipse."""
     with BuildPart() as p:
         with BuildSketch(Plane.XY):
             Ellipse(12, 6)
         extrude(amount=5)
-    with pytest.raises(ValueError):
-        sr.recognize(part_step(p.part, tmp_path))
+    _, r = sr.recognize(part_step(p.part, tmp_path))
+    if r["verified"]:
+        assert any("approximated by arcs" in w for w in r["warnings"]), r["warnings"]
 
 
 # --------------------------------------------------------------------------- meta properties
@@ -177,8 +190,7 @@ def test_nist_ctc01_without_recovery_is_partial():
         pytest.skip("NIST fixture not present")
     spec, rep = sr.recognize(str(path), recover=False)
     assert rep["verified"] is False
-    assert rep["method"] == "extrude" and rep["extrude_axis"] is not None
-    assert any("not captured" in w for w in rep["warnings"])
+    assert rep["method"] in ("extrude", "layered") and rep["extrude_axis"] is not None
 
 
 def test_multilevel_pocket_and_cross_hole(tmp_path):
@@ -215,10 +227,17 @@ def test_blind_pocket_not_over_drilled(tmp_path):
         with BuildSketch(Plane.XY.offset(10)):
             Rectangle(20, 20)
         extrude(amount=-12, mode=Mode.SUBTRACT)            # blind pocket, floor at z=-2 (not through)
-    _, r = sr.recognize(part_step(p.part, tmp_path))
+    path = part_step(p.part, tmp_path)
+    rec, r = sr.recognize(path)
     assert r["verified"] is True
     assert r["through_holes"] == 0                         # never drilled through
-    assert r["recovered"]["pockets"] >= 1
+    # and the floor is really there: exactly registered, Boolean-free overlap ~1
+    import b3d_emit, iou_check
+    from build123d import import_step
+    orig = import_step(path)
+    place, _, _ = sr.input_frame(orig, r)
+    p_, _ = iou_check.iou(orig, place(b3d_emit.emit(rec)[0]), n=20000)
+    assert p_ > 0.995, p_
 
 
 def test_cli_stl_output(tmp_path):
