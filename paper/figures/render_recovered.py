@@ -65,9 +65,21 @@ def tri_mesh(solids, tol=TOL):
     """list of build123d solids -> (Nx3x3) triangle vertex array."""
     out = []
     for solid in solids:
-        verts, faces = solid.tessellate(tol)
-        v = np.array([(p.X, p.Y, p.Z) for p in verts])
-        out.append(v[np.array(faces)])
+        try:
+            parts = [solid.tessellate(tol)]
+        except AttributeError:
+            # OCCT leaves an occasional face untriangulated (CTC-02's recovered solid); mesh face
+            # by face and skip those, rather than losing the whole render
+            parts = []
+            for f in solid.faces():
+                try:
+                    parts.append(f.tessellate(tol))
+                except AttributeError:
+                    continue
+        for verts, faces in parts:
+            if len(faces):
+                v = np.array([(p.X, p.Y, p.Z) for p in verts])
+                out.append(v[np.array(faces)])
     return np.concatenate(out)
 
 

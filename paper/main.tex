@@ -60,17 +60,19 @@ MIT-licensed, training-free recogniser that recovers an editable feature tree
 from an exact B-rep, gates every recovery by re-executing the tree and comparing
 the result against the input, and emits into FreeCAD and Onshape --- two systems
 with no import-time feature recognition at all. On the eleven-part NIST MBE PMI
-conformance corpus it returns \VERIFIED{} for 3 parts and \PARTIAL{} for 8,
-producing \emph{no silently incorrect trees}: all three \VERIFIED{} recoveries
-exceed \SI{99.6}{\percent} IoU against the input, measured without Boolean
-operations. We also report a negative result about our own
-acceptance criterion: a scalar volume comparison lets over-cut and uncut
-material cancel, and on one part a reconstruction agreeing to
-\SI{2.43}{\percent} on volume overlaps its target by only \SI{31}{\percent}.
-A two-sided IoU test eliminates the failure mode. Finally we infer design
-intent --- holes, patterns, units and standard sizes --- and score it against
-the designer's own semantic PMI: 38 of 39 dimensioned holes recovered, all 36
-nominal sizes and all three unit systems correct. We claim no methodological novelty; we claim an available,
+conformance corpus it returns an editable tree for all eleven parts, \VERIFIED{}
+for 3 and \PARTIAL{} for 8, with \emph{no incorrect tree accepted}; recovered
+geometry overlaps its input by \SI{97.6}{\percent} IoU on average and by at least
+\SI{93.5}{\percent} on every part, measured without Boolean operations. We also
+report a negative result about our own acceptance criterion: a volume-and-extent
+comparison lets over-cut and uncut material cancel, and when a layered 2.5D
+recogniser multiplied the candidates it \emph{accepted} two parts that overlap
+their inputs by only \SI{95.0}{\percent} and \SI{93.7}{\percent}. The shipped
+gate now also requires a Boolean-free two-sided IoU of \SI{99.5}{\percent}.
+Finally we infer design intent --- holes, patterns, units and standard sizes ---
+and score it against the designer's own semantic PMI across all eleven parts: 97
+of 196 dimensioned holes recovered, 68 of 74 inferred nominal sizes and 9 of 11
+unit systems correct. We claim no methodological novelty; we claim an available,
 honest implementation and a measured account of where it fails.
 \end{abstract}
 
@@ -120,14 +122,15 @@ This paper is a response to that gap, not to a gap in the methods literature.
 \item \textbf{An evaluation with an explicit verdict per part
   (\S\ref{sec:results}).} On the NIST MBE PMI conformance corpus we report
   \VERIFIED{}/\PARTIAL{}/\REFUSED{} per part, with reconstruction IoU for
-  \emph{every} part --- bounded above for the ones that failed, which is the
-  direction that matters. We are not aware of another AFR evaluation that
+  \emph{every} part, measured under exact registration rather than bounded, so
+  the ones that failed say how much of the part came back. We are not aware of another AFR evaluation that
   reports a refusal class alongside a success rate, or that quantifies how wrong
   its failures are.
 \item \textbf{A negative result about the acceptance criterion
   (\S\ref{sec:cancellation}).} Over-cut and uncut material enter a volume
-  difference with opposite signs. We measure the resulting cancellation and show
-  why a two-sided test is required.
+  difference with opposite signs. We measure the resulting cancellation, observe
+  it producing two false accepts once a stronger recogniser offered more
+  candidates, and ship the two-sided test that removes them.
 \end{enumerate}
 
 \paragraph{What this paper does not claim.} It does not claim novelty for
@@ -216,18 +219,46 @@ ends are often a foot or a rim lip rather than the wall; slices split by a slot
 through a side wall are ignored. What remains is handed to the same carving
 loop.
 
+\paragraph{Layered 2.5D parts.} Open shells are one case of a more general
+form: a part that is a \emph{stack} of 2.5D layers along some axis --- a pan with
+a flange, a housing with bosses at several heights, a plate with a raised pad.
+Along each principal axis, section heights are taken first from every planar
+face perpendicular to the axis (where a step, floor or flange can start), then
+refined wherever the section's topology changes between samples, located by
+bisection (a boss merging into a wall ends on a curved face, with no flat face
+to mark it). Sections are cut exactly with the kernel's section operator and
+nested into regions by point-in-polygon. Adjacent intervals whose sections agree
+to \SI{0.05}{\milli\metre} merge into one layer; each layer becomes one sketch
+holding all of its regions and one pad, drafted when its slices fit a line.
+Holes are linked across layers into vertical runs and cut once each. Curves that
+are not lines or circular arcs are approximated by arcs within
+\SI{0.05}{\milli\metre}, and the report says how many. A section that will not
+close at any sampled height is spanned by the layer below rather than dropped,
+since pads stack on the current top face and a dropped layer would lower
+everything above it; this too is reported.
+
+These candidates cut hundreds of sections, which is where the geometry kernel
+occasionally segfaults. Each runs in a fresh process, so a crash costs that
+candidate rather than the part; forking the recogniser instead deadlocked on
+locks held by kernel threads at fork time.
+
 \paragraph{Registration.} Recovery works in the part's own frame: the chosen
 axis is rotated onto $+Z$ and an extrude is built from $z=0$. The recogniser
 reports that transform, so a recovered tree can be placed back onto its input
 exactly, with no orientation search.
 
 \paragraph{The gate.} Let $S$ be the input solid, $T$ a candidate tree and
-$E(T)$ its re-execution. We accept when the volume difference and a
-rotation-tolerant bounding-box comparison both fall within tolerance, and report
-\PARTIAL{} with the residual otherwise. When no axis yields a recognisable
+$E(T)$ its re-execution. We accept when the volume difference
+($\le\SI{0.5}{\percent}$) and a rotation-tolerant bounding-box comparison
+($\le\SI{0.05}{\milli\metre}$) both fall within tolerance \emph{and} $E(T)$,
+placed back on $S$ by the exact registration, overlaps it by
+$\mathrm{IoU}\ge\SI{99.5}{\percent}$, estimated by classifying 12\,000 sampled
+points against both solids with no Boolean operation. Otherwise we report
+\PARTIAL{} with the residual, returning the candidate that overlaps its input
+best. When no axis yields a recognisable
 extrude or body of revolution, the recogniser \REFUSED{}s outright rather than
-returning a best guess. Section~\ref{sec:cancellation} shows why this particular
-invariant is weaker than it looks.
+returning a best guess. Section~\ref{sec:cancellation} shows why the first two
+tests alone are weaker than they look, and what that cost.
 
 \section{Evaluation}
 \label{sec:results}
@@ -243,57 +274,77 @@ rather than the recogniser.
 \begin{table}[htbp]
 \centering
 \caption{Recovery over the eleven-part NIST corpus. IoU is estimated
-\emph{without Boolean operations}, by classifying 60\,000 uniformly sampled
-points against both solids (95\% intervals at most $\pm$\SI{3.0}{\percent};
+\emph{without Boolean operations}, by classifying 20\,000 uniformly sampled
+points against both solids (95\% intervals at most $\pm$\SI{2.5}{\percent};
 Section~\ref{sec:booleans}), and is \emph{exactly registered}: the recogniser's
 own rotation and offset are undone, so every figure, \PARTIAL{} included, is a
-measurement rather than a bound. A multi-solid reconstruction is scored as a
-whole. Regenerate with \code{paper/figures/run\_corpus.py} and
-\code{paper/figures/iou\_mc\_check.py}; the full per-part record, including
-which gate test each \PARTIAL{} part failed, is
-\code{paper/figures/corpus\_table.md}.}
+measurement rather than a bound. Time is recognition only, one part at a time,
+with at most two candidate processes concurrent. Method: E extrude (with carving),
+L layered 2.5D, R revolve. Regenerate with \code{paper/figures/run\_corpus.py},
+\code{iou\_mc\_check.py} and \code{results\_report.py}; the full per-part record,
+including which test each \PARTIAL{} part failed, is
+\code{paper/figures/results.md}.}
 \label{tab:corpus}
-\begin{tabular}{llS[table-format=2.2]S[table-format=3.0]S[table-format=3.1]S[table-format=3.1]}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lllS[table-format=1.2]S[table-format=1.2]S[table-format=3.0]S[table-format=3.0]S[table-format=3.2]}
 \toprule
-Part & Verdict & {$|\Delta V|/V$ (\%)} & {Features} & {Time (s)} & {IoU (\%)} \\
+Part & Verdict & Method & {$|\Delta V|/V$ (\%)} & {Extent (mm)} & {Features} & {Time (s)} & {IoU (\%)} \\
 \midrule
-CTC-01 & \VERIFIED  &  0.14 &  54 & 28.9 & 99.8 \\
-CTC-02 & \PARTIAL   & 62.19 &  64 & 93.6 &  7.4 \\
-CTC-03 & \PARTIAL   & 41.46 &  16 & 13.0 & 36.1 \\
-CTC-04 & \PARTIAL   &  2.43 & 270 & 79.2 & 30.8 \\
-CTC-05 & \PARTIAL   & 51.80 & 106 & 18.2 & 14.5 \\
-FTC-06 & \PARTIAL   & 31.85 &  44 & 15.9 & 59.6 \\
-FTC-07 & \PARTIAL   &  0.09 &  25 & 59.0 & 95.5 \\
-FTC-08 & \PARTIAL   &  3.56 &  48 & 111.8 & 95.9 \\
-FTC-09 & \VERIFIED  &  0.19 &  80 & 10.3 & 99.7 \\
-FTC-10 & \PARTIAL   & 20.80 &  24 & 31.4 & 76.0 \\
-FTC-11 & \VERIFIED  &  0.00 &   2 &  3.3 & 100.0 \\
+CTC-01 & \VERIFIED & E & 0.14 & 0.00 &  54 &  86 &  99.84 \\
+CTC-02 & \PARTIAL  & L & 0.63 & 0.01 & 144 & 562 &  93.48 \\
+CTC-03 & \PARTIAL  & L & 0.21 & 0.04 &  64 &  72 &  95.19 \\
+CTC-04 & \PARTIAL  & L & 0.14 & 0.01 & 108 & 194 &  99.01 \\
+CTC-05 & \PARTIAL  & L & 0.77 & 0.00 &  57 &  58 &  97.20 \\
+FTC-06 & \PARTIAL  & L & 0.76 & 0.00 &  27 & 166 &  98.17 \\
+FTC-07 & \PARTIAL  & E & 0.09 & 1.52 &  29 & 194 &  95.35 \\
+FTC-08 & \PARTIAL  & L & 0.26 & 0.00 &  37 & 152 &  98.71 \\
+FTC-09 & \VERIFIED & E & 0.19 & 0.00 &  80 &  18 &  99.67 \\
+FTC-10 & \PARTIAL  & L & 0.71 & 0.06 &  38 & 241 &  97.29 \\
+FTC-11 & \VERIFIED & R & 0.00 & 0.00 &   2 &  19 & 100.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Results.} Three parts \VERIFIED{} (\SI{27}{\percent}) and eight
-\PARTIAL{} (\SI{73}{\percent}); no part was refused.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/recovered_all.png}
+\caption{Every NIST part, input (grey) beside its recovered tree re-executed
+(teal), placed by the recogniser's own exact transform and labelled with its
+verdict and Boolean-free IoU. The striping on CTC-02 is its drafted walls
+approximated as a stack of layers. Regenerate with
+\code{paper/figures/render\_recovered.py --all}.}
+\label{fig:recovered}
+\end{figure}
+
+\paragraph{Results.} Every part yields an editable tree: three \VERIFIED{}
+(\SI{27}{\percent}) and eight \PARTIAL{} (\SI{73}{\percent}); none was refused
+and none errored.
 
 The result we consider most important is that \textbf{no incorrect tree was
-accepted}. Every \VERIFIED{} recovery exceeds \SI{99.6}{\percent} IoU against
-the input by a point-sampling estimate that uses no Boolean operations (exact
-Boolean figures, which agree within the sampling interval: 99.860, 99.684 and
-\SI{100.000}{\percent}). A \SI{27}{\percent} acceptance rate paired with an explicit,
-machine-readable verdict is a different and more useful contract than a higher
-rate with no soundness signal, and it is the property that makes the output safe
-to edit.
+accepted}, and it now holds by construction: the two-sided test is part of the
+gate. The three \VERIFIED{} recoveries measure 99.84, 99.67 and
+\SI{100.00}{\percent} IoU. A \SI{27}{\percent} acceptance rate paired with an
+explicit, machine-readable verdict is a different and more useful contract than
+a higher rate with no soundness signal, and it is the property that makes the
+output safe to edit.
 
 \paragraph{How good the \PARTIAL{} recoveries are.} Because registration is
 exact, the \PARTIAL{} figures measure how much of each part came back:
-\SI{7.4}{\percent} for CTC-02 up to \SI{95.9}{\percent} for FTC-08. An earlier
-version of this evaluation could only bound them from below, by searching 24
-axis-aligned orientations under a bounding-box-corner alignment, and the bounds
-were loose: FTC-10 was at least \SI{46.5}{\percent} and is \SI{76.0}{\percent},
-CTC-03 at least \SI{6.5}{\percent} and is \SI{36.1}{\percent}. On this corpus
-the verdict classes do not overlap --- every \VERIFIED{} part is above
-\SI{99.7}{\percent} and every \PARTIAL{} part below \SI{96}{\percent} --- but the
-gap is under four points and eleven parts are no basis for a threshold.
+from \SI{93.5}{\percent} (CTC-02) to \SI{99.0}{\percent} (CTC-04), with ten of
+eleven parts above \SI{95}{\percent}. The previous version of this paper, before
+layered recognition, reported \SI{7.4}{\percent} for CTC-02,
+\SI{14.5}{\percent} for CTC-05, \SI{30.8}{\percent} for CTC-04 and
+\SI{36.1}{\percent} for CTC-03; the mean over the corpus rose from
+\SI{65.0}{\percent} to \SI{97.6}{\percent} while the \VERIFIED{} count did not
+move. Most remaining shortfall is in what a stack of sketch-and-pad layers
+approximates rather than represents: drafted walls whose draft differs from wall
+to wall become a staircase of layers, bosses along a second axis become layer
+outlines, and fillets and blends become arcs. CTC-02, a cast housing with 663
+faces (158 conical, 34 B-spline, 24 spherical, against CTC-01's 139 faces of
+which none is freeform), shows all three: 55 layers and 1\,369 approximated
+section curves, at \SI{93.5}{\percent}. Four parts miss acceptance only on
+overlap, two of them by less than a point (CTC-04 at 99.0, FTC-08 at
+\SI{98.7}{\percent}).
 
 \paragraph{An earlier threshold, not the vocabulary, was the binding
 constraint.} A previous version of this evaluation refused CTC-02, FTC-07 and
@@ -317,11 +368,12 @@ gained a labelled tree but not a good one; the open-shell path does better
 Crucially, this was safe to do \emph{because verification is downstream and
 independent of it}. The axis threshold is a recall knob, not a correctness knob:
 loosening it can only move a part from \REFUSED{} to \PARTIAL{} or \VERIFIED{},
-and the verifier still has to accept the result. We confirmed this empirically
---- no false accept appeared, and CTC-01's IoU improved slightly
-(\SI{99.841}{\percent} to \SI{99.860}{\percent}) --- but the property is
-structural, and it is the practical argument for separating recognition from
-acceptance. Refusal remains reachable for geometry outside the vocabulary
+and the verifier still has to accept the result. That is only as strong as the
+verifier, a caveat we learned the hard way (Section~\ref{sec:cancellation}): under
+volume-plus-extent, more candidates later \emph{did} yield false accepts. With a
+two-sided gate the argument holds, and it is the practical argument for
+separating recognition from acceptance. Refusal remains reachable for geometry
+outside the vocabulary
 entirely (a torus is still refused); it simply is not exercised by this corpus.
 
 \paragraph{FTC-07: looking from several aspects.} FTC-07 is a molded
@@ -346,7 +398,9 @@ recovered as two L-brackets, \SI{52.7}{\percent} IoU. The shell detector did
 find it along its depth --- but a single straight-line fit across the flange
 step read as an $8^\circ$ ``draft'', which is what layer segmentation replaced.
 Recovered as a flange pad, a wall pad, a cavity pocket and its 21 floor cutouts,
-it is \SI{3.56}{\percent} short on volume at \SI{95.9}{\percent} IoU.
+it was \SI{3.56}{\percent} short on volume at \SI{95.9}{\percent} IoU. Layered
+recognition now recovers it as a stack of 24 outlines with its cutouts, at
+\SI{0.26}{\percent} volume error and \SI{98.7}{\percent} IoU.
 
 Getting there exposed a latent bug in the carving loop. It aligned the input to
 the rebuilt base by bounding-box corners in all three axes, which is right only
@@ -395,19 +449,33 @@ two-sided test --- IoU, or a symmetric-difference bound --- removes the failure
 mode entirely, because over-cut and uncut material both increase the symmetric
 difference. IoU is additionally the metric the CAD-program-inference literature
 already reports, so adopting it buys comparability at the same time. We report
-IoU in Table~\ref{tab:corpus} for this reason, and recommend it as the
-acceptance criterion in place of the volume test the implementation currently
-ships.
+IoU in Table~\ref{tab:corpus} for this reason, and the implementation now ships
+it as part of the acceptance criterion.
+
+\paragraph{The failure mode, observed.} The argument above was written while
+the shipped gate was volume-plus-extent. It then happened. Adding layered
+recognition gave every part several more candidates, and two of them passed
+volume and extents while being measurably the wrong shape: CTC-03 at
+\SI{95.0}{\percent} IoU and FTC-07 at \SI{93.7}{\percent}, each with
+over-cut and uncut material cancelling to within \SI{0.5}{\percent} of volume. Both
+were reported \VERIFIED{}. More candidates are exactly what should make a sound
+gate \emph{more} useful, and exactly what exposes an unsound one: every extra
+candidate is another draw at compensating errors. The IoU test was added to the
+gate, both parts are now \PARTIAL{}, and the gate's IoU is measured on every
+candidate near on volume, so that when nothing verifies the best-overlapping
+candidate is returned rather than the one closest on volume (that choice had
+returned FTC-08 at \SI{93.5}{\percent} over a \SI{98.7}{\percent} sibling).
 
 \paragraph{CTC-04 shows volume proximity is not geometric proximity.} The
 argument above is structural; CTC-04 gives it a part number. That part
-reconstructs to within \SI{2.43}{\percent} on volume --- the closest of the
+reconstructed, in the previous version of this evaluation, to within \SI{2.43}{\percent} on volume --- the closest of the
 eight \PARTIAL{} parts, and on the scalar alone it looks nearly recovered. Yet
 \emph{no} orientation of its reconstruction matches the input's bounding-box
 extents to within \SI{0.05}{\milli\metre}: the recovered solid has close to the
 right amount of material distributed through a measurably different envelope.
 Measured with exact registration, its reconstruction overlaps the input by
-\SI{30.8}{\percent}. A volume agreement of \SI{97.6}{\percent} carries no
+\SI{30.8}{\percent}. (Layered recognition now recovers it at
+\SI{99.0}{\percent}.) A volume agreement of \SI{97.6}{\percent} carries no
 implication of \SI{97.6}{\percent} shape agreement; here it came with less than a
 third.
 
@@ -468,24 +536,43 @@ carries recovered hole axes into it.
 
 \begin{table}[htbp]
 \centering
-\caption{Inferred intent against semantic PMI on the three \VERIFIED{} parts.
-Holes: callout-referenced holes matched by a recovered hole of the same diameter
-on the same axis line. Sizes: inferred nominal within \SI{0.01}{\milli\metre}
-of the callout. Regenerate with \code{paper/figures/intent\_eval.py}.}
+\caption{Inferred intent against semantic PMI, all eleven parts, from the
+persisted recovered trees. Holes: callout-referenced holes matched by a
+recovered hole of the same diameter on the same axis line. Sizes: inferred
+nominal within \SI{0.01}{\milli\metre} of the callout, over matched holes.
+Grouping: pairwise precision / recall of inferred patterns against callout
+groups, where defined. Regenerate with \code{paper/figures/intent\_eval.py}.}
 \label{tab:intent}
-\begin{tabular}{lcccc}
+\begin{tabular}{llcccc}
 \toprule
-Part & Holes & Nominal sizes & Units & Grouping P / R \\
+Part & Verdict & Holes & Nominal sizes & Units & Grouping P / R \\
 \midrule
-CTC-01 & 7/7   & 7/7   & metric \checkmark & {--} \\
-FTC-09 & 29/30 & 27/27 & inch \checkmark   & 0.78 / 0.78 \\
-FTC-11 & 2/2   & 2/2   & metric \checkmark & {--} \\
+CTC-01 & \VERIFIED & 7/7   & 7/7   & metric \checkmark & {--} \\
+CTC-02 & \PARTIAL  & 2/7   & 2/2   & metric \checkmark & {--} \\
+CTC-03 & \PARTIAL  & 0/11  & {--}  & metric \checkmark & {--} \\
+CTC-04 & \PARTIAL  & 36/41 & 30/36 & metric \checkmark & 1.00 / 0.10 \\
+CTC-05 & \PARTIAL  & 1/1   & {--}  & inch $\times$     & {--} \\
+FTC-06 & \PARTIAL  & 0/22  & {--}  & inch $\times$     & {--} \\
+FTC-07 & \PARTIAL  & 4/27  & {--}  & inch \checkmark   & 0.17 / 1.00 \\
+FTC-08 & \PARTIAL  & 16/16 & {--}  & inch \checkmark   & 0.74 / 0.30 \\
+FTC-09 & \VERIFIED & 29/30 & 27/27 & inch \checkmark   & 0.78 / 0.78 \\
+FTC-10 & \PARTIAL  & 0/32  & {--}  & metric \checkmark & {--} \\
+FTC-11 & \VERIFIED & 2/2   & 2/2   & metric \checkmark & {--} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-38 of 39 dimensioned holes are recovered, all 36 inferred nominal sizes agree
-with the drawing, and the unit system is right on all three parts. FTC-09 is
+On the three \VERIFIED{} parts 38 of 39 dimensioned holes are recovered, all
+36 inferred nominal sizes agree with the drawing, and the unit system is right.
+Across all eleven, 97 of 196 holes, 68 of 74 sizes and 9 of 11 unit systems. A
+\PARTIAL{} tree can still carry intent: FTC-08's 16 holes all come back, and
+CTC-04's 36 of 41, because a layered tree holds a hole as a round inner loop of
+each layer's sketch. The misses are of two kinds. Where a hole's section is
+not a clean circle at the sampled heights (a counterbore split across a layer
+boundary, a threaded or chamfered bore approximated by arcs), it is not
+recognised as a hole at all: FTC-06, FTC-10 and CTC-03 recover none. And units
+are inferred wrongly on CTC-05 and FTC-06, metric parts whose overall dimensions
+happen to fall on an inch grid. FTC-09 is
 an inch part, and its holes come back as the drill sizes a machinist would pick:
 a 5/32\,in drill where the drawing says .156, letter drills A and K where it
 says .234 and .281. Pattern grouping is scored only on FTC-09, the only one of
@@ -501,17 +588,25 @@ the truth itself: a designer may dimension two holes of one pattern separately.
   rate. A corpus-scale evaluation remains the obvious next step.
 \item \textbf{Equivalence, and some intent.} Verification certifies that $E(T)$
   matches $S$, not that $T$ is the designer's history. Section~\ref{sec:intent}
-  recovers holes, patterns, units and standard sizes, scored on three parts;
+  recovers holes, patterns, units and standard sizes, scored on eleven parts;
   datums, and design intent beyond holes, are not yet inferred.
 \item \textbf{Edge blends are outside the vocabulary.} Fillets and chamfers are
   not swept profiles and are left as sub-tolerance residual, so a chamfered part
   can verify while the recovered tree has sharp edges.
 \item \textbf{Recovery is subtractive only.} Additive bosses cannot be
   recovered; such parts are reported \PARTIAL{}, not approximated.
-\item \textbf{Freeform geometry is rejected, not approximated.} Splines,
-  lofts and sweeps admit no faithful sketch-and-pad tree. Draft is recognised
-  only on open shells; a drafted boss elsewhere is not. The Onshape backend
+\item \textbf{Freeform geometry is approximated, and said to be.} Splines,
+  lofts and sweeps admit no faithful sketch-and-pad tree; the layered recogniser
+  approximates their sections by arcs and reports the count, and the gate
+  decides whether the result is close enough. Draft is fitted per layer, so walls
+  with different drafts in one layer become a staircase. The Onshape backend
   does not emit draft yet.
+\item \textbf{One stack per part.} A layered tree is a stack along one axis;
+  features along a second axis (CTC-02's side bosses) are approximated as layer
+  outlines rather than recognised on their own axis.
+\item \textbf{Recognition is slow on large parts.} Median \SI{152}{\second} per
+  part, \SI{562}{\second} for CTC-02, dominated by exact section cuts and the
+  sampled IoU of each near candidate.
 \item \textbf{Tolerances are uncalibrated.} $\epsilon$ was chosen to separate
   observed successes from observed failures on the parts tested. It is not
   derived from a manufacturing tolerance model.
@@ -529,12 +624,13 @@ the literature in 1995, shipped commercially since 1998 and standardised in
 AP242 is still absent from open CAD, and that gap is a practical problem for
 anyone building on FreeCAD, Onshape or a code-CAD toolchain. We have shown that
 a training-free implementation reaches a useful contract on standard
-conformance geometry --- accepting a quarter of the corpus with no incorrect
-acceptances, and labelling the rest rather than guessing --- and we have
-measured a real weakness in the acceptance criterion we began with, together
-with the two-sided replacement that removes it. That weakness is not
-hypothetical: the part that comes closest to passing on volume overlaps its
-target by less than a third.
+conformance geometry --- a tree for every part, a quarter of the corpus
+accepted with no incorrect acceptances, and the rest labelled rather than
+guessed at, overlapping their inputs by \SI{93.5}{\percent} or more. We have also
+measured a real weakness in the acceptance criterion we began with. It was not
+hypothetical: a better recogniser, by offering more candidates, produced two
+false accepts under it, and the two-sided test that now gates every result
+removed them.
 
 \section*{Availability}
 
@@ -542,10 +638,10 @@ target by less than a third.
 2026-06-26 at \url{https://github.com/punkfab/featuretree}; the recognition
 component dates from 2026-07-10. Every number reported here is reproduced by the
 commands in \code{paper/figures/README.md}, verified against the repository at
-commit \code{c9eb846} (2026-09-29). \textbf{Note that this is later than the tagged
-v0.1.0 release}: the evaluation in this version reflects the multi-region and
-axis-gate changes described in \S\ref{sec:results}, which postdate that tag, so
-v0.1.0 does not reproduce these figures. The prior-art scan supporting
+commit \code{5ae85ac} (2026-09-29), whose \code{paper/figures/recovered/}
+holds every recovered tree the figures were measured on. \textbf{Note that this
+is later than the tagged v0.1.0 release}: layered recognition and the two-sided
+gate postdate that tag, so v0.1.0 does not reproduce these figures. The prior-art scan supporting
 \S\ref{sec:related} is in \code{paper/prior-art/FINDINGS.md}.
 
 This paper is archived as a preprint at

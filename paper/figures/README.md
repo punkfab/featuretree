@@ -143,11 +143,28 @@ recovery the residual is almost purely over-cut.
 > with a self-consistency assertion. Do not "simplify" the script back to a
 > direct difference.
 
+## Results report — the scorecard, per-part table and history (blog + paper)
+
+```bash
+python3 paper/figures/run_corpus.py --jobs 1 --timeout 5000   # ~33 min; cached per part
+python3 paper/figures/iou_mc_check.py --jobs 3 --fine 20000
+python3 paper/figures/intent_eval.py
+python3 paper/figures/results_report.py   # -> results.md, results.json, results_tables.html
+```
+
+`run_corpus.py` persists every recovered tree to `recovered/<part>.json` and caches each
+part's row in `recovered/<part>.row.json`, keyed on a hash of the recogniser's source;
+a re-run redoes only parts whose code changed (`--fresh` redoes everything). Every
+later script reads the persisted trees, so all numbers describe the same trees.
+Published run: FEATURETREE_JOBS=2 (candidate processes per part), one part at a time.
+The scorecard criteria are OURS -- NIST's test cases target PMI translation and define
+no feature-recognition score.
+
 ## IoU — Table 1's last column, and why it is NOT from the Boolean harness
 
 ```bash
 python3 paper/figures/iou_corpus.py      # Boolean (OCCT union) IoU  -> iou_results.json
-python3 paper/figures/iou_mc_check.py --jobs 11   # Boolean-FREE check -> iou_mc_results.json
+python3 paper/figures/iou_mc_check.py --jobs 3 --fine 20000   # Boolean-FREE check -> iou_mc_results.json
 ```
 
 **The paper's IoU column comes from `iou_mc_check.py`, not `iou_corpus.py`.** The measurement
@@ -160,7 +177,7 @@ Boolean harness derives IoU from an OCCT union by inclusion–exclusion. On
 PARTIAL parts that union is unreliable in a way no range check catches: it can
 return the larger operand as the "union", which makes IoU equal the volume ratio
 and satisfies `U >= max(A,B)` with equality. Preprint v2 shipped four such
-numbers. `iou_mc_check.py` classifies 60 000 sampled points against both solids
+numbers. `iou_mc_check.py` classifies 20 000 sampled points (the published run; default 60 000) against both solids
 (no Booleans at all) and reports a 95% binomial interval.
 
 Observed 2026-09-28 (boolean vs Boolean-free, at the Boolean harness's rotation):
