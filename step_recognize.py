@@ -33,6 +33,7 @@ lofts/sweeps/freeform, and profiles whose boundary has splines/ellipses (lines +
     python step_recognize.py part.step --fcstd out.FCStd  # + write an editable FreeCAD tree
     python step_recognize.py part.step --emit out.ir.json # + write the recovered IR
     python step_recognize.py part.step --iou              # + Boolean-free IoU vs the input (iou_check.py)
+    python step_recognize.py part.step --intent           # + design intent: holes, patterns, units (intent.py)
     from step_recognize import recognize;  spec, report = recognize("part.step")
 """
 
@@ -744,6 +745,25 @@ def main():
     for w in report["warnings"]:
         print(f"  ! {w}")
     print(f"  => {tag}" + ("" if v else " — fall back to importing the STEP as one solid"))
+
+    if "--intent" in args:
+        # Design intent (see intent.py): holes as holes, patterns, units, standard sizes. It only
+        # re-expresses the tree, so it cannot change the verdict above.
+        import intent
+        ob = import_step(str(step_path))
+        sb = (ob.solids()[0] if ob.solids() else ob).bounding_box()
+        d = intent.describe(spec, extents=(sb.size.X, sb.size.Y, sb.size.Z))
+        print(f"  intent: {d['units']} units; {len(d['holes'])} round feature(s), "
+              f"{len(d['counterbores'])} counterbore(s)")
+        for dia, lab in d["nominals"].items():
+            n = sum(1 for h in d["holes"] if round(h.diameter, 3) == dia)
+            print(f"    Ø{dia:<9g} x{n:<3} {lab or '(no standard size)'}")
+        for p in d["patterns"]:
+            if p["type"] == "single":
+                continue
+            geom = (f"PCD {p['pcd']:.3f}" if "pcd" in p else f"pitch {p['pitch']:.3f}"
+                    + (f" x {p['pitch2']:.3f}" if "pitch2" in p else ""))
+            print(f"    pattern: {p['type']:<9} {len(p['holes'])} x Ø{p['diameter']:.3f}  {geom}")
 
     if "--iou" in args:
         # Two-sided, Boolean-FREE check (see iou_check.py): over-cut and uncut material cannot

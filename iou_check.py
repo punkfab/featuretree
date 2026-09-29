@@ -121,3 +121,23 @@ def registered_iou(orig, rec, n=60000, n_search=4000, seed=0):
             best_rot, best_p = list(rot), p
     p, ci = iou(orig, register(rec, orig, best_rot), n=n, seed=seed + 2)
     return {"iou": p, "ci": ci, "rot": best_rot, "lower_bound": True}
+
+
+def registration_transform(rec, orig, rot):
+    """The rigid map register() applies, as functions on points and directions, so features of a
+    recovered tree (hole axes, sketch planes) can be carried into the ORIGINAL part's frame."""
+    from build123d import Rot
+    rec, orig = solid_part(rec), solid_part(orig)
+    tr = Rot(*rot).wrapped.Transformation()
+    R = [[tr.Value(i, j) for j in (1, 2, 3)] for i in (1, 2, 3)]
+    rb, ob = (Rot(*rot) * rec).bounding_box(), orig.bounding_box()
+    delta = (ob.min.X - rb.min.X, ob.min.Y - rb.min.Y, ob.min.Z - rb.min.Z)
+
+    def direction(v):
+        return tuple(sum(R[i][j] * v[j] for j in range(3)) for i in range(3))
+
+    def point(p):
+        q = direction(p)
+        return tuple(q[i] + delta[i] for i in range(3))
+
+    return point, direction

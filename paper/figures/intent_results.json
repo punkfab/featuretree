@@ -1,0 +1,439 @@
+{
+  "results": [
+    {
+      "part": "nist_ctc_01_asme1_rd.stp",
+      "pmi_file": "nist_ctc_01_asme1_ap242-e1.stp",
+      "verified": true,
+      "dvol_pct": 0.14,
+      "pmi": {
+        "dimensions": 21,
+        "tolerances": 6,
+        "datums": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hole_callouts": 7,
+        "holes": 7
+      },
+      "recovered_holes": 36,
+      "counterbores": 0,
+      "hole_recall": [
+        7,
+        7
+      ],
+      "size_agreement": [
+        7,
+        7
+      ],
+      "units": {
+        "inferred": "metric",
+        "pmi": "metric",
+        "score": {
+          "inch": 3.68,
+          "metric": 116.05
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 7,
+        "fn": 0
+      },
+      "patterns": [
+        {
+          "type": "rectangle",
+          "d": 20.0,
+          "n": 4
+        },
+        {
+          "type": "pair",
+          "d": 20.0,
+          "n": 2
+        },
+        {
+          "type": "rectangle",
+          "d": 25.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 25.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 25.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 25.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 35.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 35.0,
+          "n": 4
+        },
+        {
+          "type": "rectangle",
+          "d": 35.0,
+          "n": 4
+        },
+        {
+          "type": "pair",
+          "d": 40.0,
+          "n": 2
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 35.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 35.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 20.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 20.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 35.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 35.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 25.0,
+          "n": 1,
+          "bolt_circle": false
+        }
+      ],
+      "nominals": {
+        "20.0": "20 mm",
+        "25.0": "25 mm",
+        "35.0": "35 mm",
+        "40.0": "40 mm"
+      }
+    },
+    {
+      "part": "nist_ftc_09_asme1_rd.stp",
+      "pmi_file": "nist_ftc_09_asme1_ap242-e1.stp",
+      "verified": true,
+      "dvol_pct": 0.19,
+      "pmi": {
+        "dimensions": 24,
+        "tolerances": 31,
+        "datums": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H"
+        ],
+        "hole_callouts": 14,
+        "holes": 30
+      },
+      "recovered_holes": 34,
+      "counterbores": 0,
+      "hole_recall": [
+        29,
+        30
+      ],
+      "size_agreement": [
+        27,
+        27
+      ],
+      "units": {
+        "inferred": "inch",
+        "pmi": "inch",
+        "score": {
+          "inch": 79.29,
+          "metric": 20.03
+        }
+      },
+      "grouping": {
+        "tp": 18,
+        "fp": 5,
+        "fn": 5
+      },
+      "patterns": [
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 3.969,
+          "n": 1
+        },
+        {
+          "type": "pair",
+          "d": 5.613,
+          "n": 2
+        },
+        {
+          "type": "rectangle",
+          "d": 5.944,
+          "n": 4
+        },
+        {
+          "type": "linear",
+          "d": 6.35,
+          "n": 3
+        },
+        {
+          "type": "linear",
+          "d": 6.35,
+          "n": 3
+        },
+        {
+          "type": "rectangle",
+          "d": 6.35,
+          "n": 4
+        },
+        {
+          "type": "single",
+          "d": 6.522,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 7.034,
+          "n": 1
+        },
+        {
+          "type": "linear",
+          "d": 7.137,
+          "n": 3
+        },
+        {
+          "type": "pair",
+          "d": 8.001,
+          "n": 2
+        },
+        {
+          "type": "single",
+          "d": 8.391,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 9.093,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 9.137,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 19.05,
+          "n": 1
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 5.944,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.944,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.944,
+          "n": 2,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 6.35,
+          "n": 3,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 6.35,
+          "n": 3,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 6.35,
+          "n": 4,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 9.525,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.962,
+          "n": 3,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 203.2,
+          "n": 2,
+          "bolt_circle": true
+        },
+        {
+          "nominal": 7.137,
+          "n": 3,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.962,
+          "n": 2,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 19.05,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 5.613,
+          "n": 2,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 3.962,
+          "n": 2,
+          "bolt_circle": false
+        }
+      ],
+      "nominals": {
+        "3.969": "5/32\"",
+        "5.613": "#2 (0.2210\")",
+        "5.944": "letter A (0.2340\")",
+        "6.35": "1/4\"",
+        "6.522": "letter F (0.2570\")",
+        "7.034": "letter J (0.2770\")",
+        "7.137": "letter K (0.2810\")",
+        "8.001": "0.315\"",
+        "8.391": "0.330\"",
+        "9.093": "letter T (0.3580\")",
+        "9.137": "0.360\"",
+        "19.05": "3/4\""
+      }
+    },
+    {
+      "part": "nist_ftc_11_asme1_rb.stp",
+      "pmi_file": "nist_ftc_11_asme1_ap242-e2.stp",
+      "verified": true,
+      "dvol_pct": 0.0,
+      "pmi": {
+        "dimensions": 7,
+        "tolerances": 4,
+        "datums": [
+          "A",
+          "B"
+        ],
+        "hole_callouts": 2,
+        "holes": 2
+      },
+      "recovered_holes": 2,
+      "counterbores": 0,
+      "hole_recall": [
+        2,
+        2
+      ],
+      "size_agreement": [
+        2,
+        2
+      ],
+      "units": {
+        "inferred": "metric",
+        "pmi": "metric",
+        "score": {
+          "inch": 3.23,
+          "metric": 23.03
+        }
+      },
+      "grouping": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "patterns": [
+        {
+          "type": "single",
+          "d": 32.0,
+          "n": 1
+        },
+        {
+          "type": "single",
+          "d": 63.0,
+          "n": 1
+        }
+      ],
+      "callouts": [
+        {
+          "nominal": 32.0,
+          "n": 1,
+          "bolt_circle": false
+        },
+        {
+          "nominal": 63.0,
+          "n": 1,
+          "bolt_circle": false
+        }
+      ],
+      "nominals": {
+        "32.0": "32 mm",
+        "63.0": "63 mm"
+      }
+    }
+  ]
+}

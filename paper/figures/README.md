@@ -208,3 +208,30 @@ every registration you report a number for.**
 
 `out/nist_compare.png` is stale (51-feature recovery, uncommitted command) and is
 superseded by `recovered_parts.png`.
+
+## Design intent vs the designer's PMI — `intent_results.json`
+
+```bash
+python3 paper/figures/intent_eval.py
+```
+
+Recovers each VERIFIED part from its geometry-only file, infers intent with `intent.py`
+(holes, counterbores, patterns, units, standard sizes) and scores it against the semantic PMI
+in the part's AP242 file, read by `pmi.py`. The two files are different exports of one design
+(CTC-01: 117 vs 139 faces, +2,000 mm^3) but share a frame, so recovered holes are carried into
+it with `iou_check.registration_transform`.
+
+Observed 2026-09-29:
+
+| Part | Holes found | Nominal agrees | Units | Grouping P / R |
+|---|---|---|---|---|
+| CTC-01 | 7/7 | 7/7 | metric ✓ | n/a — every callout is a single hole |
+| FTC-09 | 29/30 | 27/27 | inch ✓ | 0.78 / 0.78 |
+| FTC-11 | 2/2 | 2/2 | metric ✓ | n/a — two callouts, one feature each |
+
+Caveats. CTC parts are "not intended to be fully toleranced" (NIST), so CTC-01's drawing
+dimensions only 7 of its round features and never groups them; grouping is only meaningful on
+FTC-09. A callout partition is a proxy for pattern truth, not the truth: a designer may give
+two holes of one pattern separate callouts. Drill sizes come from the ASME B94.11M values as
+tabulated on Wikipedia's "Drill bit sizes" (fetched 2026-09-29).
+
