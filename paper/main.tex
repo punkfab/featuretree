@@ -20,6 +20,7 @@
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{siunitx}
@@ -65,8 +66,11 @@ exceed \SI{99.6}{\percent} IoU against the input, measured without Boolean
 operations. We also report a negative result about our own
 acceptance criterion: a scalar volume comparison lets over-cut and uncut
 material cancel, and on one part a reconstruction agreeing to
-\SI{2.43}{\percent} on volume matches no orientation of the target's bounding
-box at all. A two-sided IoU test eliminates the failure mode. We claim no methodological novelty; we claim an available,
+\SI{2.43}{\percent} on volume overlaps its target by only \SI{31}{\percent}.
+A two-sided IoU test eliminates the failure mode. Finally we infer design
+intent --- holes, patterns, units and standard sizes --- and score it against
+the designer's own semantic PMI: 38 of 39 dimensioned holes recovered, all 36
+nominal sizes and all three unit systems correct. We claim no methodological novelty; we claim an available,
 honest implementation and a measured account of where it fails.
 \end{abstract}
 
@@ -176,7 +180,8 @@ rather than as nonexistent.
 
 The intermediate representation is a list of named, ordered features ---
 \code{sketch}, \code{pad}, \code{pocket}, \code{revolve}, \code{prism\_cut},
-\code{fillet} --- as plain JSON. Geometry is selected by \emph{query},
+\code{fillet} --- as plain JSON. Pads and blind pockets carry an optional draft
+(taper) angle, which build123d and FreeCAD emit natively. Geometry is selected by \emph{query},
 re-resolved against live geometry at each build rather than by persisted kernel
 identifiers, which is what lets one IR drive structurally different backends and
 lets edits be matched back by name. Authored IR uses human-meaningful names;
@@ -192,6 +197,24 @@ residual is carved feature by feature, each remaining lump itself recognised as
 a profile extruded along its own axis. Because several axes can appear
 prismatic, candidates are not scored heuristically --- one is generated per axis
 and the verifier selects the winner.
+
+\paragraph{Open shells.} Boxes, cups and enclosures are not prisms along any
+axis: across the opening a section cuts stray walls, and along it the section
+changes with depth. Looking at the part from several aspects exposes them.
+Along each principal axis a stack of 24 slices is cut (after a five-slice
+pre-check), and an axis whose slices are mostly \emph{rings} --- one region with
+a large inner loop --- solid at one end and open at the other, is an open shell.
+It is recovered as a designer would draw it: a pad of the outer outline and a
+blind pocket for the cavity, both drafted by an angle fitted to how the ring
+outlines grow with depth. The outlines are taken from clean wall slices and
+carried to the pad and pocket planes along the fitted draft, because the
+sections at the ends are often a foot or a rim lip rather than the wall. What
+remains is handed to the same carving loop.
+
+\paragraph{Registration.} Recovery works in the part's own frame: the chosen
+axis is rotated onto $+Z$ and an extrude is built from $z=0$. The recogniser
+reports that transform, so a recovered tree can be placed back onto its input
+exactly, with no orientation search.
 
 \paragraph{The gate.} Let $S$ be the input solid, $T$ a candidate tree and
 $E(T)$ its re-execution. We accept when the volume difference and a
@@ -214,33 +237,32 @@ rather than the recogniser.
 
 \begin{table}[htbp]
 \centering
-\caption{Recovery over the eleven-part NIST corpus. IoU is computed after
-rotation-aware co-registration, because recovery works in the part's own frame
-and the recovered solid is generally rotated relative to the input.
-$^\dagger$~marks a \emph{lower bound}: the best of 24 axis-aligned orientations
-under a bounding-box-corner alignment, which is not an optimal registration, so
-the true best-aligned overlap can only be higher. A multi-solid reconstruction
-is scored as a whole. IoU is estimated \emph{without Boolean operations}, by
-classifying 60\,000 uniformly sampled points against both solids; 95\%
-intervals are at most $\pm$\SI{1.5}{\percent} (Section~\ref{sec:booleans}).
-Regenerate with \code{paper/figures/run\_corpus.py} and
-\code{paper/figures/iou\_mc\_check.py}.}
+\caption{Recovery over the eleven-part NIST corpus. IoU is estimated
+\emph{without Boolean operations}, by classifying 60\,000 uniformly sampled
+points against both solids (95\% intervals at most $\pm$\SI{3.0}{\percent};
+Section~\ref{sec:booleans}), and is \emph{exactly registered}: the recogniser's
+own rotation and offset are undone, so every figure, \PARTIAL{} included, is a
+measurement rather than a bound. A multi-solid reconstruction is scored as a
+whole. Regenerate with \code{paper/figures/run\_corpus.py} and
+\code{paper/figures/iou\_mc\_check.py}; the full per-part record, including
+which gate test each \PARTIAL{} part failed, is
+\code{paper/figures/corpus\_table.md}.}
 \label{tab:corpus}
 \begin{tabular}{llS[table-format=2.2]S[table-format=3.0]S[table-format=2.1]S[table-format=3.1]}
 \toprule
 Part & Verdict & {$|\Delta V|/V$ (\%)} & {Features} & {Time (s)} & {IoU (\%)} \\
 \midrule
-CTC-01 & \VERIFIED  &  0.14 &  54 & 24.5 & 99.8 \\
-CTC-02 & \PARTIAL   & 62.19 &  64 & 90.0 &  3.9\rlap{$^\dagger$} \\
-CTC-03 & \PARTIAL   & 41.46 &  16 &  5.1 &  6.5\rlap{$^\dagger$} \\
-CTC-04 & \PARTIAL   &  2.43 & 270 & 81.5 & 25.0\rlap{$^\dagger$} \\
-CTC-05 & \PARTIAL   & 51.80 & 106 & 11.1 &  8.2\rlap{$^\dagger$} \\
-FTC-06 & \PARTIAL   & 31.85 &  44 & 11.5 & 39.3\rlap{$^\dagger$} \\
-FTC-07 & \PARTIAL   & 63.41 &  52 & 17.7 & 30.3\rlap{$^\dagger$} \\
-FTC-08 & \PARTIAL   & 32.61 &  24 & 62.7 & 53.3\rlap{$^\dagger$} \\
-FTC-09 & \VERIFIED  &  0.19 &  80 &  5.3 & 99.7 \\
-FTC-10 & \PARTIAL   & 20.80 &  24 & 26.3 & 46.5\rlap{$^\dagger$} \\
-FTC-11 & \VERIFIED  &  0.00 &   2 &  2.9 & 100.0 \\
+CTC-01 & \VERIFIED  &  0.14 &  54 & 28.9 & 99.8 \\
+CTC-02 & \PARTIAL   & 62.19 &  64 & 93.6 &  7.4 \\
+CTC-03 & \PARTIAL   & 41.46 &  16 & 13.0 & 36.1 \\
+CTC-04 & \PARTIAL   &  2.43 & 270 & 79.2 & 30.8 \\
+CTC-05 & \PARTIAL   & 51.80 & 106 & 18.2 & 14.5 \\
+FTC-06 & \PARTIAL   & 31.85 &  44 & 15.9 & 59.6 \\
+FTC-07 & \PARTIAL   &  1.80 &  21 & 57.0 & 94.9 \\
+FTC-08 & \PARTIAL   & 32.61 &  24 & 45.6 & 52.7 \\
+FTC-09 & \VERIFIED  &  0.19 &  80 & 10.3 & 99.7 \\
+FTC-10 & \PARTIAL   & 20.80 &  24 & 31.4 & 76.0 \\
+FTC-11 & \VERIFIED  &  0.00 &   2 &  3.3 & 100.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -257,17 +279,16 @@ machine-readable verdict is a different and more useful contract than a higher
 rate with no soundness signal, and it is the property that makes the output safe
 to edit.
 
-\paragraph{What the \PARTIAL{} IoU figures do and do not say.} They are lower
-bounds, and the direction matters. We search 24 axis-aligned orientations under
-a bounding-box-corner alignment, so the true best-registered overlap is at least
-the figure reported and may be higher. Consequently these numbers establish a
-\emph{floor} on how much of each part was recovered --- \SI{3.9}{\percent} at
-worst, \SI{53.3}{\percent} at best --- and we explicitly do \emph{not} claim
-from them that the \PARTIAL{} recoveries are geometrically poor, nor that the
-two verdict classes are separated. Establishing that would need proper
-registration, which we have not done. What the figures are sound for is the
-opposite inference: a high lower bound certifies that a recovery is largely
-right, and FTC-08 at \SI{53.3}{\percent} is the closest of the eight.
+\paragraph{How good the \PARTIAL{} recoveries are.} Because registration is
+exact, the \PARTIAL{} figures measure how much of each part came back:
+\SI{7.4}{\percent} for CTC-02 up to \SI{94.9}{\percent} for FTC-07. An earlier
+version of this evaluation could only bound them from below, by searching 24
+axis-aligned orientations under a bounding-box-corner alignment, and the bounds
+were loose: FTC-10 was at least \SI{46.5}{\percent} and is \SI{76.0}{\percent},
+CTC-03 at least \SI{6.5}{\percent} and is \SI{36.1}{\percent}. On this corpus
+the verdict classes do not overlap --- every \VERIFIED{} part is above
+\SI{99.7}{\percent} and every \PARTIAL{} part below \SI{95}{\percent} --- but the
+gap is under five points and eleven parts are no basis for a threshold.
 
 \paragraph{An earlier threshold, not the vocabulary, was the binding
 constraint.} A previous version of this evaluation refused CTC-02, FTC-07 and
@@ -282,10 +303,11 @@ parallel prisms, which one pad per region recovers exactly. It is also what a
 hollow part looks like when cut across its walls, and FTC-07 is that case: an
 open-sided enclosure whose section along the recovered axis is its two opposing
 side walls. The multi-region path recovers those two walls and nothing that
-joins them, and the verifier reports \PARTIAL{} at a \SI{63.41}{\percent} volume
+joins them, and the verifier reported \PARTIAL{} at a \SI{63.41}{\percent} volume
 shortfall. Relaxing the first threshold to \SI{75}{\percent} and adding the second
 path converted all three refusals into \PARTIAL{} recoveries. For FTC-07 that
-gains a labelled tree, but it is a gain in recall, not in quality.
+gained a labelled tree but not a good one; the open-shell path does better
+(below).
 
 Crucially, this was safe to do \emph{because verification is downstream and
 independent of it}. The axis threshold is a recall knob, not a correctness knob:
@@ -296,6 +318,26 @@ and the verifier still has to accept the result. We confirmed this empirically
 structural, and it is the practical argument for separating recognition from
 acceptance. Refusal remains reachable for geometry outside the vocabulary
 entirely (a torus is still refused); it simply is not exercised by this corpus.
+
+\paragraph{FTC-07: looking from several aspects.} FTC-07 is a molded
+enclosure: an open box with \SI{1.0}{\degree} of draft on every wall, inside and
+out, a lip at the rim, slots in its side walls and bosses in its corners.
+Across its opening every section is two walls; along it, the section is the
+ring an open box should give, but it changes with depth. The open-shell path
+finds it on the one axis where 18 of 24 slices are rings, fits the
+\SI{1.0}{\degree} draft on both faces, and recovers it as a drafted pad and a
+drafted cavity pocket: two operations, \SI{86.7}{\percent} IoU. Carving the slots
+and bosses takes it to 21 features, a \SI{1.80}{\percent} volume error and
+\SI{94.9}{\percent} IoU, from two stray walls at \SI{63.41}{\percent}. It stays
+\PARTIAL{}, correctly: the rim lip and some details are not recovered.
+
+Getting there exposed a latent bug in the carving loop. It aligned the input to
+the rebuilt base by bounding-box corners in all three axes, which is right only
+when the base outline spans the part's full extent. The base sketch already uses
+the aligned part's own $X$ and $Y$, so only $Z$ differs; FTC-07's rim lip
+overhangs its drafted walls by \SI{3.18}{\milli\metre}, and every carved feature
+had landed \SI{3.18}{\milli\metre} off (\SI{92.3}{\percent} IoU before the fix,
+\SI{94.9}{\percent} after). No \VERIFIED{} part changed.
 
 \paragraph{Scale and comparability.} This is eleven parts. It establishes that
 the verdict contract holds on non-trivial standard geometry; it does not
@@ -347,8 +389,10 @@ eight \PARTIAL{} parts, and on the scalar alone it looks nearly recovered. Yet
 \emph{no} orientation of its reconstruction matches the input's bounding-box
 extents to within \SI{0.05}{\milli\metre}: the recovered solid has close to the
 right amount of material distributed through a measurably different envelope.
-A volume agreement of \SI{97.6}{\percent} therefore carries no implication of
-\SI{97.6}{\percent} shape agreement.
+Measured with exact registration, its reconstruction overlaps the input by
+\SI{30.8}{\percent}. A volume agreement of \SI{97.6}{\percent} carries no
+implication of \SI{97.6}{\percent} shape agreement; here it came with less than a
+third.
 
 This is why the shipped gate tests extent alongside volume, and CTC-04 is
 correctly rejected today at $\epsilon_V = \SI{0.5}{\percent}$. The point is what
@@ -356,10 +400,7 @@ happens under the obvious move when acceptance rates disappoint --- loosening
 $\epsilon_V$ to a few percent to admit ``nearly right'' recoveries. CTC-04 sits
 inside that relaxation while being demonstrably the wrong shape, and a scalar
 volume test has nothing left to reject it with. A two-sided criterion is what
-would make such a relaxation safe to consider at all. We note that our IoU
-figures are lower bounds and so cannot themselves quantify how wrong CTC-04 is;
-the bounding-box mismatch is the part of this we can state without
-qualification.
+would make such a relaxation safe to consider at all.
 
 \subsection{Booleans cannot be trusted to measure the failures}
 \label{sec:booleans}
@@ -369,11 +410,13 @@ between these operands returned degenerate results --- an empty intersection
 for solids whose bounding boxes coincide exactly. The union is not safe either.
 A previous version of this paper reported \PARTIAL{} IoU computed from unions
 guarded by the sanity checks $U \ge \max(A,B)$ and $\mathrm{IoU}\in[0,1]$.
-A Boolean-free re-measurement --- classifying 60\,000 sampled points against
-each solid --- disagreed on four of the eight \PARTIAL{} parts: CTC-03 had been
-reported at \SI{58.5}{\percent} and is \SI{6.5}{\percent}; FTC-10 at
-\SI{74.4}{\percent} and is \SI{46.5}{\percent}; CTC-02 and CTC-05 were also
-overstated. CTC-03 shows the characteristic signature: the ``union'' came back
+A Boolean-free re-measurement at the \emph{same} registration --- classifying
+60\,000 sampled points against each solid --- disagreed on four of the eight
+\PARTIAL{} parts: \SI{58.5}{\percent} against \SI{0.1}{\percent} for CTC-03,
+\SI{74.4}{\percent} against \SI{1.2}{\percent} for FTC-10, and smaller but real
+overstatements for CTC-02 and CTC-05. The FTC-10 case was caught by a picture:
+drawn in the registration its number came from, the recovery sat at right angles
+to the original under a caption claiming \SI{74}{\percent} overlap. CTC-03 shows the characteristic signature: the ``union'' came back
 equal to the larger operand, which makes IoU collapse to the volume ratio
 $B/A$ and satisfies $U \ge \max(A,B)$ with equality. That failure is
 \emph{plausible}, so no range check catches it.
@@ -385,34 +428,73 @@ report only where an independent, Boolean-free measurement has confirmed it,
 and it is least safe exactly where it matters most --- on the recoveries that
 failed. Any verifier built on Booleans inherits the same problem.
 
+\section{Design intent, scored against the designer's own PMI}
+\label{sec:intent}
+
+A \VERIFIED{} tree rebuilds the part, but it reads as a machine wrote it: holes
+are arcs inside generic pockets, equal holes are unrelated, and every size is a
+bare float. We re-express it the way a designer would have drawn it --- holes as
+holes (including a revolve's bores), counterbores, patterns (bolt circles,
+equally spaced lines, rectangles), the unit system (whichever grid explains the
+dimensions: each value earns the log-surprise of landing on its coarsest grid),
+and the standard size each diameter most plausibly is (1/64-inch
+fractions, letter and number drills per ASME B94.11M, decimals, metric). Because
+this never changes geometry it cannot break a \VERIFIED{} tree.
+
+The NIST AP242 files carry \emph{semantic} PMI --- dimensions with nominal
+values, tolerances and datums, each linked to the faces it applies to --- which
+is the designer's stated intent, so intent can be scored rather than
+demonstrated. We recover each part from its geometry-only file and read the PMI
+from its AP242 file; the two are different exports of one design (CTC-01:
+117 against 139 faces) but share a coordinate frame, and the exact registration
+carries recovered hole axes into it.
+
+\begin{table}[htbp]
+\centering
+\caption{Inferred intent against semantic PMI on the three \VERIFIED{} parts.
+Holes: callout-referenced holes matched by a recovered hole of the same diameter
+on the same axis line. Sizes: inferred nominal within \SI{0.01}{\milli\metre}
+of the callout. Regenerate with \code{paper/figures/intent\_eval.py}.}
+\label{tab:intent}
+\begin{tabular}{lcccc}
+\toprule
+Part & Holes & Nominal sizes & Units & Grouping P / R \\
+\midrule
+CTC-01 & 7/7   & 7/7   & metric \checkmark & {--} \\
+FTC-09 & 29/30 & 27/27 & inch \checkmark   & 0.78 / 0.78 \\
+FTC-11 & 2/2   & 2/2   & metric \checkmark & {--} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+38 of 39 dimensioned holes are recovered, all 36 inferred nominal sizes agree
+with the drawing, and the unit system is right on all three parts. FTC-09 is
+an inch part, and its holes come back as the drill sizes a machinist would pick:
+a 5/32\,in drill where the drawing says .156, letter drills A and K where it
+says .234 and .281. Pattern grouping is scored only on FTC-09, the only one of
+the three whose drawing groups holes (NIST: the CTC ``are not intended to be
+fully toleranced''), and a callout partition is a proxy for pattern truth, not
+the truth itself: a designer may dimension two holes of one pattern separately.
+
 \section{Limitations}
 \label{sec:limits}
 
 \begin{itemize}
 \item \textbf{Eleven parts.} A demonstration of the contract, not a study of a
   rate. A corpus-scale evaluation remains the obvious next step.
-\item \textbf{\PARTIAL{} IoU is a lower bound only.} Each figure is the best of 24
-  axis-aligned orientations under a bbox-corner alignment that is not optimal
-  (most \PARTIAL{} recoveries have the wrong extents, so the harness falls back
-  from its extent prefilter to all 24). The \PARTIAL{} figures in
-  Table~\ref{tab:corpus} can therefore only move upward. An earlier version of
-  this table scored multi-solid reconstructions on their first solid alone,
-  which understated CTC-02, FTC-07 and FTC-08; they are now scored whole. They are
-  sound as bounds, and they certify a floor on how much of each part was
-  recovered, but they cannot show that a recovery is \emph{bad} --- that would
-  need an upper limit, which this method does not provide. Proper registration
-  (ICP or a pose optimiser) would, and is the single change that would most
-  improve this evaluation.
-\item \textbf{Equivalence, not intent.} Verification certifies that $E(T)$
-  matches $S$, not that $T$ is the designer's history. Recovered feature names
-  are generated and carry no design intent.
+\item \textbf{Equivalence, and some intent.} Verification certifies that $E(T)$
+  matches $S$, not that $T$ is the designer's history. Section~\ref{sec:intent}
+  recovers holes, patterns, units and standard sizes, scored on three parts;
+  datums, and design intent beyond holes, are not yet inferred.
 \item \textbf{Edge blends are outside the vocabulary.} Fillets and chamfers are
   not swept profiles and are left as sub-tolerance residual, so a chamfered part
   can verify while the recovered tree has sharp edges.
 \item \textbf{Recovery is subtractive only.} Additive bosses cannot be
   recovered; such parts are reported \PARTIAL{}, not approximated.
 \item \textbf{Freeform geometry is rejected, not approximated.} Splines,
-  ellipses, lofts and sweeps admit no faithful sketch-and-pad tree.
+  lofts and sweeps admit no faithful sketch-and-pad tree. Draft is recognised
+  only on open shells; a drafted boss elsewhere is not. The Onshape backend
+  does not emit draft yet.
 \item \textbf{Tolerances are uncalibrated.} $\epsilon$ was chosen to separate
   observed successes from observed failures on the parts tested. It is not
   derived from a manufacturing tolerance model.
@@ -434,8 +516,8 @@ conformance geometry --- accepting a quarter of the corpus with no incorrect
 acceptances, and labelling the rest rather than guessing --- and we have
 measured a real weakness in the acceptance criterion we began with, together
 with the two-sided replacement that removes it. That weakness is not
-hypothetical: the part that comes closest to passing on volume matches no
-orientation of its target's bounding box.
+hypothetical: the part that comes closest to passing on volume overlaps its
+target by less than a third.
 
 \section*{Availability}
 

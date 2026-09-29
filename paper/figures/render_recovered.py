@@ -132,17 +132,21 @@ def prepare(fn, out_npz):
     orig = whole(import_step(path))
 
     r_ = {r["part"]: r for r in json.load(open(IOU))["results"]}.get(fn) or {}
-    # "best" is absent if the 24-orientation search crashed; the fixed-rotation
-    # measurement is then the only Boolean-free number, and it is still valid.
     best = r_.get("best") or r_.get("at_harness_rot") or {}
-    rc = Rot(*best.get("rot", (0, 0, 0))) * Compound(rec)
-    bo, br = Compound(orig).bounding_box(), rc.bounding_box()
-    rc = Pos(bo.min.X - br.min.X, bo.min.Y - br.min.Y, bo.min.Z - br.min.Z) * rc
+    if rep.get("extrude_axis"):
+        # the exact transform the recogniser applied, undone (step_recognize.input_frame)
+        place, _, _ = sr.input_frame(Compound(orig), rep)
+        rc = place(Compound(rec))
+    else:
+        rc = Rot(*best.get("rot", (0, 0, 0))) * Compound(rec)
+        bo, br = Compound(orig).bounding_box(), rc.bounding_box()
+        rc = Pos(bo.min.X - br.min.X, bo.min.Y - br.min.Y, bo.min.Z - br.min.Z) * rc
     np.savez_compressed(
         out_npz, orig=tri_mesh(orig), rec=tri_mesh(list(rc.solids())),
         meta=json.dumps({"verdict": "VERIFIED" if rep.get("verified") else "PARTIAL",
                          "dvol": rep.get("dvol_pct"), "nfeat": len(spec.get("features", [])),
-                         "iou": best.get("iou_pct"), "ci": best.get("ci_pct")}))
+                         "iou": best.get("iou_pct"), "ci": best.get("ci_pct"),
+                         "exact": best.get("registration") == "exact"}))
 
 
 def main():
@@ -175,21 +179,25 @@ def main():
         d = np.load(npz)
         m = json.loads(str(d["meta"]))
         rows.append((label, view, d["orig"], d["rec"], m["verdict"], m["dvol"], m["nfeat"],
-                     m["iou"], m["ci"]))
+                     m["iou"], m["ci"], m.get("exact", False)))
         print(f"    {m['verdict']}  dvol={m['dvol']}%  features={m['nfeat']}", flush=True)
 
     per_row = 2 if args.all else 1                       # part-pairs per figure row
     nrows = -(-len(rows) // per_row)
     ncols = 2 * per_row
     fig = plt.figure(figsize=(4.5 * ncols, (3.0 if args.all else 3.3) * nrows))
-    for i, (label, view, orig, rec, verdict, dvol, nfeat, iou_pct, iou_ci) in enumerate(rows):
+    for i, (label, view, orig, rec, verdict, dvol, nfeat, iou_pct, iou_ci, exact) in enumerate(rows):
         a1 = fig.add_subplot(nrows, ncols, 2 * i + 1, projection="3d")
         a2 = fig.add_subplot(nrows, ncols, 2 * i + 2, projection="3d")
         t = np.concatenate([orig.reshape(-1, 3), rec.reshape(-1, 3)])
         frame = (t.min(0), t.max(0))          # one box for both, so scale is honest
-        # VERIFIED parts are effectively exact; a PARTIAL's IoU is a floor, so say so
-        iou_txt = (f"IoU {iou_pct:.2f}±{iou_ci:.2f}%" if verdict == "VERIFIED"
-                   else f"IoU ≥ {iou_pct:.0f}%") if iou_pct is not None else ""
+        # exactly registered IoU is a measurement; only a search-registered one is a floor
+        if iou_pct is None:
+            iou_txt = ""
+        elif verdict == "VERIFIED":
+            iou_txt = f"IoU {iou_pct:.2f}±{iou_ci:.2f}%"
+        else:
+            iou_txt = f"IoU {iou_pct:.1f}±{iou_ci:.1f}%" if exact else f"IoU ≥ {iou_pct:.0f}%"
         fs = 17 if args.all else 10.5     # the gallery is shown at ~1/4 size in a blog column
         draw(a1, orig, C_ORIG, f"{label}  ·  original" if args.all else f"{label}  ·  original STEP",
              view, frame, fs)
@@ -204,7 +212,7 @@ def main():
     else:
         fig.subplots_adjust(left=0.0, right=1.0, top=0.965, bottom=0.0, wspace=0.0, hspace=0.12)
     fig.savefig(out_path, dpi=150 if args.all else 170, facecolor="white")
-    print(f"\nwrote {out_path}")
+    print(f"\nwrote {out_path}", flush=True)
 
 
 if __name__ == "__main__":
