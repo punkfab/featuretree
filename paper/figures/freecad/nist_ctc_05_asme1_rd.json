@@ -1,0 +1,12 @@
+{
+ "part": "nist_ctc_05_asme1_rd",
+ "features": 57,
+ "tree_objects": 104,
+ "build_s": 13.4,
+ "volume": 12763092.11,
+ "reference_volume": 12792050.61,
+ "dvol_pct": 0.2264,
+ "iou_pct": 99.779,
+ "ci_pct": 0.216,
+ "verdict": "VERIFIED"
+}

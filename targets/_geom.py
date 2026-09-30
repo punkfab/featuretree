@@ -5,6 +5,10 @@
 # into its sketch space and (b) call its own line / arc / circle / extrude API. All lengths are mm.
 import math
 
+# A bulge smaller than this is a straight line (spec rule). At 1e-4 the sagitta of a 100 mm chord is
+# 5 um; below it an "arc" has a km-scale radius that sketch solvers (FreeCAD) fail on.
+BULGE_EPS = 1e-4
+
 
 def _add(a, b):
     return (a[0] + b[0], a[1] + b[1], a[2] + b[2])
@@ -45,7 +49,7 @@ def poly_segments(poly):
     for i in range(n):
         x1, y1, b = v[i]
         x2, y2, _ = v[(i + 1) % n]
-        if abs(b) < 1e-9:
+        if abs(b) < BULGE_EPS:
             segs.append(("line", (x1, y1), (x2, y2)))
         else:
             chord = math.hypot(x2 - x1, y2 - y1)
@@ -54,6 +58,40 @@ def poly_segments(poly):
             mid = ((x1 + x2) / 2 - uy * sag, (y1 + y2) / 2 + ux * sag)
             segs.append(("arc", (x1, y1), mid, (x2, y2)))
     return segs
+
+
+def arc_center(p1, mid, p2):
+    """Centre, radius, start angle and CCW-signed sweep (radians) of the arc p1 -> mid -> p2."""
+    ax, ay = p1
+    bx, by = mid
+    cx, cy = p2
+    d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+    ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d
+    uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d
+    r = math.hypot(ax - ux, ay - uy)
+    a1 = math.atan2(ay - uy, ax - ux)
+    am = (math.atan2(by - uy, bx - ux) - a1) % (2 * math.pi)
+    a2 = (math.atan2(cy - uy, cx - ux) - a1) % (2 * math.pi)
+    sweep = a2 if am < a2 else a2 - 2 * math.pi       # the direction that passes through mid
+    return (ux, uy), r, a1, sweep
+
+
+def loop_points(loop, per_arc=32, per_circle=96):
+    """A loop as a polyline (arcs and circles discretised), for 2D checks such as validation."""
+    segs = loop["segments"]
+    if segs[0][0] == "circle":
+        (cx, cy), r = segs[0][1], segs[0][2]
+        return [(cx + r * math.cos(2 * math.pi * k / per_circle), cy + r * math.sin(2 * math.pi * k / per_circle))
+                for k in range(per_circle)]
+    pts = []
+    for s in segs:
+        if s[0] == "line":
+            pts.append(s[1])
+        else:
+            c, r, a1, sw = arc_center(s[1], s[2], s[3])
+            pts += [(c[0] + r * math.cos(a1 + sw * k / per_arc), c[1] + r * math.sin(a1 + sw * k / per_arc))
+                    for k in range(per_arc)]
+    return pts
 
 
 def rect_segments(w, h, cx, cy):

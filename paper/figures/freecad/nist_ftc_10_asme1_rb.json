@@ -1,0 +1,12 @@
+{
+ "part": "nist_ftc_10_asme1_rb",
+ "features": 38,
+ "tree_objects": 63,
+ "build_s": 22.7,
+ "volume": 186987.229,
+ "reference_volume": 186987.229,
+ "dvol_pct": 0.0,
+ "iou_pct": 100.0,
+ "ci_pct": 0.0,
+ "verdict": "VERIFIED"
+}

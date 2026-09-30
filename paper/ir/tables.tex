@@ -1,0 +1,77 @@
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrlrrlrr@{}}
+\toprule
+& & & \multicolumn{3}{c}{FreeCAD} & \multicolumn{3}{c}{Onshape} \\
+\cmidrule(lr){4-6}\cmidrule(l){7-9}
+Part & Features & Valid & Verdict & IoU \% & $|\Delta V|$ \% & Verdict & IoU \% & $|\Delta V|$ \% \\
+\midrule
+CTC-01 & 54 & yes & \VERIFIED{} & 100.00 & 0.00 & 53/54 built & 99.36 & 0.58 \\
+CTC-02 & 144 & yes & \VERIFIED{} & 99.90 & 0.05 & not run &  &  \\
+CTC-03 & 64 & no & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
+CTC-04 & 108 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
+CTC-05 & 57 & yes & \VERIFIED{} & 99.78 & 0.23 & not run &  &  \\
+FTC-06 & 27 & no & build fails &  &  & not run &  &  \\
+FTC-07 & 29 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
+FTC-08 & 37 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
+FTC-09 & 80 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
+FTC-10 & 38 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
+FTC-11 & 2 & yes & \VERIFIED{} & 100.00 & 0.00 & \VERIFIED{} & 100.00 & 0.00 \\
+\bottomrule
+\end{tabular}
+\caption{Each recovered NIST feature tree built by FreeCAD and Onshape and gated against the build123d reference build of the same IR (\VERIFIED{}: IoU $\geq$ 99.5\% and $|\Delta V| \leq$ 0.5\%). ``Valid'': passes \code{ir.validate}. Onshape's run stopped at the free plan's daily API quota.}
+\label{tab:corpus}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Part & Feature & Onshape (mm$^3$) & Reference (mm$^3$) & Difference \\
+\midrule
+plate (sample) & \code{body} & 11,497.345 & 11,497.345 & +0.000 \\
+ & \code{hole} & 11,497.345 & 11,497.345 & +0.000 \\
+every kind & \code{base} & 22,028.273 & 22,028.273 & +0.000 \\
+ & \code{top\_pk} & 21,784.056 & 21,788.231 & -4.175 \\
+ & \code{hub} & 24,328.746 & 24,332.921 & -4.175 \\
+ & \code{side\_slot} & 24,157.241 & 24,161.417 & -4.176 \\
+ & \code{thru} & 24,006.445 & 24,010.621 & -4.176 \\
+ & \code{round} & 23,980.157 & 23,984.332 & -4.175 \\
+taper A & \code{base} & 12,000.000 & 12,000.000 & +0.000 \\
+ & \code{up} & 12,432.802 & 12,432.802 & +0.000 \\
+ & \code{down} & 12,668.025 & 12,668.025 & +0.000 \\
+ & \code{sym} & 12,724.573 & 12,724.573 & +0.000 \\
+taper B & \code{base} & 12,000.000 & 12,000.000 & +0.000 \\
+ & \code{pk\_bottom} & 11,826.944 & 11,826.944 & +0.000 \\
+ & \code{pk\_top} & 11,632.467 & 11,632.467 & +0.000 \\
+ & \code{side} & 11,550.769 & 11,550.769 & +0.000 \\
+\bottomrule
+\end{tabular}
+\caption{Onshape coverage parts: volume after every solid feature against the build123d reference. The $-4.175$ offset enters at \code{top\_pk} (a pocket crossing a concave arc edge) and is carried through; everything else agrees to three decimals.}
+\label{tab:coverage}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrlrr@{}}
+\toprule
+& \multicolumn{2}{c}{Onshape import} & \multicolumn{2}{c}{cadmpeg 0.6.0} & \multicolumn{2}{c}{Solid operations} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(l){6-7}
+Part & IoU \% & $\Delta V$ \% & IoU \% & STEP & Designer & Recovered \\
+\midrule
+CTC-01 & 100.00 & -0.000 & 21.39 & invalid & 10 & 39 \\
+CTC-02 & 99.94 & +0.009 & 3.47 & invalid & 42 & 89 \\
+CTC-03 & 100.00 & -0.164 & 11.14 & invalid & 15 & 33 \\
+CTC-04 & 100.00 & -0.001 & 22.37 & no solid & 24 & 93 \\
+CTC-05 & 100.00 & -0.000 & 6.99 & no solid & 17 & 40 \\
+FTC-06 & 100.00 & +0.000 & 25.83 & invalid & 21 & 18 \\
+FTC-07 & 99.93 & +0.009 & 0.00 & no solid & 28 & 21 \\
+FTC-08 & 100.00 & +0.008 & 6.95 & invalid & 30 & 32 \\
+FTC-09 & 100.00 & -0.000 & 80.72 & invalid & 33 & 40 \\
+FTC-10 & 100.00 & +0.001 & 26.46 & no solid & 19 & 25 \\
+FTC-11 & 100.00 & -0.000 & 100.00 & valid & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\caption{NIST's native SolidWorks 2018 files decoded to STEP by two decoders and compared with NIST's own STEP of each part; and the number of solid operations in the designer's tree (as decoded) against the tree \code{featuretree} recovers from the STEP.}
+\label{tab:native}
+\end{table}

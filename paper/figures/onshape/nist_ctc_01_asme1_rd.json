@@ -1,0 +1,21 @@
+{
+ "part": "nist_ctc_01_asme1_rd",
+ "features": 54,
+ "built": 53,
+ "failures": [
+  {
+   "name": "cut4",
+   "kind": "prism_cut",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'cut4' regenerated with status ERROR"
+  }
+ ],
+ "build_s": 44.1,
+ "volume": 14707999.101,
+ "reference_volume": 14622488.16,
+ "dvol_pct": 0.5848,
+ "iou_pct": 99.364,
+ "ci_pct": 0.21,
+ "verdict": "MISMATCH",
+ "url": "https://cad.onshape.com/documents/0dbba813823d1ff40ac5da0d/w/054e0f98348d077f1c0620c7/e/6d79948920032ef249fd0b82"
+}

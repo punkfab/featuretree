@@ -62,6 +62,8 @@ def _open(req, tries=6):
             if e.code != 429 or i == tries - 1:
                 raise
             wait = float(e.headers.get("Retry-After") or 0) or min(60, 5 * 2 ** i)
+            if wait > 600:                       # a daily/annual quota, not a burst limit: stop
+                raise SystemExit(f"Onshape API quota exhausted; retry after {wait / 3600:.1f} h") from None
             print(f"  (Onshape rate limit: waiting {wait:.0f}s)", flush=True)
             time.sleep(wait)
             req = req._resign()

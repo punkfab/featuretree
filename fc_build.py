@@ -47,7 +47,7 @@ def _add_poly(sk, pts):
         x1, y1, b = v[i]
         x2, y2, _ = v[(i + 1) % n]
         p1, p2 = App.Vector(x1, y1, 0), App.Vector(x2, y2, 0)
-        if abs(b) < 1e-9:
+        if abs(b) < 1e-4:                      # BULGE_EPS: a straight line (spec rule)
             sk.addGeometry(Part.LineSegment(p1, p2), False)
         else:                                     # 3-point arc: chord midpoint + perpendicular*sagitta
             chord = math.hypot(x2 - x1, y2 - y1)
@@ -70,8 +70,14 @@ def _map_poly(poly, inv, zref):
 def build(spec, out_path):
     doc = App.newDocument(spec["name"])
     body = doc.addObject("PartDesign::Body", "Body")
+    # A PartDesign Body is one solid by default, so a sketch of several disjoint outlines (two feet,
+    # a row of lugs) pads only ONE of them, silently halving the part. FreeCAD 1.0 lifts that with
+    # AllowCompound; the IR's region semantics (and build123d's) are the union of all outlines.
+    if hasattr(body, "AllowCompound"):
+        body.AllowCompound = True
     sketches = {}
     tip = None      # last solid-producing feature (fillet bases reference it)
+    volumes = []    # tip volume after each IR feature, for localising a disagreement
 
     for f in spec["features"]:
         kind = f["kind"]
@@ -195,6 +201,10 @@ def build(spec, out_path):
         else:
             raise ValueError(f"unknown feature kind: {kind}")
         doc.recompute()
+        try:                                        # the per-feature trace other backends report
+            volumes.append(round(float(tip.Shape.Volume), 3) if tip is not None and not tip.Shape.isNull() else None)
+        except Exception:
+            volumes.append(None)
 
     doc.recompute()
     # freecadcmd writes NO GuiDocument.xml, and the GUI stores per-object display state THERE (not
@@ -209,7 +219,8 @@ def build(spec, out_path):
     _write_gui_document(out_path, [o.Name for o in doc.Objects], visible)
     stl = out_path[:-6] + ".stl" if out_path.endswith(".FCStd") else out_path + ".stl"
     body.Shape.exportStl(stl)
-    return fc_common.result(doc)
+    body.Shape.exportStep(stl[:-4] + ".step")     # for the IoU gate against the reference
+    return dict(fc_common.result(doc), volumes=volumes)
 
 
 def _write_gui_document(out_path, names, visible):

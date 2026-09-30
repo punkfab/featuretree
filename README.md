@@ -54,8 +54,8 @@ wall that kills neutral feature-file formats. The IR sidesteps it:
   `FREECAD_APPIMAGE` (path to the AppImage) or `FREECAD_CMD` (path to a `freecadcmd` binary)
   environment variables.
 - **Python 3** for the host-side scripts (`gen.py` / `roundtrip.py`).
-- **For the Onshape backend (optional):** `pip install onpy` and an Onshape API key (access +
-  secret) from <https://dev-portal.onshape.com>. See [Onshape backend](#onshape-backend).
+- **For the Onshape backend (optional):** an Onshape API key (access + secret) from
+  <https://dev-portal.onshape.com>, and `pip install shapely`. See [Onshape backend](#onshape-backend).
 
 ## Install
 
@@ -295,7 +295,7 @@ into the geometry), so the world bounding-box centre — not `.location` — def
 | `fc_read.py` | FreeCAD's Python 3.11 | read labels / params back out |
 | `fc_common.py` | FreeCAD's Python 3.11 | shared FreeCAD-side helpers |
 | `onshape_client.py` | host Python 3 | Onshape REST client (HMAC) — create a doc, run FeatureScript |
-| `onshape_emit.py` | host Python 3 | emit an IR spec → an Onshape Part Studio (via `onpy`) |
+| `onshape_emit.py` | host Python 3 | emit an IR spec → a native Onshape Part Studio (REST, query-string references) |
 | `script_emit.py` | host Python 3 | emit an IR spec → a Fusion or SolidWorks build script (`targets/`) |
 | `targets/*.py` | inside Fusion / SolidWorks | the runtime each generated script carries |
 | `cad_verify.py` | host Python 3 | check a target's STEP, `.sldprt` or `.f3d` against the IR (IoU + tree) |
@@ -305,42 +305,37 @@ arguments as documents to open.
 
 ## Onshape backend
 
-The same IR also drives **Onshape** — one IR emits to FreeCAD *and* a live Onshape Part Studio, so the
-design opens, editable, in cloud CAD too. Onshape geometry is created through
-[`onpy`](https://github.com/kyle-tennison/onpy) (a maintained Python Onshape API whose BTM
-serialization is known-correct); `onshape_client.py` is a small stdlib-only HMAC REST client used to
-create the document and run FeatureScript.
+The same IR drives **Onshape** as a native Part Studio: Sketch, Extrude, Fillet, Revolve and Plane
+features, each named after its IR feature, posted through the REST API (v6 feature JSON). Every
+geometric reference is a **FeatureScript query string** that Onshape re-evaluates on each
+regeneration, never a stored entity id:
 
-```python
-import sys; sys.path.insert(0, "/path/to/featuretree")
-import ir, onshape_client as oc, onshape_emit
-spec = ir.SAMPLES["plate"]()                          # or your own ir.part(...)
-doc = oc.create_document("my-part", public=True)      # free accounts: public docs only
-onshape_emit.emit(spec, doc["did"])
-print("https://cad.onshape.com/documents/" + doc["did"])
+- a profile is `qContainsPoint(qSketchRegion(<sketch>), <interior point>)` for each material region;
+- a face-attached sketch plane is the planar Z-normal face farthest along ±Z;
+- a fillet's edges are the circular edges containing points found by the same rule the reference uses.
+
+```bash
+python3 onshape_emit.py part.ir.json            # new Part Studio in the verification document
+python3 onshape_emit.py part.ir.json --verify   # + export STEP and run the IoU gate
+python3 onshape_emit.py part.ir.json --trace    # + volume after every feature vs build123d
+python3 onshape_emit.py --read <eid> part.ir.json   # edited dimensions back, by feature name
 ```
 
-**Auth** (two credentials, both kept out of the repo — same Onshape key pair):
-
-- `onshape_client.py` reads `ONSHAPE_ACCESS_KEY` / `ONSHAPE_SECRET_KEY` from the environment
-  (HMAC-SHA256 signing, `Accept: */*` — *not* `application/json`, which forces a regen-hostile
-  serialization).
-- `onpy` reads `~/.onpy/config.json` → `{"dev_access": "...", "dev_secret": "..."}`. `onpy.configure()`
-  is the *interactive* setup prompt — skip it once that file exists.
+**Auth:** the Onshape key pair, from `ONSHAPE_ACCESS_KEY` / `ONSHAPE_SECRET_KEY` or onpy's
+`~/.onpy/config.json` (onpy itself is no longer needed).
 
 ### Onshape scope / gotchas
 
-- **Working:** sketches (polygons / circles / rects) on the Top plane → **Pad** (extrude) and
-  **Pocket** (subtract). Geometry is exact (a metric part round-trips to the right millimetre).
-- **Units:** onpy's `metric` system is **meters**, so the emitter scales the mm IR by `0.001`.
-- **Sketches arrive under-defined** ("not fully defined" / blue) — the API places geometry by
-  coordinate with no constraints. The solid is correct and won't drift; the IR is the source of truth,
-  so this is a property of the generated *view*, not a defect. (Fully-defining would mean authoring
-  constraints in raw BTM, which onpy doesn't expose.)
-- **Speed:** onpy re-solves the sketch on every entity add (a round-trip per line/circle), so dense
-  profiles (100+ segments) are slow — prefer `circles` over many-sided polygons and simplify outlines.
+- **Working:** sketches (circles, rects, polygons with arcs) on XY, XZ or a top/bottom face; pad
+  (blind, symmetric, taper); pocket (through, blind, taper); fillet; revolve; prism_cut on
+  axis-aligned planes. On coverage parts every feature's volume matches build123d to three decimals,
+  with one unexplained 4.175 mm³ difference on a pocket that crosses a concave arc.
+- **Not yet:** polar_pocket and prism_cut on oblique planes (they need rotated construction planes).
+- **Feature JSON must go to `/api/v6/...`**; the unversioned API expects an older envelope format.
+- **The free plan has a daily API quota** (about 1,500 calls). A large part costs a few hundred calls.
+  The client stops, rather than sleeping for a day, when Onshape asks for a wait over ten minutes.
 - **Free Onshape accounts can only create public documents.**
-- **Not yet:** fillets, face-attached sketches, non-Top planes — build123d / FreeCAD still cover those.
+- **Sketches arrive unconstrained**; the IR is the source of truth.
 
 ## Fusion and SolidWorks backends (untested inside either program so far)
 
@@ -428,9 +423,9 @@ run `gen.py` / `roundtrip.py` directly), and make sure the FreeCAD AppImage is l
 - **STEP → IR recognition:** extrude / revolve in any orientation, arcs, any-shape through-holes, and
   **multi-axis recovery** (floor / through-web pockets + cross-axis holes) — self-verified by re-emit.
   See [STEP → IR](#step--ir-feature-recognition--round-trip-engineering).
-- **Onshape backend:** sketches (polys / circles / rects) → Pad / Pocket via `onpy`; geometry
-  exact. Sketches arrive under-defined; fillets / face-attach / non-Top planes / `prism_cut` not yet.
-  See [Onshape backend](#onshape-backend).
+- **Onshape backend:** native Sketch / Extrude / Fillet / Revolve / Plane features with every
+  reference stored as a FeatureScript query; polar_pocket and oblique prism_cut not yet; sketches
+  arrive unconstrained. See [Onshape backend](#onshape-backend).
 - **cadgen / text-to-cad ingest:** STEP + sidecar (or tree package) → assembly IR with a verified
   editable tree per part, mates / couplings / poses preserved, placements self-checked. The
   per-part trees emit through `gen.py` today; emitting the *assembly itself* as a native FreeCAD /

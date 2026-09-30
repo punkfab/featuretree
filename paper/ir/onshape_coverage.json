@@ -1,0 +1,9 @@
+{
+ "note": "Onshape coverage runs of 2026-09-29, recorded from `python3 onshape_emit.py <ir> --trace` (per-feature volume vs the build123d reference, mm^3). Part Studios are in the public verification document 0dbba813823d1ff40ac5da0d. every_kind's final 'boss' is excluded: it ran before the reference's bottom-face fix and the draft-sign fix; taper's 'pk' is excluded: the test placed it after a downward pad, so it cut empty space (an Onshape error, a build123d no-op).",
+ "parts": [
+  {"part": "plate (sample)", "eid": "14644ffd07c64c59e214fec5", "features": [["body", 11497.345, 11497.345], ["hole", 11497.345, 11497.345]], "verdict": "VERIFIED", "iou_pct": 100.0},
+  {"part": "every kind", "eid": "0f8231e6c5c3a75c4a3b532d", "features": [["base", 22028.273, 22028.273], ["top_pk", 21784.056, 21788.231], ["hub", 24328.746, 24332.921], ["side_slot", 24157.241, 24161.417], ["thru", 24006.445, 24010.621], ["round", 23980.157, 23984.332]]},
+  {"part": "taper A", "eid": "f3eab11b68f56aa4fed8ff17", "features": [["base", 12000.0, 12000.0], ["up", 12432.802, 12432.802], ["down", 12668.025, 12668.025], ["sym", 12724.573, 12724.573]]},
+  {"part": "taper B", "eid": "636a3a67a12d23ed4a76a402", "features": [["base", 12000.0, 12000.0], ["pk_bottom", 11826.944, 11826.944], ["pk_top", 11632.467, 11632.467], ["side", 11550.769, 11550.769]]}
+ ]
+}

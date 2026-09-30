@@ -127,6 +127,76 @@ def update_from_params(spec, params):
 update_from_freecad = update_from_params     # the original name, kept for existing callers
 
 
+def validate(spec):
+    """Well-formedness of an IR spec, as a list of problems (empty = valid). Every backend is
+    entitled to assume these hold; build123d happens to tolerate some violations (it unions
+    loops one at a time) where FreeCAD and Onshape reject them, so a spec that breaks a rule can
+    VERIFY in one backend and fail in another.
+
+      names      feature names unique; every sketch reference names an EARLIER sketch
+      loops      closed: >= 3 segments, or >= 2 if any is an arc; no zero-length segment; no
+                 self-intersection
+      profiles   within one sketch, loop boundaries never touch or cross (nesting is fine)
+      pocket     a taper needs a blind pocket; a blind pocket needs a positive length
+      placement  prism_cut normal and xdir are non-zero and orthogonal
+
+    Loop checks need shapely; without it they are skipped and reported as one problem."""
+    import math
+    import os
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "targets"))
+    import _geom as G
+    problems, seen, sketches = [], set(), set()
+
+    def loops_ok(where, loops):
+        try:
+            from shapely.geometry import LineString, Polygon
+        except ImportError:
+            problems.append(f"{where}: loop checks skipped (pip install shapely)")
+            return
+        polys = []
+        for i, lp in enumerate(loops):
+            seg = lp["segments"]
+            if seg[0][0] != "circle":
+                arcs = any(sg[0] == "arc" for sg in seg)
+                if len(seg) < (2 if arcs else 3):          # two arcs close a loop; lines need three
+                    problems.append(f"{where}: loop {i} has {len(seg)} segment(s)")
+                    continue
+                if any(math.dist(sg[1], sg[-1]) < 1e-6 for sg in seg):
+                    problems.append(f"{where}: loop {i} has a zero-length segment")
+            poly = Polygon(G.loop_points(lp))
+            if not poly.is_valid:
+                problems.append(f"{where}: loop {i} self-intersects")
+            polys.append((i, poly))
+        for a in range(len(polys)):
+            for b in range(a + 1, len(polys)):
+                (i, p), (j, q) = polys[a], polys[b]
+                if LineString(p.exterior.coords).intersects(LineString(q.exterior.coords)):
+                    problems.append(f"{where}: loops {i} and {j} touch or cross")
+
+    for f in spec["features"]:
+        n, k = f["name"], f["kind"]
+        if n in seen:
+            problems.append(f"{n}: duplicate feature name")
+        seen.add(n)
+        if k == "sketch":
+            sketches.add(n)
+            loops_ok(n, G.sketch_loops(f.get("circles", []), f.get("rects", []), f.get("polys", [])))
+        elif k in ("pad", "pocket", "revolve"):
+            if f["sketch"] not in sketches:
+                problems.append(f"{n}: sketch '{f['sketch']}' is not an earlier sketch")
+            if k == "pocket" and not f["through"] and not (f.get("length") or 0) > 0:
+                problems.append(f"{n}: blind pocket needs a positive length")
+            if k == "pocket" and f["through"] and f.get("taper"):
+                problems.append(f"{n}: taper on a through pocket")
+        elif k == "prism_cut":
+            nn, xx = f["normal"], f["xdir"]
+            if not any(nn) or not any(xx) or abs(sum(a * b for a, b in zip(nn, xx))) > 1e-6:
+                problems.append(f"{n}: normal and xdir must be non-zero and orthogonal")
+            loops_ok(n, G.sketch_loops(polys=f["polys"]))
+    return problems
+
+
 # --- built-in samples (also a smoke test: volume must match a build123d twin) ---
 
 def sample_plate():

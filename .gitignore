@@ -13,3 +13,15 @@ out/*.FCBak
 
 # Fusion / SolidWorks scripts, their STEP exports and reports (regenerate with script_emit.py)
 out/cad_scripts/
+
+paper/figures/onshape/*.step
+paper/figures/freecad/*.FCStd
+paper/figures/freecad/*.step
+paper/figures/freecad/*.stl
+paper/figures/freecad/*.ir.json
+paper/ir/*.aux
+paper/ir/*.log
+paper/ir/*.out
+paper/ir/*.bbl
+paper/ir/*.blg
+paper/figures/freecad/*.FCBak

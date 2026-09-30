@@ -269,3 +269,21 @@ and the Onshape key pair. Decoded files and IoUs are cached next to the .SLDPRT 
 Observed 2026-09-29: Onshape's import matches NIST's STEP on 11/11 parts; cadmpeg's on 1/11 (FTC-11).
 The designer's tree has 1–42 solid operations per part; featuretree's recovered trees are 2–4× longer on
 the CTC parts.
+
+---
+
+## IR paper (`paper/ir/`): backends against the reference
+
+```bash
+python3 paper/figures/freecad_corpus.py --fresh   # -> paper/figures/freecad/<part>.json
+python3 paper/figures/onshape_corpus.py           # -> paper/figures/onshape/<part>.json (Onshape API)
+python3 paper/figures/native_nist.py              # -> native_nist.{json,md}
+python3 paper/ir/tables.py                        # -> paper/ir/tables.tex
+cd paper/ir && tectonic main.tex
+```
+
+Each corpus runner builds every recovered tree in `recovered/` with one backend, exports STEP, and
+gates it against the build123d build of the same IR (`cad_verify.verify`, 20,000 samples). Both
+cache per part. The Onshape runner stops, and caches nothing, when the free plan's daily API quota
+runs out; rerun it the next day and it resumes. `paper/ir/onshape_coverage.json` records the Onshape
+coverage-part runs (per-feature volume against the reference, with the Part Studio ids).

@@ -36,7 +36,7 @@ def _poly_face(poly, plane_obj):
     bul = [float(p[2]) if len(p) > 2 else 0.0 for p in poly]
     if len(pts) > 1 and pts[0] == pts[-1]:
         pts, bul = pts[:-1], bul[:-1]
-    if all(abs(b) < 1e-9 for b in bul):
+    if all(abs(b) < 1e-4 for b in bul):                  # BULGE_EPS (targets/_geom.py)
         return plane_obj * Polygon(*pts, align=None)     # straight polygon (fast path)
     # Build the arc profile in LOCAL XY, then place it onto plane_obj with a left-multiply — same as
     # the fast path. (Building directly on plane_obj drops the origin's IN-PLANE offset, which is
@@ -47,7 +47,7 @@ def _poly_face(poly, plane_obj):
         with BuildLine(Plane.XY):
             for i in range(n):
                 p1, p2, b = pts[i], pts[(i + 1) % n], bul[i]
-                if abs(b) < 1e-9:
+                if abs(b) < 1e-4:
                     Line(p1, p2)
                 else:
                     chord = math.dist(p1, p2)
@@ -181,6 +181,7 @@ def emit(spec):
     tree = []
     params = {}
     volumes = []           # solid volume after each feature (None before the first solid)
+    sides = {}             # name -> "top" | "bottom" for a face-attached sketch, else None
 
     for f in spec["features"]:
         kind = f["kind"]
@@ -200,6 +201,7 @@ def emit(spec):
                 z0 = 0.0
             sketches[f["name"]] = (_sketch_faces(f, z0, plane), z0)
             planes[f["name"]] = plane
+            sides[f["name"]] = (on or {}).get("side", "top") if on else None
             radii = [c[2] for c in f.get("circles", [])]
             if radii:
                 params[f["name"]] = {"radii": [round(r, 4) for r in radii]}
@@ -209,9 +211,10 @@ def emit(spec):
             # Deterministic direction: grow +Z for an XY / top-face sketch, -Z only for a bottom-face
             # one. extrude(fc, amount) alone follows the region's winding-dependent normal, so the same
             # IR could pad up in one backend and down in another (breaking cross-backend parity and any
-            # absolute-coord prism_cut placed against it). +Z matches the FreeCAD emitter.
-            d = -1.0 if (part is not None and z0 < -1e-6
-                         and abs(z0 - _face_z(part, "bottom")) < 1e-6) else 1.0
+            # absolute-coord prism_cut placed against it). A sketch attached to the BOTTOM face grows
+            # outward, -Z, as FreeCAD's face-attached Pad does. That is decided by the sketch's declared
+            # side, not by its height: a bottom face at z = 0 is still a bottom face.
+            d = -1.0 if sides.get(f["sketch"]) == "bottom" else 1.0
             taper = f.get("taper", 0.0)
             if taper and f.get("symmetric"):
                 raise ValueError(f"pad '{f['name']}': taper with symmetric is not supported")

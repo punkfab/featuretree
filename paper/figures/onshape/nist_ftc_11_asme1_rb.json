@@ -1,0 +1,14 @@
+{
+ "part": "nist_ftc_11_asme1_rb",
+ "features": 2,
+ "built": 2,
+ "failures": [],
+ "build_s": 2.0,
+ "volume": 5129.37,
+ "reference_volume": 5129.37,
+ "dvol_pct": 0.0,
+ "iou_pct": 100.0,
+ "ci_pct": 0.0,
+ "verdict": "VERIFIED",
+ "url": "https://cad.onshape.com/documents/0dbba813823d1ff40ac5da0d/w/054e0f98348d077f1c0620c7/e/03ff9119c1f5660d5c94bd31"
+}
