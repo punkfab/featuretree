@@ -279,6 +279,36 @@ cadgen is not consistent about where placement lives (a gear's is in `.location`
 into the geometry), so the world bounding-box centre — not `.location` — defines the part frame.
 `tests/fixtures/cadgen/` holds genuine cadgen output the tests run against.
 
+## Assemblies: loop closures, posing, MuJoCo and 3MF
+
+The assembly IR ([`assembly_ir.py`](assembly_ir.py)) is a design artifact in its own right, not
+just an ingest format. Occurrences place parts; `mates` form a forward-kinematic **tree**; and
+**`closures`** close loops (four-bar, parallelogram, slider-crank) between two occurrences that the
+tree already connects. Closures live in their own list, so anything that walks `mates`, including a
+cadgen export, never sees a cycle.
+
+```python
+import assembly_ir as A, assembly_kin as K, mjcf_emit as M, threemf_emit as T
+
+A.closure_problems(asm); A.mobility(asm)        # validation; planar loops counted as planar
+q, poses = K.solve(asm, {"crank": 90})          # drive some mates, solve the rest (loops stay closed)
+xml = M.emit(asm, "out/", sim)                  # MuJoCo: bodies = fastened groups, joints = mates,
+                                                #   closures -> <equality>, geometry = the parts' own meshes
+T.emit_assembly(asm, "bot.3mf", pose={"crank": 90})   # 3MF components + the IR embedded in the package
+T.emit_objects(plate_objects, "plate.3mf")      # loose build items: a print plate
+```
+
+- **`assembly_kin.py`** is a numpy pose solver. It works in displacements from the authored pose,
+  uses damped least squares on the closure residuals, and continues from the authored pose so a
+  linkage stays on its branch. Tested against the closed-form four-bar to 0.001° over a full crank turn.
+- **`mjcf_emit.py`** writes no geometry by hand. Sim-only facts (masses of bought parts, collision
+  proxies for concave parts, actuators, joint friction) ride in a small `sim` dict, never in the IR.
+  `emit_fragment(..., prefix=)` composes several instances into one scene.
+- **`threemf_emit.py`** (lib3mf): 3MF is the manufacturing *output* (meshes, materials, hierarchy),
+  never the design source. `read_assembly` round-trips a package for checking.
+
+Tests: `tests/test_assembly_loops.py`, `tests/test_threemf_emit.py`.
+
 ## How it runs
 
 | file | runs under | role |
