@@ -1,0 +1,85 @@
+{
+ "part": "nist_ftc_09_asme1_rd",
+ "editable": 11,
+ "v0": 136706.4,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 3.0378,
+   "new": 3.3416,
+   "read_back": 3.3416,
+   "v_fc": 150410.5,
+   "v_ref": 150410.5,
+   "dvol_pct": 0.0,
+   "moved_pct": 10.0245,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind_sk0",
+   "kind": "sketch",
+   "param": "circles[0].r",
+   "old": 4.5467,
+   "new": 5.0014,
+   "read_back": 5.0014,
+   "v_fc": 136691.2,
+   "v_ref": 136691.2,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.0111,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind0",
+   "kind": "pocket",
+   "param": "length",
+   "old": 1.27,
+   "new": 1.397,
+   "read_back": 1.397,
+   "v_fc": 136698.1,
+   "v_ref": 136698.1,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.0061,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind_sk1",
+   "kind": "sketch",
+   "param": "circles[0].r",
+   "old": 4.5683,
+   "new": 5.0251,
+   "read_back": 5.0251,
+   "v_fc": 136688.9,
+   "v_ref": 136688.9,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.0128,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind1",
+   "kind": "pocket",
+   "param": "length",
+   "old": 1.27,
+   "new": 1.397,
+   "read_back": 1.397,
+   "v_fc": 136698.0,
+   "v_ref": 136698.0,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.0061,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind_sk2",
+   "kind": "sketch",
+   "param": "circles[0].r",
+   "old": 4.1957,
+   "new": 4.6153,
+   "read_back": 4.6153,
+   "v_fc": 136693.6,
+   "v_ref": 136693.6,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.0094,
+   "outcome": "agree"
+  }
+ ]
+}

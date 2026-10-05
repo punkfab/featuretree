@@ -65,3 +65,12 @@ def test_validate_flags_touching_loops_bad_refs_and_duplicates():
     probs = IR.validate(spec)
     assert any("touch or cross" in p for p in probs)
     assert any("duplicate" in p for p in probs) and any("not an earlier sketch" in p for p in probs)
+
+
+def test_a_placed_cut_edit_reads_back_under_either_key():
+    """FreeCAD stores a prism_cut as a Pocket, so its edited depth comes back as 'length'. Before
+    the fix update_from_params dropped it: 16 of 46 edits in the first nudge run were lost this way."""
+    cut = IR.prism_cut("c", (0, 0, 5), (0, 0, -1), (1, 0, 0), 2.0, polys=[[(-1, -1), (1, -1), (1, 1), (-1, 1)]])
+    spec = IR.part("p", IR.sketch("s", rects=[(10, 10, 0, 0)]), IR.pad("b", "s", 5), cut)
+    assert IR.update_from_params(spec, {"c": {"length": 3.0}})["features"][-1]["depth"] == 3.0
+    assert IR.update_from_params(spec, {"c": {"depth": 4.0}})["features"][-1]["depth"] == 4.0

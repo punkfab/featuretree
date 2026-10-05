@@ -1,0 +1,76 @@
+{
+ "part": "nist_ctc_05_asme1_rd",
+ "editable": 40,
+ "v0": 12792050.6,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 12.7,
+   "new": 13.97,
+   "read_back": 13.97,
+   "v_fc": 13069534.6,
+   "v_ref": 13098493.1,
+   "dvol_pct": 0.2211,
+   "moved_pct": 2.3956,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L6",
+   "kind": "pad",
+   "param": "length",
+   "old": 82.8326,
+   "new": 91.1159,
+   "read_back": 91.1159,
+   "v_fc": 12940989.0,
+   "v_ref": 12969947.5,
+   "dvol_pct": 0.2233,
+   "moved_pct": 1.3907,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L12",
+   "kind": "pad",
+   "param": "length",
+   "old": 3.1322,
+   "new": 3.4454,
+   "read_back": 3.4454,
+   "v_fc": 12769015.6,
+   "v_ref": 12797974.1,
+   "dvol_pct": 0.2263,
+   "moved_pct": 0.0463,
+   "outcome": "agree"
+  },
+  {
+   "feature": "hole1",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 12.7,
+   "new": 13.97,
+   "read_back": 12.7,
+   "v_fc": 12763092.1,
+   "outcome": "edit did not reach the IR"
+  },
+  {
+   "feature": "hole7",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 12.7,
+   "new": 13.97,
+   "read_back": 12.7,
+   "v_fc": 12763092.1,
+   "outcome": "edit did not reach the IR"
+  },
+  {
+   "feature": "hole13",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 12.7,
+   "new": 13.97,
+   "read_back": 12.7,
+   "v_fc": 12763092.1,
+   "outcome": "edit did not reach the IR"
+  }
+ ]
+}

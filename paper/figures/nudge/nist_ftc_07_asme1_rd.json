@@ -1,0 +1,85 @@
+{
+ "part": "nist_ftc_07_asme1_rd",
+ "editable": 17,
+ "v0": 1724637.2,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 11.3214,
+   "new": 12.4535,
+   "read_back": 12.4535,
+   "v_fc": -24776.7,
+   "v_ref": 1742053.0,
+   "dvol_pct": 101.4223,
+   "moved_pct": 1.0098,
+   "outcome": "volumes differ"
+  },
+  {
+   "feature": "body2",
+   "kind": "pad",
+   "param": "length",
+   "old": 10.6413,
+   "new": 11.7054,
+   "read_back": 11.7054,
+   "v_fc": -24776.7,
+   "v_ref": 1746169.4,
+   "dvol_pct": 101.4189,
+   "moved_pct": 1.2485,
+   "outcome": "volumes differ"
+  },
+  {
+   "feature": "pocket0",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 2.6416,
+   "new": 2.9058,
+   "read_back": 2.9058,
+   "v_fc": 1724637.9,
+   "v_ref": 1724637.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  },
+  {
+   "feature": "pocket2",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 128.27,
+   "new": 141.097,
+   "read_back": 141.097,
+   "v_fc": 1724637.9,
+   "v_ref": 1724637.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  },
+  {
+   "feature": "cut4",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 9.5277,
+   "new": 10.4805,
+   "read_back": 10.4805,
+   "v_fc": 1724637.9,
+   "v_ref": 1724637.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  },
+  {
+   "feature": "cut6",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 2.6416,
+   "new": 2.9058,
+   "read_back": 2.9058,
+   "v_fc": 1724637.9,
+   "v_ref": 1724637.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  }
+ ]
+}

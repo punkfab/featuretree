@@ -1,0 +1,77 @@
+{
+ "part": "nist_ctc_01_asme1_rd",
+ "editable": 53,
+ "v0": 14622488.2,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 150.0,
+   "new": 165.0,
+   "read_back": 165.0,
+   "v_fc": 0.0,
+   "outcome": "reference rebuild failed",
+   "detail": "no solid"
+  },
+  {
+   "feature": "blind3",
+   "kind": "pocket",
+   "param": "length",
+   "old": 50.0,
+   "new": 55.0,
+   "read_back": 55.0,
+   "v_fc": 14622487.9,
+   "v_ref": 14622488.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind7",
+   "kind": "pocket",
+   "param": "length",
+   "old": 100.0,
+   "new": 110.0,
+   "read_back": 110.0,
+   "v_fc": 14622487.9,
+   "v_ref": 14622488.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  },
+  {
+   "feature": "blind11",
+   "kind": "pocket",
+   "param": "length",
+   "old": 50.0,
+   "new": 55.0,
+   "read_back": 55.0,
+   "v_fc": 14622487.9,
+   "v_ref": 14622488.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0,
+   "outcome": "agree"
+  },
+  {
+   "feature": "cut3",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 51.0086,
+   "new": 56.1095,
+   "read_back": 51.0086,
+   "v_fc": 14620885.4,
+   "outcome": "edit did not reach the IR"
+  },
+  {
+   "feature": "cut11",
+   "kind": "prism_cut",
+   "param": "depth",
+   "old": 100.0,
+   "new": 110.0,
+   "read_back": 100.0,
+   "v_fc": 14622487.9,
+   "outcome": "edit did not reach the IR"
+  }
+ ]
+}

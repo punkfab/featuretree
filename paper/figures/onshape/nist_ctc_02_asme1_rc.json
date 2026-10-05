@@ -1,0 +1,75 @@
+{
+ "part": "nist_ctc_02_asme1_rc",
+ "features": 144,
+ "built": 93,
+ "failures": [
+  {
+   "name": "L1",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L1' regenerated with status ERROR"
+  },
+  {
+   "name": "L2",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L2' regenerated with status ERROR"
+  },
+  {
+   "name": "L5",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L5' regenerated with status ERROR"
+  },
+  {
+   "name": "L7",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L7' regenerated with status ERROR"
+  },
+  {
+   "name": "L8",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L8' regenerated with status ERROR"
+  },
+  {
+   "name": "L9",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L9' regenerated with status ERROR"
+  },
+  {
+   "name": "L10",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L10' regenerated with status ERROR"
+  },
+  {
+   "name": "L11",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L11' regenerated with status ERROR"
+  },
+  {
+   "name": "L12",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L12' regenerated with status ERROR"
+  },
+  {
+   "name": "L13",
+   "kind": "pad",
+   "ok": false,
+   "error": "RuntimeError: Onshape feature 'L13' regenerated with status ERROR"
+  }
+ ],
+ "build_s": 87.7,
+ "volume": 815760.067,
+ "reference_volume": 46804120.365,
+ "dvol_pct": 98.2571,
+ "iou_pct": 0.407,
+ "ci_pct": 0.206,
+ "verdict": "MISMATCH",
+ "url": "https://cad.onshape.com/documents/0dbba813823d1ff40ac5da0d/w/054e0f98348d077f1c0620c7/e/fb8c230dac9fa6c02ce152cc"
+}

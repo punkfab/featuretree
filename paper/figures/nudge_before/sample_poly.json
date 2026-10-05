@@ -1,0 +1,33 @@
+{
+ "part": "sample_poly",
+ "editable": 2,
+ "v0": 4768.6,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 6,
+   "new": 6.6,
+   "read_back": 6.6,
+   "v_fc": 5245.4,
+   "v_ref": 5245.4,
+   "dvol_pct": 0.0,
+   "moved_pct": 9.9987,
+   "outcome": "agree"
+  },
+  {
+   "feature": "hole_sketch",
+   "kind": "sketch",
+   "param": "circles[0].r",
+   "old": 2.6,
+   "new": 2.86,
+   "read_back": 2.86,
+   "v_fc": 4741.8,
+   "v_ref": 4741.8,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.562,
+   "outcome": "agree"
+  }
+ ]
+}

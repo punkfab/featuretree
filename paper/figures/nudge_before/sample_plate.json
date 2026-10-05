@@ -1,0 +1,33 @@
+{
+ "part": "sample_plate",
+ "editable": 2,
+ "v0": 11497.3,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 10,
+   "new": 11.0,
+   "read_back": 11.0,
+   "v_fc": 12647.1,
+   "v_ref": 12647.1,
+   "dvol_pct": 0.0,
+   "moved_pct": 10.0006,
+   "outcome": "agree"
+  },
+  {
+   "feature": "hole_sketch",
+   "kind": "sketch",
+   "param": "circles[0].r",
+   "old": 4,
+   "new": 4.4,
+   "read_back": 4.4,
+   "v_fc": 11391.8,
+   "v_ref": 11391.8,
+   "dvol_pct": 0.0,
+   "moved_pct": -0.9176,
+   "outcome": "agree"
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "part": "nist_ctc_03_asme1_rc",
+ "editable": 33,
+ "v0": 331238.3,
+ "edits": [
+  {
+   "feature": "body",
+   "kind": "pad",
+   "param": "length",
+   "old": 13.4824,
+   "new": 14.8306,
+   "read_back": 14.8306,
+   "v_fc": 331543.7,
+   "v_ref": 331543.7,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.0922,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L5",
+   "kind": "pad",
+   "param": "length",
+   "old": 8.2524,
+   "new": 9.0776,
+   "read_back": 9.0776,
+   "v_fc": 331631.2,
+   "v_ref": 331631.2,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.1186,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L10",
+   "kind": "pad",
+   "param": "length",
+   "old": 15.8757,
+   "new": 17.4633,
+   "read_back": 17.4633,
+   "v_fc": 332213.9,
+   "v_ref": 332213.9,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.2945,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L15",
+   "kind": "pad",
+   "param": "length",
+   "old": 10.0955,
+   "new": 11.1051,
+   "read_back": 11.1051,
+   "v_fc": 331974.0,
+   "v_ref": 331974.0,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.2221,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L20",
+   "kind": "pad",
+   "param": "length",
+   "old": 19.0527,
+   "new": 20.958,
+   "read_back": 20.958,
+   "v_fc": 332593.6,
+   "v_ref": 332593.6,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.4092,
+   "outcome": "agree"
+  },
+  {
+   "feature": "L25",
+   "kind": "pad",
+   "param": "length",
+   "old": 1.2725,
+   "new": 1.3998,
+   "read_back": 1.3998,
+   "v_fc": 333324.7,
+   "v_ref": 333324.7,
+   "dvol_pct": 0.0,
+   "moved_pct": 0.6299,
+   "outcome": "agree"
+  }
+ ]
+}

@@ -38,38 +38,42 @@ Emitted Natively into Several CAD Systems and Checked by Re-Reading}}
 \author{Daniel Newcome\\[2pt]
   \small punkfab\\
   \small\url{https://github.com/punkfab/featuretree}}
-\date{September 2026}
+\date{October 2026 (version 2)}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-A STEP file carries a part's shape but not how it was built; a CAD system's
-native file carries the history but only that vendor can read it. We publish
-the specification of a small neutral format between the two: a declarative JSON
-list of named features --- sketches with arcs, pad, pocket, fillet, revolve and
-placed cuts, with draft --- whose references to faces and edges are stored as
-queries resolved against live geometry, never as kernel identifiers. One IR is
-emitted as a native, editable feature tree in FreeCAD (headless PartDesign),
-build123d (code), and Onshape (REST, with every reference written as a
-FeatureScript query that Onshape re-evaluates on regeneration), and as scripts
-for Autodesk Fusion and SolidWorks. Every emitted part is checked the same way:
-exported to STEP and compared with a reference build by volume and a Boolean-free
-point-sampled IoU, with a per-feature volume trace that names the first feature
-where two backends disagree. We report the measurements, including the parts
-that fail. On the eleven feature trees recovered from the NIST MBE PMI corpus
-FreeCAD reproduces the reference on \FCverified{} of 11; Onshape reproduces every
-feature of our coverage parts exactly, but its corpus run was stopped by the free
-plan's daily API quota after two parts. Running the backends against each other
-found six defects, including one in the reference backend and two rules the
-specification had never stated. Separately, reading NIST's native SolidWorks
-files back through two decoders shows why one decoder is not enough: Onshape's
-importer matches NIST's own STEP on 11 of 11 parts, an open-source decoder on 1,
-four of its failures passing its own check. Neutral feature exchange is not new
---- it goes back to the macro-parametric work of 2003, and a closely related
-system appeared this year --- so we claim no novelty. We offer an open
-specification, an MIT-licensed implementation, and measurements that can be
-reproduced.
+When a program or a language-model agent writes a part, a person still has to be
+able to open it, see how it was built, and change one dimension without starting
+again. That needs a shared, small description of the feature tree --- the
+``timeline'' every history-based CAD system shows --- that an agent can emit, each
+CAD system can rebuild natively, and an edit made in any of them can be read
+back into. Feature-based modelling has been studied since the 1980s and no
+complete vocabulary exists; we publish a deliberately small one and a rule for
+growing it. The \code{featuretree} IR is a declarative JSON list of named
+features --- sketches with arcs, pad, pocket, fillet, revolve and placed cuts,
+with draft --- whose references to faces and edges are stored as queries resolved
+against live geometry, never as kernel identifiers. One IR is emitted as a
+native, editable tree in FreeCAD, build123d and Onshape, and as scripts for
+Autodesk Fusion and SolidWorks. Every emitted part is checked the same way: STEP
+export, a volume and Boolean-free IoU gate against a reference build, and a
+per-feature volume trace that names the first feature where two backends
+disagree. We report the measurements, including the failures. On the eleven
+trees recovered from the NIST MBE PMI corpus FreeCAD reproduces the reference on
+\FCverified{} of 11; Onshape, limited by its free plan's API quota, has run
+\OSrun{} and passes \OSverified{}. An edit made in the FreeCAD tree, read back by
+feature name and rebuilt by the reference, agrees on \NudgeAgree{} of
+\NudgeTried{} single-dimension edits; before a defect that this measurement found
+was fixed, it agreed on \NudgeBeforeAgree{}. Of the \VocabTotal{} features in the
+designers' own trees of the same parts, \VocabKindPct\% have a kind of their own in
+the IR; three more kinds (hole, pattern, chamfer) would bring that to
+\VocabNextPct\%. Running the backends against each other found six defects,
+including one in the reference backend and two rules the specification had never
+stated. Neutral feature exchange is not new --- it goes back to the
+macro-parametric work of 2003, and a closely related system appeared this year
+--- so we claim no novelty. We offer an open specification, an MIT-licensed
+implementation, and measurements that can be reproduced.
 \end{abstract}
 
 % ----------------------------------------------------------------------------
@@ -88,9 +92,18 @@ constraint translation~\cite{safdar2020macroparametric}.
 The question has come back for a new reason. Parts are now written by programs
 and by language-model agents, and most of that output is either code for one
 kernel (CadQuery, FreeCAD Python) or bare geometry~\cite{alrashedy2025cadcodeverify,rukhovich2025cadrecode,wu2021deepcad}.
-A design that should open as an editable tree in whichever system its user has
-needs a representation that is small enough for a program to emit, explicit
-enough for several CAD systems to rebuild natively, and checkable. CADIR, which
+A person reviewing such a part needs to nudge it: open it in the system they
+know, find the feature, change a dimension, and hand the result back. Bare
+geometry does not allow that, and code for one kernel allows it only to someone
+who reads that code. What is needed is a representation of the feature tree
+itself that is small enough for a program to emit, explicit enough for several
+CAD systems to rebuild natively, checkable, and able to take an edit back from
+any of them. Which features such a representation should contain is an old
+question: feature-based modelling was surveyed thirty years
+ago~\cite{shah1991assessment,salomons1993review}, the vendors' vocabularies
+still differ, and no list is complete. We do not try to settle it. We fix a
+small subset, measure how far it reaches, and state how it grows
+(\S\ref{sec:grow}). CADIR, which
 appeared in August 2026, targets the same need with an executable Python IR and
 adapters for FreeCAD, SolidWorks and Fusion~\cite{liu2026cadir}.
 \code{featuretree} was developed independently (public since June 2026) and makes
@@ -108,10 +121,15 @@ different choices; we describe them and measure the result.
   (\S\ref{sec:verify}): STEP export, a volume and Boolean-free IoU gate, a
   per-feature volume trace, and read-back of native files through two
   independent decoders.
-\item \textbf{Measurements} (\S\ref{sec:results}): every backend on the
-  eleven recovered NIST trees and on coverage parts; the six defects that
-  cross-backend disagreement exposed; a two-decoder study of NIST's native
-  SolidWorks files; and a comparison of the designers' own trees with ours.
+\item \textbf{A mapping to each system's timeline} (\S\ref{sec:timeline}): what
+  every IR kind is called in each tree, which dimensions read back by name, and
+  a measured edit round trip.
+\item \textbf{Measurements} (\S\ref{sec:results}): the backends on the eleven
+  recovered NIST trees and on coverage parts; the six defects that cross-backend
+  disagreement exposed; the edit round trip; a two-decoder study of NIST's
+  native SolidWorks files; and how much of the designers' own feature vocabulary
+  the IR covers.
+\item \textbf{A rule for growing the vocabulary} (\S\ref{sec:grow}).
 \end{enumerate}
 
 % ----------------------------------------------------------------------------
@@ -220,6 +238,61 @@ query inside the program, then exports STEP and a report. The shared geometry
 those runtimes draw from is tested by replaying it with build123d, but the
 scripts have not yet run in either program, so we report no results for them.
 
+We looked for a way to write a SolidWorks file without SolidWorks. The
+open-source decoder we use to read \code{.sldprt} files, cadmpeg, also lists
+\code{.sldprt} and \code{.f3d} as write targets. At version 0.6.0 its writers
+decline a plain box read from STEP (``SLDPRT semantic writer does not encode
+explicit edge parameter ranges''; for Fusion, a file with no native source
+cannot be serialised), the same refusal is in its source on 4 October 2026, and
+none of its 24 public forks changes the writer. So today the open route reads
+SolidWorks files but does not write them, and a SolidWorks result still needs
+the program.
+
+% ----------------------------------------------------------------------------
+\section{The IR as a shared timeline}\label{sec:timeline}
+
+Each history-based CAD system shows the user an ordered list of features: the
+model tree in FreeCAD, the feature list in Onshape, the timeline in Fusion, the
+FeatureManager tree in SolidWorks. The IR is that list with the vendor removed.
+Table~\ref{tab:timeline} gives the correspondence the backends implement. Every
+emitted feature carries its IR name as its name in the target's tree, and that
+name is the only key used in either direction.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}lp{0.17\linewidth}p{0.2\linewidth}p{0.2\linewidth}l@{}}
+\toprule
+IR kind & FreeCAD & Onshape & Fusion, SolidWorks & Reads back \\
+\midrule
+\code{sketch} & Sketch & Sketch & Sketch & circle radii \\
+\code{pad} & Pad & Extrude (new/add) & Extrude (join), Boss-Extrude & length \\
+\code{pocket} & Pocket & Extrude (remove) & Extrude (cut), Cut-Extrude & length \\
+\code{fillet} & Fillet & Fillet & Fillet & radius \\
+\code{revolve} & Revolution & Revolve & Revolve & angle \\
+\code{prism\_cut} & plane, sketch, Pocket & plane, sketch, Extrude (remove) & plane, sketch, cut & depth \\
+\code{polar\_pocket} & $n$ subtractive cylinders & not emitted & $n$ placed cuts & -- \\
+\bottomrule
+\end{tabular}
+\caption{What each IR kind becomes in each system's tree, and the driving
+dimension that is read back by feature name. The Fusion and SolidWorks columns
+describe the generated scripts, which have not run.}
+\label{tab:timeline}
+\end{table}
+
+\paragraph{The edit loop.} A person changes a dimension in the target's own
+interface. A reader for that target returns \code{\{feature name: \{parameter:
+value\}\}}; \code{ir.update\_from\_params} writes those values into the IR; every
+other backend rebuilds from the IR. Nothing else flows back: a feature added,
+deleted or reordered in the target is not read, and sketch geometry other than
+circle radii is not read. Readers exist for FreeCAD and Onshape, and inside the
+Fusion and SolidWorks scripts. \S\ref{sec:nudge} measures the FreeCAD loop.
+
+\paragraph{What the table hides.} The mapping is one-to-one only for the first
+five rows. A placed cut becomes three tree entries in every target, and a polar
+pocket becomes $n$; a person reading the tree sees the parts, not the IR
+feature. The reverse problem is larger: a designer's hole or pattern feature has
+no kind of its own and arrives as plain cuts (\S\ref{sec:vocab}).
+
 % ----------------------------------------------------------------------------
 \section{Verification}\label{sec:verify}
 
@@ -261,12 +334,18 @@ FreeCAD's result on every part and Onshape's where it ran.
 \input{tables.tex}
 
 FreeCAD reproduces the reference on \FCverified{} of 11 parts. \FCnote{}
-Onshape builds \VERIFIED{} on FTC-11. On CTC-01 it builds 53 of 54 features; one
-placed cut, whose profile edge lies exactly on the part's outer wall, is
-rejected by Onshape's kernel, and the part reaches \SI{99.36}{\percent} IoU,
-just under the gate. The free Onshape plan's daily API quota (about 1,500 calls)
-then stopped the run; the other nine parts need roughly 2,500 calls, and we will
-add them in a revision rather than delay the rest.
+
+Onshape has run on \OSrun{} parts and is \VERIFIED{} on \OSverified{}, FTC-11.
+On CTC-01 it builds 53 of 54 features; one placed cut, whose profile edge lies
+exactly on the part's outer wall, is rejected by Onshape's kernel, and the part
+reaches \SI{99.36}{\percent} IoU, just under the gate. On CTC-02, the largest
+tree, it builds 93 of 144: ten of the stacked pads that make up the body
+regenerate with an error, most of the later cuts then have nothing to cut, and
+the result is far from the reference. We have not yet found why those pads fail.
+The free plan's daily API quota (about 1,500 calls) is what limits this column:
+our emitter spends several calls on each feature, CTC-02 alone used a day's
+quota, and the remaining eight parts have not run. Cutting the calls per feature
+is the next change to that backend.
 
 Onshape was also run on coverage parts built to exercise every path it supports
 (Table~\ref{tab:coverage}). With the conventions pinned, every feature's volume
@@ -323,14 +402,80 @@ native file's geometry is judged by the commercial importer when available, its
 history by the open decoder. We reported the geometry failures upstream with a
 reproduction.
 
-\subsection{Designers' trees against recovered trees}
+\subsection{An edit, round the loop}\label{sec:nudge}
 
-The same native files carry the designers' own feature trees. Counting only
-solid-modifying operations, the designers used 1 to 42 per part; the trees our
-recogniser recovers from the STEP files are 2 to 4 times longer on the CTC parts
-(CTC-01: 10 against 39), mostly because one designer hole or pattern feature
-stands for many of our cuts (Table~\ref{tab:native}). That gap is a measurable
-target for intent recovery.
+For each part FreeCAD could build quickly (the two samples and eight NIST trees;
+CTC-02 and CTC-04 take minutes per rebuild and were left out) we took up to six
+editable dimensions spread through the tree. Each was set to 1.1 times its value
+in the FreeCAD file, alone, as a person would in the GUI; FreeCAD recomputed;
+every parameter was read back into the IR; and the reference rebuilt from the
+IR (Table~\ref{tab:nudge}).
+
+\NudgeAgree{} of \NudgeTried{} edits agree. The first run agreed on only
+\NudgeBeforeAgree{} of \NudgeBeforeTried{}: \NudgeBeforeLost{} edits to placed
+cuts never reached the IR, because FreeCAD holds a placed cut as a Pocket and
+reports its depth as \code{length}, while the IR reader looked for \code{depth}.
+The edit was silently dropped and the rebuilt part was the old part. The same
+run found that the function for editing a sketch circle called a FreeCAD method
+that does not exist in version 1.0. Both are fixed, and both had been in the
+code since the round trip was first written; no test had exercised them on a
+recovered tree.
+
+The three that still fail are all edits to the length of a base pad. On FTC-07
+(two edits) FreeCAD's recomputed body is invalid, with a negative volume, while
+the reference rebuilds a valid solid. On CTC-01 neither system produces a solid.
+The recovered trees place later cuts at absolute coordinates rather than
+relative to the pad they cut, which is the likely reason, but we have not
+diagnosed these and report them as failures.
+
+\subsection{How much of a designer's vocabulary}\label{sec:vocab}
+
+The native SolidWorks files carry the designers' own feature trees, which cadmpeg
+decodes. Table~\ref{tab:vocab} counts their solid-modifying features over the
+eleven parts and says what the IR has for each. \VocabKind{} of \VocabTotal{}
+(\VocabKindPct\%) are extrudes, fillets and revolves, which have kinds of their
+own. Almost all of the rest are holes, patterns and chamfers
+(\VocabNext{} features): the IR can hold their shape, as cuts, but not the fact
+that the designer made one hole feature with a counterbore or one pattern of
+twelve. Those three kinds would bring the share with a kind of its own to
+\VocabNextPct\%. Two cautions apply. The count says a kind exists, not that every
+option of the designer's feature is covered: the IR's fillet, for example, can
+select only circular edges on the top face. And eleven parts from one test suite
+modelled in one CAD system are a small sample of how people model.
+
+The same gap shows in tree length. The trees our recogniser recovers from the
+STEP files are 2 to 4 times longer than the designers' on the CTC parts (CTC-01:
+39 operations against 10), mostly because one hole or pattern feature stands for
+many of our cuts (Table~\ref{tab:native}).
+
+% ----------------------------------------------------------------------------
+\section{Growing the vocabulary}\label{sec:grow}
+
+The subset is meant to grow, and \S\ref{sec:defects} shows what an
+under-specified kind costs: two backends that each look correct and disagree. A
+kind is added when all of the following hold.
+
+\begin{enumerate}
+\item \textbf{Its meaning is written without reference to any kernel}: the
+  parameters, their units, every sign and direction convention, and what happens
+  at the edges (a cut that removes nothing, a zero length).
+\item \textbf{The validator checks what backends may assume} about it.
+\item \textbf{The reference backend builds it}, and a second backend on a
+  different kernel agrees with the reference at that feature, in the volume
+  trace, on parts written to exercise each convention in both directions.
+\item \textbf{It has a row in Table~\ref{tab:timeline}}: a native feature of the
+  same meaning in each target, or an explicit statement that the target gets a
+  decomposition.
+\item \textbf{Its driving dimensions read back by name}, and the edit round trip
+  of \S\ref{sec:nudge} passes for it.
+\end{enumerate}
+
+By this rule the next kinds are the ones Table~\ref{tab:vocab} ranks: hole (with
+its counterbore, countersink and thread callouts as parameters), linear and
+circular pattern of an earlier feature, and chamfer. Each has a native feature of
+the same name in all four targets. A draft applied to existing faces, shell and
+rib are rarer in this sample and wait. Sketch constraints are a separate
+question that this vocabulary does not address.
 
 % ----------------------------------------------------------------------------
 \section{Related work}\label{sec:related}
@@ -366,9 +511,15 @@ testing~\cite{lipman2017nistpmi,lipman2020gdt}.
 \item \textbf{Fusion and SolidWorks have not run.} Their scripts exist and their
   geometry is replay-tested, but API behaviour, sign conventions and profile
   selection are unverified until a run passes the gate.
-\item \textbf{Onshape's corpus run is incomplete} (2 of 11 parts) because of the
-  free plan's API quota, and it does not yet emit oblique placed cuts or polar
+\item \textbf{Onshape's corpus run is incomplete} (\OSrun{} of 11 parts) because of
+  the free plan's API quota; one of the three fails badly for a reason we have
+  not found; and the backend does not yet emit oblique placed cuts or polar
   pockets.
+\item \textbf{The edit loop carries dimensions only.} Features added, removed or
+  reordered in a target are not read back; the round trip was measured for
+  FreeCAD only, on up to six edits per part, one at a time, each a 10\% change.
+\item \textbf{The vocabulary is small.} About half of the features designers
+  used on these parts arrive without their identity (\S\ref{sec:vocab}).
 \item \textbf{The reference is OpenCASCADE, and so is FreeCAD.} Their agreement
   is partly self-consistency. Onshape (Parasolid) is the independent kernel.
 \item \textbf{Single bodies, no sketch constraints, no assemblies} in this IR;
@@ -383,10 +534,11 @@ testing~\cite{lipman2017nistpmi,lipman2020gdt}.
 \section{Availability}
 
 Code, specification (\code{ir.py}), validator and every backend are MIT-licensed
-at \url{https://github.com/punkfab/featuretree}; the numbers here come from commit \code{a3ebeb5}. The measurements are regenerated by:
+at \url{https://github.com/punkfab/featuretree}; the numbers here come from the commit tagged \code{ir-paper-v2}. The measurements are regenerated by:
 \begin{itemize}
 \item \code{paper/figures/freecad\_corpus.py} and \code{onshape\_corpus.py} (Table~\ref{tab:corpus});
-\item \code{paper/figures/native\_nist.py} (Table~\ref{tab:native});
+\item \code{paper/figures/native\_nist.py} (Tables~\ref{tab:native} and~\ref{tab:vocab});
+\item \code{paper/figures/nudge\_roundtrip.py} (Table~\ref{tab:nudge});
 \item \code{paper/ir/tables.py}, which writes every table and inline number.
 \end{itemize}
 The software is archived as

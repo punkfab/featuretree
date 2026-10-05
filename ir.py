@@ -115,8 +115,8 @@ def update_from_params(spec, params):
             f["radius"] = p["radius"]
         if f["kind"] == "revolve" and "angle" in p:
             f["angle"] = p["angle"]
-        if f["kind"] == "prism_cut" and "depth" in p:
-            f["depth"] = p["depth"]
+        if f["kind"] == "prism_cut" and ("depth" in p or "length" in p):
+            f["depth"] = p.get("depth", p.get("length"))   # FreeCAD holds a placed cut as a Pocket: 'length'
         if f["kind"] == "sketch" and "radii" in p:
             for i, r in enumerate(p["radii"]):
                 if i < len(f["circles"]):

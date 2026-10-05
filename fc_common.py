@@ -82,9 +82,11 @@ def apply_edits(doc, edits):
             changed.append(label)
         if "radius" in kv:
             if o.TypeId == "Sketcher::SketchObject":
-                for i, g in enumerate(o.Geometry):
+                geo = list(o.Geometry)               # sketches are emitted unconstrained
+                for g in geo:
                     if isinstance(g, Part.Circle):
-                        o.setRadius(i, float(kv["radius"]))
+                        g.Radius = float(kv["radius"])
+                        o.Geometry = geo
                         changed.append(label)
                         break
             elif hasattr(o, "Radius"):          # a fillet

@@ -7,7 +7,7 @@
 Part & Features & Valid & Verdict & IoU \% & $|\Delta V|$ \% & Verdict & IoU \% & $|\Delta V|$ \% \\
 \midrule
 CTC-01 & 54 & yes & \VERIFIED{} & 100.00 & 0.00 & 53/54 built & 99.36 & 0.58 \\
-CTC-02 & 144 & yes & \VERIFIED{} & 99.90 & 0.05 & not run &  &  \\
+CTC-02 & 144 & yes & \VERIFIED{} & 99.90 & 0.05 & 93/144 built & 0.41 & 98.26 \\
 CTC-03 & 64 & no & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
 CTC-04 & 108 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
 CTC-05 & 57 & yes & \VERIFIED{} & 99.78 & 0.23 & not run &  &  \\
@@ -19,7 +19,7 @@ FTC-10 & 38 & yes & \VERIFIED{} & 100.00 & 0.00 & not run &  &  \\
 FTC-11 & 2 & yes & \VERIFIED{} & 100.00 & 0.00 & \VERIFIED{} & 100.00 & 0.00 \\
 \bottomrule
 \end{tabular}
-\caption{Each recovered NIST feature tree built by FreeCAD and Onshape and gated against the build123d reference build of the same IR (\VERIFIED{}: IoU $\geq$ 99.5\% and $|\Delta V| \leq$ 0.5\%). ``Valid'': passes \code{ir.validate}. Onshape's run stopped at the free plan's daily API quota.}
+\caption{Each recovered NIST feature tree built by FreeCAD and Onshape and gated against the build123d reference build of the same IR (\VERIFIED{}: IoU $\geq$ 99.5\% and $|\Delta V| \leq$ 0.5\%). ``Valid'': passes \code{ir.validate}. Onshape's run is limited by the free plan's daily API quota.}
 \label{tab:corpus}
 \end{table}
 
@@ -74,4 +74,52 @@ FTC-11 & 100.00 & -0.000 & 100.00 & valid & 1 & 1 \\
 \end{tabular}
 \caption{NIST's native SolidWorks 2018 files decoded to STEP by two decoders and compared with NIST's own STEP of each part; and the number of solid operations in the designer's tree (as decoded) against the tree \code{featuretree} recovers from the STEP.}
 \label{tab:native}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+Designer's feature & Count & Share \% & In the IR \\
+\midrule
+extrude & 85 & 35.4 & own kind: pad, pocket, prism\_cut \\
+hole & 63 & 26.2 & shape only, as a pocket or placed cut \\
+fillet & 37 & 15.4 & own kind: fillet \\
+pattern & 27 & 11.2 & shape only, as its instances, one cut each \\
+draft & 11 & 4.6 & shape only, as taper on the extrusion it drafts \\
+chamfer & 10 & 4.2 & shape only, as a placed cut \\
+revolve & 4 & 1.7 & own kind: revolve \\
+shell & 1 & 0.4 & shape only, as a pocket \\
+rib & 1 & 0.4 & shape only, as a pad \\
+combine & 1 & 0.4 & -- \\
+\midrule
+all & 240 & 100.0 & \\
+\bottomrule
+\end{tabular}
+\caption{The solid-modifying features in the designers' own trees of the eleven NIST SolidWorks files (as decoded by cadmpeg), and what the IR has for each. ``Shape only'' means the IR can hold the geometry but the feature loses its identity in the tree.}
+\label{tab:vocab}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Part & Editable & Edited & Agree & Volumes differ & Reference rebuild failed \\
+\midrule
+CTC-01 & 53 & 6 & 5 & 0 & 1 \\
+CTC-03 & 33 & 6 & 6 & 0 & 0 \\
+CTC-05 & 40 & 6 & 6 & 0 & 0 \\
+FTC-07 & 17 & 6 & 4 & 2 & 0 \\
+FTC-08 & 32 & 6 & 6 & 0 & 0 \\
+FTC-09 & 11 & 6 & 6 & 0 & 0 \\
+FTC-10 & 25 & 6 & 6 & 0 & 0 \\
+FTC-11 & 0 & 0 & 0 & 0 & 0 \\
+sample plate & 2 & 2 & 2 & 0 & 0 \\
+sample poly & 2 & 2 & 2 & 0 & 0 \\
+\midrule
+all & 215 & 46 & 43 & 2 & 1 \\
+\bottomrule
+\end{tabular}
+\caption{The edit round trip. One dimension at a time is set to 1.1 times its value in the FreeCAD tree, every parameter is read back into the IR by feature name, and the reference rebuilds from the IR. ``Agree'': the edited FreeCAD solid and the rebuilt reference are within 0.5\% in volume. ``Editable'': dimensions FreeCAD can drive; up to six per part were edited.}
+\label{tab:nudge}
 \end{table}
