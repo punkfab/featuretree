@@ -1,0 +1,261 @@
+{
+ "spec": {
+  "name": "nist_ftc_11_asme1_rb",
+  "features": [
+   {
+    "kind": "sketch",
+    "name": "stock_sk",
+    "plane": "XY",
+    "on": null,
+    "circles": [],
+    "rects": [
+     [
+      63.0,
+      63.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "polys": []
+   },
+   {
+    "kind": "pad",
+    "name": "stock",
+    "sketch": "stock_sk",
+    "length": 3.0,
+    "symmetric": false
+   },
+   {
+    "kind": "prism_cut",
+    "name": "cut0",
+    "origin": [
+     -0.0,
+     -0.0,
+     0.0
+    ],
+    "normal": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "xdir": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "depth": 3.0,
+    "polys": [
+     [
+      [
+       16.0,
+       0.0,
+       1.0
+      ],
+      [
+       -16.0,
+       0.0,
+       1.0
+      ]
+     ]
+    ]
+   },
+   {
+    "kind": "prism_cut",
+    "name": "cut1",
+    "origin": [
+     -0.0,
+     -0.0,
+     0.0
+    ],
+    "normal": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "xdir": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "depth": 3.0,
+    "polys": [
+     [
+      [
+       0.0,
+       31.5,
+       0.0
+      ],
+      [
+       31.5,
+       31.5,
+       -0.0
+      ],
+      [
+       31.5,
+       0.0,
+       -0.414214
+      ]
+     ]
+    ]
+   },
+   {
+    "kind": "prism_cut",
+    "name": "cut2",
+    "origin": [
+     -0.0,
+     -0.0,
+     0.0
+    ],
+    "normal": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "xdir": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "depth": 3.0,
+    "polys": [
+     [
+      [
+       -0.0,
+       -31.5,
+       -0.414214
+      ],
+      [
+       31.5,
+       0.0,
+       -0.0
+      ],
+      [
+       31.5,
+       -31.5,
+       -0.0
+      ]
+     ]
+    ]
+   },
+   {
+    "kind": "prism_cut",
+    "name": "cut3",
+    "origin": [
+     -0.0,
+     -0.0,
+     0.0
+    ],
+    "normal": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "xdir": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "depth": 3.0,
+    "polys": [
+     [
+      [
+       -31.5,
+       -31.5,
+       0.0
+      ],
+      [
+       -31.5,
+       0.0,
+       -0.414214
+      ],
+      [
+       0.0,
+       -31.5,
+       -0.0
+      ]
+     ]
+    ]
+   },
+   {
+    "kind": "prism_cut",
+    "name": "cut4",
+    "origin": [
+     -0.0,
+     -0.0,
+     0.0
+    ],
+    "normal": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "xdir": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "depth": 3.0,
+    "polys": [
+     [
+      [
+       -31.5,
+       0.0,
+       0.0
+      ],
+      [
+       -31.5,
+       31.5,
+       0.0
+      ],
+      [
+       0.0,
+       31.5,
+       -0.414214
+      ]
+     ]
+    ]
+   }
+  ]
+ },
+ "report": {
+  "name": "nist_ftc_11_asme1_rb",
+  "method": "cells",
+  "planes": 1,
+  "cylinders": 2,
+  "unsupported_faces": 2,
+  "warnings": [
+   "2 face(s) are not planes or cylinders and were not used to split",
+   "34.897% of the part's volume in empty space that no candidate cut reaches (cones, freeform faces, oblique features)"
+  ],
+  "per_axis": {
+   "(0.0, 0.0, 1.0)": {
+    "cells": 12,
+    "empty": 10,
+    "candidates": 5
+   },
+   "(0.0, 1.0, 0.0)": {
+    "cells": 2,
+    "empty": 0,
+    "candidates": 0
+   },
+   "(1.0, 0.0, 0.0)": {
+    "cells": 2,
+    "empty": 0,
+    "candidates": 0
+   }
+  },
+  "candidates": 5,
+  "cells": 16,
+  "uncut_pct_of_part": 34.897,
+  "features": 7,
+  "cuts": 5,
+  "invalid": [],
+  "recognise_s": 1.2,
+  "vol_orig": 5129.4,
+  "vol_ir": 6939.0,
+  "dvol_pct": 35.279,
+  "iou_pct": 74.12,
+  "verified": false,
+  "total_s": 3.8
+ }
+}

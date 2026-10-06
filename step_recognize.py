@@ -45,6 +45,9 @@ from pathlib import Path
 
 from build123d import Axis, GeomType, Plane, Pos, Rectangle, Vector, import_step
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "targets"))
+import _geom as _G  # noqa: E402
+
 import ir as IR
 import b3d_emit
 
@@ -431,7 +434,12 @@ def _loop_points(wire):
     parameters; `wire @ t` re-measures the whole wire's arc length on every call, and ~96,000 such
     calls were 180 s of a 183 s recognition of CTC-02."""
     pts = []
-    for e, rev in _ordered_edges(wire):
+    oe = _ordered_edges(wire)
+    if len(oe) == 1:
+        # a full circle is one closed edge: start + midpoint is a 2-point "polygon" that contains
+        # nothing, so a hole inside a round boss was nested as a second region, not as its hole
+        return [((oe[0][0] @ (i / 8)).X, (oe[0][0] @ (i / 8)).Y) for i in range(8)]
+    for e, rev in oe:
         a, m = (e @ 1.0, e @ 0.5) if rev else (e @ 0.0, e @ 0.5)
         pts += [(a.X, a.Y), (m.X, m.Y)]
     return pts
@@ -442,7 +450,13 @@ def _approx_poly(wire, tol=DIM_TOL):
     in the wire's own order; a reversed edge contributes its segments reversed, bulges negated."""
     loop = []
     try:
-        for e, rev in _ordered_edges(wire):
+        oe = _ordered_edges(wire)
+        if len(oe) == 1 and oe[0][0].geom_type == GeomType.CIRCLE:
+            # a full circle is ONE closed edge and no single bulge can express it: two half-arcs
+            # (it used to fall through to the 64-point polyline, so round holes came back as 64-gons)
+            c, r = oe[0][0].arc_center, oe[0][0].radius
+            return [[round(c.X + r, 6), round(c.Y, 6), 1.0], [round(c.X - r, 6), round(c.Y, 6), 1.0]]
+        for e, rev in oe:
             segs = _approx_segments(e, tol)
             if rev:
                 segs = [(en, st, -bl) for (st, en, bl) in reversed(segs)]
@@ -451,6 +465,29 @@ def _approx_poly(wire, tol=DIM_TOL):
     except Exception:
         return _polyline(wire)
     return loop if len(loop) >= 2 else _polyline(wire)
+
+
+def _pip2(x, y, poly):
+    inside = False
+    for i in range(len(poly)):
+        (x1, y1), (x2, y2) = poly[i], poly[(i + 1) % len(poly)]
+        if (y1 > y) != (y2 > y) and x < x1 + (y - y1) * (x2 - x1) / (y2 - y1):
+            inside = not inside
+    return inside
+
+
+def _split_pinched(loop, tol=1e-4):
+    """A loop that passes through the same point twice (two outlines that meet at a single point,
+    like a key slot that only just reaches its bore) -> the simple loops it is made of. The IR's
+    loops may not touch themselves; each piece is emitted as its own loop or its own cut."""
+    if loop is None:
+        return []
+    for i in range(len(loop)):
+        for j in range(i + 1, len(loop)):
+            if abs(loop[i][0] - loop[j][0]) < tol and abs(loop[i][1] - loop[j][1]) < tol:
+                inner, outer = loop[i:j], loop[:i] + loop[j:]
+                return _split_pinched(inner, tol) + _split_pinched(outer, tol)
+    return [loop] if len(loop) >= 2 else []
 
 
 def _polyline(wire, max_seg=0.5):
@@ -977,7 +1014,9 @@ def _recognize_layers(orig, name, axis):
         outlines, slopes = [], []
         for ri, (ow, holes, oa) in enumerate(slices[rep]):
             cx, cy, hw0 = _loop_key(ow)
-            track = [_nearest([r[0] for r in slices[k]], cx, cy) for k in L]
+            # by size as well as centre: a ring groove leaves two CONCENTRIC regions in one layer
+            track = [_nearest([r[0] for r in slices[k]], cx, cy, hw0, max(2.0, 0.05 * hw0))
+                     or _nearest([r[0] for r in slices[k]], cx, cy) for k in L]
             sl = None
             if len(L) >= 4 and all(track):
                 s_, res = _fit(L, [_loop_key(w)[2] for w in track])
@@ -1002,7 +1041,12 @@ def _recognize_layers(orig, name, axis):
         if not polys:                           # straight: each region's MEDIAN outline
             taper = 0.0
             polys = [_approx_poly(_median(tr) or ow) for ow, tr in outlines]
-        polys = [p for p in polys if p is not None]
+        polys = [q for p in polys if p is not None for q in _split_pinched(p)]
+        # An outline lying inside another outline of the same layer is an ISLAND in one of its
+        # holes. The outer pad is solid there already (holes are cut afterwards, and that cut
+        # carries the island as a nested loop), and in the sketch the island would read as a hole.
+        dep = _G.poly_depths(polys) if len(polys) > 1 else [0] * len(polys)
+        polys = [p for p, d in zip(polys, dep) if d == 0]
         if not polys:
             skipped.append((li, zb, ze, "outline not approximable"))
             continue
@@ -1090,9 +1134,23 @@ def _recognize_layers(orig, name, axis):
                 continue
             z0, nz, taper = zb, 1.0, 0.0
         # pads are built from z = 0 while slice heights are in the aligned frame: shift by base_z
-        feats.append(IR.prism_cut(f"hole{n_cuts}", origin=(0.0, 0.0, z0 - base_z), normal=(0.0, 0.0, nz),
-                                  xdir=(1.0, 0.0, 0.0), depth=round(ze - zb, 4), polys=[poly], taper=taper))
-        n_cuts += 1
+        pieces = _split_pinched(poly)
+        # an ISLAND standing in the hole over its whole run (the hub inside a ring groove) is a
+        # nested loop of the cut, or the cut would remove the island's pad again
+        islands = []
+        if len(pieces) == 1 and not taper:
+            hp, ha = _loop_points(wire), abs(Face(wire).area)
+            reps = [layers[li][len(layers[li]) // 2] for li in r["layers"]]
+            for ow, _, oa in slices[reps[0]]:
+                (ix, iy), (kx, ky, khw) = _loop_points(ow)[0], _loop_key(ow)
+                if oa < ha and _pip2(ix, iy, hp) and all(
+                        _nearest([g[0] for g in slices[k]], kx, ky, khw, 0.3) is not None for k in reps):
+                    islands += _split_pinched(_approx_poly(ow))
+        for piece in pieces:                    # pieces touch, so each is its own cut
+            feats.append(IR.prism_cut(f"hole{n_cuts}", origin=(0.0, 0.0, z0 - base_z), normal=(0.0, 0.0, nz),
+                                      xdir=(1.0, 0.0, 0.0), depth=round(ze - zb, 4), polys=[piece] + islands,
+                                      taper=taper))
+            n_cuts += 1
     if not feats:
         raise ValueError("no layers")
     warnings = [f"layered along {tuple(round(c, 3) for c in axis.to_tuple())}: {len(layers)} layer(s), "

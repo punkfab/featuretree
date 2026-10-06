@@ -115,11 +115,18 @@ def _pip(x, y, v):
     return inside
 
 
+def poly_points(poly, per_arc=16):
+    """A poly's boundary as a polyline with its arcs discretised (see loop_points)."""
+    return loop_points({"segments": poly_segments(poly)}, per_arc=per_arc)
+
+
 def poly_depths(polys):
     """Nesting depth of each poly — the rule b3d_emit and FreeCAD's Pad apply: a poly inside
     another is a hole in it, an island in a hole is solid again. Even depth = material."""
-    vs = [poly_vertices(p) for p in polys]
-    areas = [_area(v) for v in vs]
+    # sampled along the arcs: a circle drawn as two half-arcs has two vertices, and as a bare
+    # vertex polygon it has no area and contains nothing
+    vs = [poly_points(p) for p in polys]
+    areas = [abs(_area(v)) for v in vs]
     order = sorted(range(len(vs)), key=lambda i: -areas[i])
     depth = {}
     for n, i in enumerate(order):

@@ -22,6 +22,9 @@ import math
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "targets"))
+import _geom as _G  # noqa: E402
+
 from build123d import (Align, Axis, BuildLine, BuildSketch, Circle, Cylinder, GeomType, Line,
                        Plane, Polygon, Pos, Rectangle, Rot, SagittaArc, export_stl, extrude,
                        fillet, make_face, revolve)
@@ -67,7 +70,7 @@ def _polys_region(polys, plane_obj):
     faces = [_poly_face(p, plane_obj) for p in polys]
     if len(faces) == 1:
         return faces[0]
-    loops = [[(q[0], q[1]) for q in p] for p in polys]
+    loops = [_G.poly_points(p) for p in polys]            # arcs sampled, not bare vertices
     areas = [abs(f.area) for f in faces]
 
     def pip(x, y, poly):

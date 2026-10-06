@@ -10,7 +10,7 @@
         "CONE": 2
       },
       "input_edges": 388,
-      "recognise_seconds": 86.49,
+      "recognise_seconds": 133.98,
       "feature_kinds": {
         "sketch": 15,
         "pad": 1,
@@ -49,7 +49,7 @@
         "overlap_pct": 99.86070283071604,
         "cancellation": 1.0060624456255243
       },
-      "seconds": 88.34
+      "seconds": 137.67
     },
     {
       "part": "nist_ctc_02_asme1_rc.stp",
@@ -62,14 +62,14 @@
         "SPHERE": 24
       },
       "input_edges": 1494,
-      "recognise_seconds": 562.21,
+      "recognise_seconds": 923.35,
       "feature_kinds": {
         "sketch": 55,
         "pad": 55,
         "prism_cut": 34
       },
       "operations": 89,
-      "iou_gate_pct": 92.32,
+      "iou_gate_pct": 92.283,
       "reason": null,
       "extrude_axis": [
         1.0,
@@ -77,10 +77,10 @@
         0.0
       ],
       "status": "PARTIAL",
-      "dvol_pct": 0.63,
+      "dvol_pct": 0.62,
       "dsize_mm": 0.011,
       "vol_orig": 47100535.5,
-      "vol_ir": 46804124.8,
+      "vol_ir": 46810194.0,
       "features": 144,
       "method": "layered",
       "recovered": null,
@@ -89,14 +89,14 @@
         "1369 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": -46817615.844650775,
-        "uncut": -47114026.58639731,
-        "net": -296410.7417465374,
-        "total": -93931642.4310481,
-        "overlap_pct": 199.3993281706882,
-        "cancellation": -316.89689070502584
+        "overcut": -46827395.61883809,
+        "uncut": -47117737.068438694,
+        "net": -290341.44960060716,
+        "total": -93945132.68727678,
+        "overlap_pct": 199.4200917863987,
+        "cancellation": -323.5677607055673
       },
-      "seconds": 700.21
+      "seconds": 1324.71
     },
     {
       "part": "nist_ctc_03_asme1_rc.stp",
@@ -106,7 +106,7 @@
         "CYLINDER": 53
       },
       "input_edges": 410,
-      "recognise_seconds": 72.18,
+      "recognise_seconds": 102.54,
       "feature_kinds": {
         "sketch": 31,
         "pad": 31,
@@ -139,7 +139,7 @@
         "overlap_pct": 1.1342634865584396,
         "cancellation": 936.6699728957641
       },
-      "seconds": 73.75
+      "seconds": 106.71
     },
     {
       "part": "nist_ctc_04_asme1_rd.stp",
@@ -152,25 +152,25 @@
         "SPHERE": 22
       },
       "input_edges": 1204,
-      "recognise_seconds": 193.91,
+      "recognise_seconds": 359.07,
       "feature_kinds": {
         "sketch": 15,
         "pad": 15,
         "prism_cut": 78
       },
       "operations": 93,
-      "iou_gate_pct": 99.272,
-      "reason": "volume and extents match but the shapes overlap only 99.27% (< 99.5%): compensating errors",
+      "iou_gate_pct": 99.029,
+      "reason": "volume and extents match but the shapes overlap only 99.03% (< 99.5%): compensating errors",
       "extrude_axis": [
         0.0,
         0.0,
         1.0
       ],
       "status": "PARTIAL",
-      "dvol_pct": 0.14,
+      "dvol_pct": 0.17,
       "dsize_mm": 0.008,
       "vol_orig": 17519087.7,
-      "vol_ir": 17543547.2,
+      "vol_ir": 17489853.9,
       "features": 108,
       "method": "layered",
       "recovered": null,
@@ -179,14 +179,14 @@
         "256 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": -18021166.671221565,
-        "uncut": -17996707.215536702,
-        "net": 24459.45568486303,
-        "total": -36017873.88675827,
-        "overlap_pct": 202.8658967629305,
-        "cancellation": -1472.554187256435
+        "overcut": -17967667.379097443,
+        "uncut": -17996901.218078926,
+        "net": -29233.83898148313,
+        "total": -35964568.59717637,
+        "overlap_pct": 202.5605196050067,
+        "cancellation": -1230.2376235962893
       },
-      "seconds": 209.61
+      "seconds": 380.02
     },
     {
       "part": "nist_ctc_05_asme1_rd.stp",
@@ -200,7 +200,7 @@
         "CONE": 26
       },
       "input_edges": 510,
-      "recognise_seconds": 58.16,
+      "recognise_seconds": 106.29,
       "feature_kinds": {
         "sketch": 17,
         "pad": 17,
@@ -234,7 +234,7 @@
         "overlap_pct": 199.74865080232482,
         "cancellation": -259.7466103514526
       },
-      "seconds": 60.74
+      "seconds": 110.4
     },
     {
       "part": "nist_ftc_06_asme1_rd.stp",
@@ -247,14 +247,14 @@
         "TORUS": 6
       },
       "input_edges": 373,
-      "recognise_seconds": 165.73,
+      "recognise_seconds": 127.77,
       "feature_kinds": {
         "sketch": 9,
         "pad": 9,
-        "prism_cut": 9
+        "prism_cut": 13
       },
-      "operations": 18,
-      "iou_gate_pct": 97.702,
+      "operations": 22,
+      "iou_gate_pct": 97.721,
       "reason": null,
       "extrude_axis": [
         0.0,
@@ -262,25 +262,25 @@
         0.0
       ],
       "status": "PARTIAL",
-      "dvol_pct": 0.76,
+      "dvol_pct": 0.73,
       "dsize_mm": 0.0,
       "vol_orig": 3323546.1,
-      "vol_ir": 3348654.3,
-      "features": 27,
+      "vol_ir": 3347962.8,
+      "features": 31,
       "method": "layered",
       "recovered": null,
       "warnings": [
-        "layered along (0.0, 1.0, 0.0): 9 layer(s), 9 hole run(s) -- 19.1 mm: 1 region(s), 4 hole(s); 2.3 mm: 1 region(s), 4 hole(s); 10.4 mm: 1 region(s), 4 hole(s); 19.0 mm: 6 region(s), 0 hole(s); 1.3 mm: 13 region(s), 0 hole(s); 18.4 mm: 11 region(s), 0 hole(s); 2.5 mm: 15 region(s), 0 hole(s); 12.1 mm: 9 region(s), 0 hole(s); 12.7 mm: 3 region(s), 1 hole(s)"
+        "layered along (0.0, 1.0, 0.0): 9 layer(s), 13 hole run(s) -- 19.1 mm: 1 region(s), 4 hole(s); 2.3 mm: 1 region(s), 4 hole(s); 10.4 mm: 1 region(s), 4 hole(s); 19.0 mm: 6 region(s), 0 hole(s); 1.3 mm: 13 region(s), 0 hole(s); 18.4 mm: 11 region(s), 0 hole(s); 2.5 mm: 13 region(s), 2 hole(s); 12.1 mm: 7 region(s), 2 hole(s); 12.7 mm: 3 region(s), 1 hole(s)"
       ],
       "decomp": {
-        "overcut": 2349511.940082979,
-        "uncut": 2374620.1972332597,
-        "net": 25108.257150280755,
-        "total": 4724132.137316238,
-        "overlap_pct": 29.30707473144211,
-        "cancellation": 188.15053984196643
+        "overcut": 2349525.9621893424,
+        "uncut": 2373942.712867693,
+        "net": 24416.750678350683,
+        "total": 4723468.675057035,
+        "overlap_pct": 29.306652829471602,
+        "cancellation": 193.4519763616679
       },
-      "seconds": 170.03
+      "seconds": 129.88
     },
     {
       "part": "nist_ftc_07_asme1_rd.stp",
@@ -294,7 +294,7 @@
         "BSPLINE": 20
       },
       "input_edges": 622,
-      "recognise_seconds": 194.08,
+      "recognise_seconds": 195.17,
       "feature_kinds": {
         "sketch": 8,
         "pad": 3,
@@ -313,7 +313,7 @@
       "dvol_pct": 0.09,
       "dsize_mm": 1.517,
       "vol_orig": 1726247.6,
-      "vol_ir": 1724637.2,
+      "vol_ir": 1724635.2,
       "features": 29,
       "method": "extrude",
       "recovered": {
@@ -326,14 +326,14 @@
         "multi-axis recovery: +9 pocket(s), +4 cross-hole(s); 24 residual lump(s) (chamfers/fillets) left uncut"
       ],
       "decomp": {
-        "overcut": 1115876.0435910418,
-        "uncut": 1114265.6368172062,
-        "net": -1610.4067738356534,
-        "total": 2230141.6804082477,
-        "overlap_pct": 35.35828481059352,
-        "cancellation": 1384.8312840218096
+        "overcut": 1115876.476729264,
+        "uncut": 1114264.107288429,
+        "net": -1612.3694408349693,
+        "total": 2230140.584017693,
+        "overlap_pct": 35.358259719278244,
+        "cancellation": 1383.1449093098722
       },
-      "seconds": 197.62
+      "seconds": 199.18
     },
     {
       "part": "nist_ftc_08_asme1_rc.stp",
@@ -345,7 +345,7 @@
         "TORUS": 12
       },
       "input_edges": 705,
-      "recognise_seconds": 152.26,
+      "recognise_seconds": 258.88,
       "feature_kinds": {
         "sketch": 5,
         "pad": 5,
@@ -378,7 +378,7 @@
         "overlap_pct": 99.15872957359136,
         "cancellation": 5.466060043578553
       },
-      "seconds": 155.3
+      "seconds": 263.49
     },
     {
       "part": "nist_ftc_09_asme1_rd.stp",
@@ -389,7 +389,7 @@
         "CONE": 8
       },
       "input_edges": 454,
-      "recognise_seconds": 18.47,
+      "recognise_seconds": 23.74,
       "feature_kinds": {
         "sketch": 40,
         "pad": 1,
@@ -422,7 +422,7 @@
         "overlap_pct": 0.8612046165182863,
         "cancellation": 1036.5649032446127
       },
-      "seconds": 19.17
+      "seconds": 25.34
     },
     {
       "part": "nist_ftc_10_asme1_rb.stp",
@@ -436,7 +436,7 @@
         "BSPLINE": 1
       },
       "input_edges": 495,
-      "recognise_seconds": 241.34,
+      "recognise_seconds": 254.22,
       "feature_kinds": {
         "sketch": 13,
         "pad": 13,
@@ -451,10 +451,10 @@
         1.0
       ],
       "status": "PARTIAL",
-      "dvol_pct": 0.71,
+      "dvol_pct": 0.72,
       "dsize_mm": 0.063,
       "vol_orig": 188318.1,
-      "vol_ir": 186987.2,
+      "vol_ir": 186963.5,
       "features": 38,
       "method": "layered",
       "recovered": null,
@@ -463,14 +463,14 @@
         "88 section curve(s) that are not lines or circular arcs (ellipse, conic, spline) approximated by arcs within 0.05 mm -- the tree holds arcs where the design had a freeform curve"
       ],
       "decomp": {
-        "overcut": -186987.22948056855,
+        "overcut": -186963.47471516498,
         "uncut": -188318.0666989932,
-        "net": -1330.8372184246546,
-        "total": -375305.29617956176,
-        "overlap_pct": 199.2933034829038,
-        "cancellation": -282.0069133803006
+        "net": -1354.591983828228,
+        "total": -375281.5414141582,
+        "overlap_pct": 199.2806893106048,
+        "cancellation": -277.04397035745825
       },
-      "seconds": 247.82
+      "seconds": 262.09
     },
     {
       "part": "nist_ftc_11_asme1_rb.stp",
@@ -481,7 +481,7 @@
         "TORUS": 2
       },
       "input_edges": 12,
-      "recognise_seconds": 18.52,
+      "recognise_seconds": 23.66,
       "feature_kinds": {
         "sketch": 1,
         "revolve": 1
@@ -511,7 +511,7 @@
         "overlap_pct": 99.99968375998162,
         "cancellation": 1.000005317426488
       },
-      "seconds": 18.61
+      "seconds": 23.75
     }
   ]
 }
