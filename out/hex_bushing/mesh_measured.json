@@ -1,0 +1,156 @@
+{
+ "mesh": "TOKEN_OR.stl",
+ "measured": {
+  "extents": [
+   99.74,
+   100.13,
+   120.44
+  ],
+  "slice_spacing": 0.25,
+  "levels": [
+   {
+    "z": [
+     -0.04,
+     29.96
+    ],
+    "height": 30.0,
+    "outer_diameter": 99.67,
+    "centre": [
+     0.04,
+     0.05
+    ],
+    "round": true,
+    "bottom_break": {
+     "height": 0.25,
+     "radius_lost": 2.71
+    },
+    "top_break": {
+     "height": 0.05,
+     "radius_lost": 0.12
+    },
+    "holes": [
+     {
+      "centre": [
+       0.0,
+       0.01
+      ],
+      "diameter": 42.06,
+      "r_min": 20.0,
+      "r_max": 22.88,
+      "shape": "regular 6-gon",
+      "across_flats": 40.101,
+      "flat_pairs": [
+       40.023,
+       40.178,
+       40.101
+      ],
+      "flat_spread": 0.155,
+      "angle_error": 0.34,
+      "regular": true,
+      "sides": 6,
+      "across_corners": 45.76,
+      "first_corner_deg": 0.2,
+      "ideal_across_corners": 46.3
+     },
+     {
+      "centre": [
+       -36.83,
+       21.1
+      ],
+      "diameter": 9.9,
+      "r_min": 4.88,
+      "r_max": 5.0,
+      "shape": "round"
+     },
+     {
+      "centre": [
+       36.91,
+       -21.0
+      ],
+      "diameter": 9.86,
+      "r_min": 4.78,
+      "r_max": 5.02,
+      "shape": "round"
+     },
+     {
+      "centre": [
+       -20.98,
+       -36.84
+      ],
+      "diameter": 9.83,
+      "r_min": 4.86,
+      "r_max": 5.0,
+      "shape": "round"
+     },
+     {
+      "centre": [
+       20.96,
+       36.82
+      ],
+      "diameter": 7.79,
+      "r_min": 3.71,
+      "r_max": 3.99,
+      "shape": "irregular"
+     }
+    ]
+   },
+   {
+    "z": [
+     30.46,
+     119.96
+    ],
+    "height": 89.5,
+    "outer_diameter": 69.76,
+    "centre": [
+     -0.02,
+     -0.18
+    ],
+    "round": true,
+    "bottom_break": {
+     "height": 0.0,
+     "radius_lost": 0.0
+    },
+    "top_break": {
+     "height": 0.15,
+     "radius_lost": 0.25
+    },
+    "holes": [
+     {
+      "centre": [
+       -0.05,
+       -0.33
+      ],
+      "diameter": 42.0,
+      "r_min": 19.97,
+      "r_max": 22.84,
+      "shape": "regular 6-gon",
+      "across_flats": 40.036,
+      "flat_pairs": [
+       39.977,
+       40.103,
+       40.029
+      ],
+      "flat_spread": 0.126,
+      "angle_error": 0.45,
+      "regular": true,
+      "sides": 6,
+      "across_corners": 45.68,
+      "first_corner_deg": 0.3,
+      "ideal_across_corners": 46.23
+     }
+    ]
+   }
+  ]
+ },
+ "notes": [
+  "4 holes read as one pattern: dia 10.0 on a 85.0 bolt circle, equally spaced",
+  "hole at [20.96, 36.82] scanned as irregular, dia 7.79; given the pattern's 10.0",
+  "bore: scan's flats measure [39.977, 40.103, 40.029] (spread 0.126 mm, angles within 0.45 deg); modelled as one regular 6-gon, 40.0 across flats"
+ ],
+ "compare": {
+  "iou_pct": 97.81,
+  "spin_deg": 359.75,
+  "scale": 1.0,
+  "dvol_pct": -0.18
+ }
+}

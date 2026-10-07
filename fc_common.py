@@ -6,13 +6,23 @@ Side-effect free so both fc_build.py and fc_read.py can import it.
 import Part
 
 
-def resolve_edges(shape, select):
+def resolve_edges(shape, select, picks=None):
     """Resolve an edge QUERY against live geometry -> ['Edge3', ...].
 
     The query (e.g. {"circles": "top_outer"}) is what the IR stores; the EdgeN names
     are recomputed here every build, so they never go stale (no persistent kernel ids).
     Supports circular edges on the top face: "top_outer" (largest) / "top_all".
     """
+    if picks is not None:                 # {"edges_of": ...}: ir.lower() worked out a point on each
+        names = []
+        for p in picks:
+            v = Part.Vertex(float(p[0]), float(p[1]), float(p[2]))
+            d, i = min((e.distToShape(v)[0], i) for i, e in enumerate(shape.Edges))
+            if d > 1e-3:
+                raise ValueError("no edge at %r (nearest is %.3f mm away)" % (tuple(p), d))
+            if "Edge%d" % (i + 1) not in names:
+                names.append("Edge%d" % (i + 1))
+        return names
     want = select.get("circles")
     zmax = max((v.Z for v in shape.Vertexes), default=0.0)
     cands = []
@@ -52,6 +62,8 @@ def result(doc):
                 params[o.Label]["type"] = str(o.Type)
         elif o.TypeId == "PartDesign::Fillet":
             params[o.Label] = {"radius": round(float(o.Radius), 4)}
+        elif o.TypeId == "PartDesign::Chamfer":
+            params[o.Label] = {"distance": round(float(o.Size), 4)}
         elif o.TypeId == "PartDesign::Revolution":
             params[o.Label] = {"angle": round(float(o.Angle), 4)}
         elif o.TypeId == "Sketcher::SketchObject":
@@ -79,6 +91,9 @@ def apply_edits(doc, edits):
             continue
         if "length" in kv and hasattr(o, "Length"):
             o.Length = float(kv["length"])
+            changed.append(label)
+        if "distance" in kv and o.TypeId == "PartDesign::Chamfer":
+            o.Size = float(kv["distance"])
             changed.append(label)
         if "radius" in kv:
             if o.TypeId == "Sketcher::SketchObject":

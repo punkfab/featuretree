@@ -136,14 +136,17 @@ def build(spec, out_path):
                 if f.get("taper"):
                     p.TaperAngle = FC_TAPER_SIGN * f["taper"]
             tip = p
-        elif kind == "fillet":
-            fl = body.newObject("PartDesign::Fillet", f["name"])
+        elif kind in ("fillet", "chamfer"):
+            fl = body.newObject("PartDesign::Fillet" if kind == "fillet" else "PartDesign::Chamfer", f["name"])
             fl.Label = f["name"]
-            edges = fc_common.resolve_edges(tip.Shape, f["select"])  # QUERY -> live EdgeN
+            edges = fc_common.resolve_edges(tip.Shape, f["select"], f.get("picks"))  # QUERY -> live EdgeN
             if not edges:
-                raise ValueError(f"fillet '{f['name']}' selected no edges")
+                raise ValueError(f"{kind} '{f['name']}' selected no edges")
             fl.Base = (tip, edges)
-            fl.Radius = f["radius"]
+            if kind == "fillet":
+                fl.Radius = f["radius"]
+            else:
+                fl.Size = f["distance"]
             tip = fl
         elif kind == "revolve":
             rev = body.newObject("PartDesign::Revolution", f["name"])

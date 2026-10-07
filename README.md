@@ -110,6 +110,17 @@ json.dump(spec, open("bracket.ir.json", "w"))            # then: python3 gen.py 
 - `polar_pocket(name, radius, length, mount_r, z, count, phase)` — a ring of tangent bores.
 - `fillet(name, radius, select={"circles": "top_outer"})` — edges chosen by **query**, re-resolved to
   live `EdgeN` every build (never a stored kernel id — the topological-naming sidestep).
+- `chamfer(name, distance, select)` — an equal-distance edge break, with the same queries as fillet.
+- Edge queries come in two forms: `{"circles": "top_outer" | "top_all"}` (circular edges on top of
+  the part) and `{"edges_of": feature, "side": "top" | "bottom"}` (a pad's rim, a pocket's mouth or
+  floor). `ir.lower()` turns the second form into one 3D point per edge, computed from the IR
+  alone; every backend then breaks the live edge through each point, so they pick the same edges.
+- `sketch(..., ngons=[(cx, cy, across_flats, sides, rotation)])` — a regular polygon kept as its
+  parameters, so a hex socket stays a hexagon when resized. Backends receive it as a poly, so the
+  CAD sketch holds six lines and an edit made there does not read back as a new across-flats size.
+
+Chamfers, `edges_of` and ngons build to the same volume in build123d, FreeCAD and Onshape. The
+Fusion and SolidWorks scripts emit them too, untested like the rest of those two backends.
 - `part(name, *features)` → the spec. `update_from_freecad(spec, params)` flows read-back edits in.
 
 ## build123d backend
@@ -251,6 +262,48 @@ then `b3d_emit` regenerates an equivalent solid to confirm parity. Or export it 
 `step_recognize` (above) — it verifies whether the inferred tree actually reproduces the part.
 Geometry that's a mesh boolean (no clean sketch/pad) can't be a feature tree — export those as
 STEP/STL and import as a single solid, and say so.
+
+## Image → IR (a rough tree from one picture) — prototype
+
+[`image_recognize.py`](image_recognize.py) starts from a picture instead of a STEP file. A picture
+has no scale and no far side, so the result is never `VERIFIED`; its status is `ROUGH`.
+
+```bash
+python3 image_recognize.py part.png --fit --size 60 --emit out.json --overlay check.png
+python3 image_recognize.py part.png --spec guess.json --fit --size 60     # no model call
+```
+
+1. **Propose.** A vision model (Claude, via the `anthropic` SDK and your API credentials) writes
+   the part as IR features. The prompt is built from `ir.py`'s docstrings. `--spec` skips this
+   step and takes a tree written by anyone, including an agent that is already looking at the image.
+2. **Build.** `ir.validate` and the build123d reference; errors go back to the model.
+3. **Pose.** Search the orthographic camera whose silhouette of the built solid best overlaps the
+   part's silhouette in the image.
+4. **Fit** (`--fit`). Adjust what an outline can see (pad lengths, the size of padded sketches) to
+   raise that overlap. Sketches inside the outline, such as a bolt circle, follow the outline that
+   contains them.
+5. **Refine** (`--refine N`). Show the model its render beside the image and ask again.
+
+With `--mesh scan.stl` (a scan of the same part) the tree takes its size from the mesh and the
+result adds the volumetric overlap with it. [`mesh_compare.py`](mesh_compare.py) does this on its
+own, and measures a scan directly: the stepped outline, each hole (round, or a regular polygon
+with its across-flats size) and how far each rim is broken. It assumes the part's axis is the
+mesh's Z axis.
+
+```bash
+python3 mesh_compare.py scan.stl --spec out.json --scale
+python3 mesh_compare.py scan.stl --tree tree.json      # a tree straight from the measurements
+```
+
+`--tree` handles one family: round steps stacked along Z with through holes. Each recognised shape
+gets one size, so a hole whose flats agree within 0.3 mm becomes a single regular `ngon`, and
+equally spaced holes at one radius become one bolt circle. Sizes within 0.3 mm of a half
+millimetre are rounded to it.
+
+It reports the **silhouette overlap** and an **interior match** (edge correlation inside the
+outline, used to pick the spin of a round part). The overlap checks outline and proportions from
+one viewpoint. Holes and pockets inside the outline are the proposal's guess, the back of the part
+is unseen, and absolute size is whatever `--size` says. The image needs a plain background.
 
 ## Ingesting cadgen / text-to-cad assemblies — the editable round-trip for agent-generated CAD
 

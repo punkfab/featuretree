@@ -24,7 +24,12 @@ def emit(spec, out_fcstd):
     out.parent.mkdir(parents=True, exist_ok=True)
     ir_json = out.with_suffix(".ir.json")
     ir_json.write_text(json.dumps(spec, indent=2))
-    proc = run_in_freecad(str(FC_BUILD), {"FC_IR": ir_json, "FC_OUT": out, "FC_LIBDIR": HERE})
+    lowered = out.with_suffix(".lowered.json")       # what FreeCAD builds: ngons and edge queries resolved
+    lowered.write_text(json.dumps(IR.lower(spec)))
+    try:
+        proc = run_in_freecad(str(FC_BUILD), {"FC_IR": lowered, "FC_OUT": out, "FC_LIBDIR": HERE})
+    finally:
+        lowered.unlink(missing_ok=True)
     line = next((ln for ln in proc.stdout.splitlines() if ln.startswith("RESULT:")), None)
     if line is None:
         sys.stderr.write((proc.stdout or "")[-1500:] + (proc.stderr or "")[-1500:])

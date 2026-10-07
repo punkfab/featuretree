@@ -27,6 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent / "targets"))
 import _geom as G  # noqa: E402
+import ir as IR  # noqa: E402
 import onshape_client as oc  # noqa: E402
 
 M = 0.001                                     # IR mm -> Onshape metres
@@ -283,7 +284,29 @@ class Emitter:
             d = (0, 0, -1) if s["z0"] >= self.top_z() - 1e-6 else (0, 0, 1)
             self.extrude(f["name"], f["sketch"], "REMOVE", depth=f["length"], world_dir=d, taper=f.get("taper", 0.0))
 
+    def edge_query(self, f):
+        """The FeatureScript query for a fillet's / chamfer's edges."""
+        if f.get("picks") is not None:      # {"edges_of": ...}: a point on each edge, from ir.lower()
+            if not f["picks"]:
+                raise RuntimeError(f"{f['kind']} '{f['name']}' selected no edges")
+            qs = [f"qContainsPoint({EDGES}, {_vec(tuple(c for c in p))})" for p in f["picks"]]
+            return qs[0] if len(qs) == 1 else "qUnion([" + ", ".join(qs) + "])"
+        return self.top_circles_query(f)
+
     def f_fillet(self, f):
+        self.ids[f["name"]] = self.add({"btType": "BTMFeature-134", "featureType": "fillet", "name": f["name"],
+                                        "parameters": [_qlist("entities", self.edge_query(f)),
+                                                       _qty("radius", f"{f['radius']!r} mm"),
+                                                       _bool("tangentPropagation", False)]})
+
+    def f_chamfer(self, f):
+        self.ids[f["name"]] = self.add({"btType": "BTMFeature-134", "featureType": "chamfer", "name": f["name"],
+                                        "parameters": [_qlist("entities", self.edge_query(f)),
+                                                       _enum("chamferType", "ChamferType", "EQUAL_OFFSETS"),
+                                                       _qty("width", f"{f['distance']!r} mm"),
+                                                       _bool("tangentPropagation", False)]})
+
+    def top_circles_query(self, f):
         # The IR's rule (as b3d_emit / fc_common): circular edges whose centre is at the top of the
         # part; "top_outer" = the largest. Resolved here, stored as point-containment queries.
         v = self.fs(f"var zt = evBox3d(context, {{\"topology\": {SOLIDS}}}).maxCorner[2];\n"
@@ -296,12 +319,9 @@ class Emitter:
         if f["select"].get("circles") == "top_outer":
             cands = cands[:1]
         if not cands:
-            raise RuntimeError(f"fillet '{f['name']}' selected no edges")
+            raise RuntimeError(f"{f['kind']} '{f['name']}' selected no edges")
         qs = [f"qContainsPoint({CIRCLE_EDGES}, {_vec((c[1] / M, c[2] / M, c[3] / M))})" for c in cands]
-        q = qs[0] if len(qs) == 1 else "qUnion([" + ", ".join(qs) + "])"
-        self.ids[f["name"]] = self.add({"btType": "BTMFeature-134", "featureType": "fillet", "name": f["name"],
-                                        "parameters": [_qlist("entities", q), _qty("radius", f"{f['radius']!r} mm"),
-                                                       _bool("tangentPropagation", False)]})
+        return qs[0] if len(qs) == 1 else "qUnion([" + ", ".join(qs) + "])"
 
     def f_revolve(self, f):
         s = self.sketches[f["sketch"]]
@@ -341,7 +361,7 @@ class Emitter:
         raise NotImplementedError(f"'{f['name']}': polar_pocket is not in the Onshape backend yet")
 
     def build(self, spec):
-        for f in spec["features"]:
+        for f in IR.lower(spec)["features"]:
             row = {"name": f["name"], "kind": f["kind"]}
             try:
                 getattr(self, "f_" + f["kind"])(f)
@@ -374,7 +394,7 @@ def read_params(did, wid, eid, spec):
     feats = oc.request("GET", f"/api/v6/partstudios/d/{did}/w/{wid}/e/{eid}/features")["features"]
     names = {f["name"]: f for f in spec["features"]}
     keys = {"pad": ("depth", "length"), "pocket": ("depth", "length"), "prism_cut": ("depth", "depth"),
-            "fillet": ("radius", "radius"), "revolve": ("angle", "angle")}
+            "fillet": ("radius", "radius"), "chamfer": ("width", "distance"), "revolve": ("angle", "angle")}
     out = {}
     for ft in feats:
         f = names.get(ft.get("name"))

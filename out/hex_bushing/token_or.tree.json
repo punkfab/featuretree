@@ -1,0 +1,114 @@
+{
+ "name": "token_or",
+ "features": [
+  {
+   "kind": "sketch",
+   "name": "step1_outline",
+   "plane": "XY",
+   "on": null,
+   "circles": [
+    [
+     0,
+     0,
+     49.75
+    ]
+   ],
+   "rects": [],
+   "polys": []
+  },
+  {
+   "kind": "pad",
+   "name": "step1",
+   "sketch": "step1_outline",
+   "length": 30.0,
+   "symmetric": false
+  },
+  {
+   "kind": "sketch",
+   "name": "step2_outline",
+   "plane": "XY",
+   "on": {
+    "face_of": "step1",
+    "side": "top"
+   },
+   "circles": [
+    [
+     0,
+     0,
+     35.0
+    ]
+   ],
+   "rects": [],
+   "polys": []
+  },
+  {
+   "kind": "pad",
+   "name": "step2",
+   "sketch": "step2_outline",
+   "length": 90.0,
+   "symmetric": false
+  },
+  {
+   "kind": "sketch",
+   "name": "bolt_circle",
+   "plane": "XY",
+   "on": null,
+   "circles": [
+    [
+     -21.05,
+     -36.921,
+     5.0
+    ],
+    [
+     36.921,
+     -21.05,
+     5.0
+    ],
+    [
+     21.05,
+     36.921,
+     5.0
+    ],
+    [
+     -36.921,
+     21.05,
+     5.0
+    ]
+   ],
+   "rects": [],
+   "polys": []
+  },
+  {
+   "kind": "pocket",
+   "name": "bolt_holes",
+   "sketch": "bolt_circle",
+   "through": true,
+   "length": null
+  },
+  {
+   "kind": "sketch",
+   "name": "bore_profile",
+   "plane": "XY",
+   "on": null,
+   "circles": [],
+   "rects": [],
+   "polys": [],
+   "ngons": [
+    [
+     0.0,
+     0.0,
+     40.0,
+     6,
+     0.5
+    ]
+   ]
+  },
+  {
+   "kind": "pocket",
+   "name": "bore",
+   "sketch": "bore_profile",
+   "through": true,
+   "length": null
+  }
+ ]
+}

@@ -242,7 +242,26 @@ class Builder:
             self.extrude(f["name"], self.profiles(f["sketch"]), s["sketch"], cut, world_dir=d,
                          length=f["length"], taper=f.get("taper", 0.0))
 
-    def f_fillet(self, f):
+    def break_edges(self, f):
+        """The live edges a fillet / chamfer means, as an ObjectCollection."""
+        edges = adsk.core.ObjectCollection.create()
+        if f.get("picks") is not None:      # {"edges_of": ...}: a point on each edge, from ir.lower()
+            for p in f["picks"]:
+                pt = adsk.core.Point3D.create(p[0] * CM, p[1] * CM, p[2] * CM)
+                best = None
+                for b in self.root.bRepBodies:
+                    for e in b.edges:
+                        ok, near = e.evaluator.getParameterAtPoint(pt)
+                        if not ok:
+                            continue
+                        ok, on = e.evaluator.getPointAtParameter(near)
+                        d = on.distanceTo(pt) if ok else 1e9
+                        if best is None or d < best[0]:
+                            best = (d, e)
+                if best is None or best[0] > 1e-4:
+                    raise RuntimeError("no edge at %r" % (tuple(p),))
+                edges.add(best[1])
+            return edges
         top = self.zrange()[1]
         cands = []
         for b in self.root.bRepBodies:
@@ -253,11 +272,14 @@ class Builder:
                     cands.append((g.radius, e))
         if f["select"].get("circles") == "top_outer":
             cands = sorted(cands, key=lambda t: -t[0])[:1]
-        if not cands:
-            raise RuntimeError("fillet selected no edges")
-        edges = adsk.core.ObjectCollection.create()
         for _, e in cands:
             edges.add(e)
+        return edges
+
+    def f_fillet(self, f):
+        edges = self.break_edges(f)
+        if edges.count == 0:
+            raise RuntimeError("fillet selected no edges")
         fl = self.root.features.filletFeatures
         inp = fl.createInput()
         r = self.uparam(f["name"], "radius", f["radius"])
@@ -266,6 +288,20 @@ class Builder:
         except Exception:
             inp.addConstantRadiusEdgeSet(edges, r, True)
         fl.add(inp).name = f["name"]
+
+    def f_chamfer(self, f):
+        edges = self.break_edges(f)
+        if edges.count == 0:
+            raise RuntimeError("chamfer selected no edges")
+        ch = self.root.features.chamferFeatures
+        d = self.uparam(f["name"], "distance", f["distance"])
+        try:
+            inp = ch.createInput2()
+            inp.chamferEdgeSets.addEqualDistanceChamferEdgeSet(edges, d, False)
+        except Exception:                   # older API
+            inp = ch.createInput(edges, False)
+            inp.setToEqualDistance(d)
+        ch.add(inp).name = f["name"]
 
     def f_revolve(self, f):
         rv = self.root.features.revolveFeatures

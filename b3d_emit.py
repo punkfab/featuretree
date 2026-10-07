@@ -24,10 +24,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "targets"))
 import _geom as _G  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import ir as IR  # noqa: E402
 
 from build123d import (Align, Axis, BuildLine, BuildSketch, Circle, Cylinder, GeomType, Line,
-                       Plane, Polygon, Pos, Rectangle, Rot, SagittaArc, export_stl, extrude,
-                       fillet, make_face, revolve)
+                       Plane, Polygon, Pos, Rectangle, Rot, SagittaArc, Vertex, chamfer, export_stl,
+                       extrude, fillet, make_face, revolve)
 
 _BIG = 1.0e4  # a through-cut overshoot (mm), clipped by the actual solid
 
@@ -128,9 +130,20 @@ def _face_z(part, side):
     return bb.max.Z if side == "top" else bb.min.Z
 
 
-def _resolve_fillet_edges(part, select):
+def _resolve_fillet_edges(part, select, picks=None):
     """Mirror fc_common.resolve_edges: circular edges on the top face; 'top_outer' = the
     largest-radius one. Resolved against the live solid, so it survives edits/rebuilds."""
+    if picks is not None:                 # {"edges_of": ...}: ir.lower() worked out a point on each
+        edges = part.edges()
+        out = []
+        for p in picks:
+            v = Vertex(*p)
+            d, e = min(((e.distance_to(v), i) for i, e in enumerate(edges)), key=lambda t: t[0])
+            if d > 1e-3:
+                raise ValueError(f"no edge at {tuple(round(c, 3) for c in p)} (nearest is {d:.3f} mm away)")
+            if all(edges[e] is not o for o in out):
+                out.append(edges[e])
+        return out
     want = select.get("circles")
     top_z = part.bounding_box().max.Z
     cands = [e for e in part.edges().filter_by(GeomType.CIRCLE)
@@ -178,6 +191,7 @@ def _cut(a, b):
 def emit(spec):
     """Build the IR `spec` into a build123d Solid. Returns (part, result_dict) where the
     result mirrors fc_common.result (tree / volume / editable params) for cross-backend parity."""
+    spec = IR.lower(spec)   # ngons -> polys; edge queries -> pick points
     part = None
     sketches = {}          # name -> (faces, z0)  consumed by the next pad/pocket/revolve
     planes = {}            # name -> "XY" | "XZ"
@@ -248,12 +262,19 @@ def emit(spec):
                     cutter = s if cutter is None else cutter + s
                 params[f["name"]] = {"length": round(float(depth), 4), "type": "Length"}
             part = _cut(part, cutter)
-        elif kind == "fillet":
-            edges = _resolve_fillet_edges(part, f["select"])
+        elif kind in ("fillet", "chamfer"):
+            try:
+                edges = _resolve_fillet_edges(part, f["select"], f.get("picks"))
+            except ValueError as e:
+                raise ValueError(f"{kind} '{f['name']}': {e}") from None
             if not edges:
-                raise ValueError(f"fillet '{f['name']}' selected no edges")
-            part = fillet(edges, f["radius"])
-            params[f["name"]] = {"radius": round(float(f["radius"]), 4)}
+                raise ValueError(f"{kind} '{f['name']}' selected no edges")
+            if kind == "fillet":
+                part = fillet(edges, f["radius"])
+                params[f["name"]] = {"radius": round(float(f["radius"]), 4)}
+            else:
+                part = chamfer(edges, f["distance"])
+                params[f["name"]] = {"distance": round(float(f["distance"]), 4)}
         elif kind == "revolve":
             faces, _ = sketches[f["sketch"]]
             if planes.get(f["sketch"]) != "XZ":

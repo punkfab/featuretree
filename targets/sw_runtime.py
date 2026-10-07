@@ -231,7 +231,14 @@ class Builder:
             d = (0, 0, -1) if self.sketches[f["sketch"]]["z0"] >= self.zrange()[1] - 1e-6 else (0, 0, 1)
             self.cut(f["name"], f["sketch"], d, f["length"], f.get("taper", 0.0))
 
-    def f_fillet(self, f):
+    def select_break_edges(self, f):
+        """Select the live edges a fillet / chamfer means; return how many."""
+        self.doc.ClearSelection2(True)
+        if f.get("picks") is not None:      # {"edges_of": ...}: a point on each edge, from ir.lower()
+            for i, p in enumerate(f["picks"]):
+                if not self.ext.SelectByID2("", "EDGE", p[0] * M, p[1] * M, p[2] * M, i > 0, 1, NULL, 0):
+                    raise RuntimeError("no edge at %r" % (tuple(p),))
+            return len(f["picks"])
         top = self.zrange()[1] * M
         cands = []
         for b in self.bodies():
@@ -244,17 +251,28 @@ class Builder:
                     cands.append((cp[6], e, cu))
         if f["select"].get("circles") == "top_outer":
             cands = sorted(cands, key=lambda t: -t[0])[:1]
-        if not cands:
-            raise RuntimeError("fillet selected no edges")
-        self.doc.ClearSelection2(True)
         for i, (_, e, cu) in enumerate(cands):
             prm = e.GetCurveParams2()           # (start xyz, end xyz, umin, umax, ...)
             p = cu.Evaluate2((prm[6] + prm[7]) / 2.0, 0)
             self.ext.SelectByID2("", "EDGE", p[0], p[1], p[2], i > 0, 1, NULL, 0)
+        return len(cands)
+
+    def f_fillet(self, f):
+        if not self.select_break_edges(f):
+            raise RuntimeError("fillet selected no edges")
         E = pythoncom.Empty
         feat = self.fm.FeatureFillet3(195, f["radius"] * M, 0.0, 0, 0, 0, 0, E, E, E, E, E, E, E)
         if feat is None:
             raise RuntimeError("FeatureFillet3 returned nothing")
+        feat.Name = f["name"]
+
+    def f_chamfer(self, f):
+        if not self.select_break_edges(f):
+            raise RuntimeError("chamfer selected no edges")
+        # options 0 (no tangent propagation), swChamferEqualDistance = 3
+        feat = self.fm.InsertFeatureChamfer(0, 3, f["distance"] * M, math.radians(45.0), 0.0, 0.0, 0.0, 0.0)
+        if feat is None:
+            raise RuntimeError("InsertFeatureChamfer returned nothing")
         feat.Name = f["name"]
 
     def f_revolve(self, f):
@@ -298,7 +316,7 @@ class Builder:
 def dump(app, here):
     """Read the active part's driving dimensions back, keyed by IR feature name."""
     doc = app.ActiveDoc
-    keys = {"pad": "length", "pocket": "length", "fillet": "radius", "prism_cut": "depth",
+    keys = {"pad": "length", "pocket": "length", "fillet": "radius", "chamfer": "distance", "prism_cut": "depth",
             "revolve": "angle"}
     params = {}
     for f in SPEC["features"]:
