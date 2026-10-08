@@ -238,7 +238,10 @@ def _write_gui_document(out_path, names, visible):
                    '<Property name="Visibility" type="App::PropertyBool" status="1">'
                    '<Bool value="%s"/></Property></Properties></ViewProvider>' % (name, val))
     gui = ("<?xml version='1.0' encoding='utf-8'?>\n<Document SchemaVersion=\"1\">\n"
-           '<ViewProviderData Count="%d">\n%s\n</ViewProviderData>\n</Document>\n'
+           '<ViewProviderData Count="%d">\n%s\n</ViewProviderData>\n'
+           # the GUI reads a Camera element next; without one it logs "Reading failed from embedded
+           # file: GuiDocument.xml" (after the visibilities above have already been applied)
+           '<Camera settings=""/>\n</Document>\n'
            % (len(vps), "\n".join(vps)))
     with zipfile.ZipFile(out_path, "a", zipfile.ZIP_DEFLATED) as z:
         z.writestr("GuiDocument.xml", gui)
