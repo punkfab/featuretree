@@ -164,7 +164,7 @@ actually moves between people and programs; this makes them *parametric* again o
 import step_recognize
 spec, report = step_recognize.recognize("part.step")    # spec is a featuretree IR
 print(report["verified"], report["dvol_pct"], report.get("recovered"))
-# True 0.14 {'pockets': 14, 'holes': 10, 'residual_lumps': 2}   # NIST CTC-01
+# True 0.14 {'pockets': 14, 'holes': 10, 'residual_lumps': 1}   # NIST CTC-01
 ```
 
 ```bash

@@ -40,7 +40,7 @@ Let the real output scroll — it *is* the demo:
   0 through hole(s), 14 blind
   volume: STEP 14642823.6  vs re-emitted IR 14627973.5  (Δ0.1%, bbox Δ0.0mm)
   ! 20 face(s) not captured by a single extrude (chamfers / cross-holes / freeform)
-  ! multi-axis recovery: +11 pocket(s), +10 cross-hole(s); 2 residual lump(s) left uncut
+  ! multi-axis recovery: +11 pocket(s), +10 cross-hole(s); 1 residual lump(s) left uncut
   => VERIFIED
 ```
 
@@ -55,7 +55,7 @@ pocket0, pocket1 → cut2 … cut20`. Expand the tree, double-click a pocket, ch
 its depth, watch the solid rebuild. *Caption: "51 features. Editable."*
 
 **5. The honest tail (5s, optional but recommended).** Scroll back to the
-`2 residual lump(s) left uncut` warning and say what it is: the part's 8 chamfers,
+`1 residual lump(s) left uncut` warning and say what it is: the part's 8 chamfers,
 which the vocabulary can't express. *Caption: "and it tells you what it couldn't
 do."*
 

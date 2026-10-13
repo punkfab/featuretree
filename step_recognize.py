@@ -144,13 +144,13 @@ def _align_to_z(solid, a):
         return solid                              # already along Z
     axis_dir = a.cross(z)
     angle = math.degrees(math.acos(max(-1.0, min(1.0, a.dot(z)))))
-    return solid.rotate(Axis((0, 0, 0), axis_dir.to_tuple()), angle)
+    return solid.rotate(Axis((0, 0, 0), tuple(axis_dir)), angle)
 
 
 def _canon_axis(a):
     """Flip an axis so its dominant component is positive — a stable canonical direction (a prism is
     the same whether swept +axis or -axis), which keeps prism_cut off the -Z degenerate."""
-    t = a.to_tuple()
+    t = tuple(a)
     i = max(range(3), key=lambda k: abs(t[k]))
     return a if t[i] >= 0 else Vector(-a.X, -a.Y, -a.Z)
 
@@ -191,6 +191,14 @@ def _face_polys(face):
     return polys
 
 
+def _floor4(v):
+    return math.floor(v * 1e4 + 1e-6) / 1e4
+
+
+def _ceil4(v):
+    return math.ceil(v * 1e4 - 1e-6) / 1e4
+
+
 def _component_prism(comp, name):
     """A residual component -> a prism_cut IR feature: its recognized 2D profile extruded along its
     OWN dominant axis over its own extent, placed at its true location. None if it isn't a single
@@ -211,10 +219,14 @@ def _component_prism(comp, name):
         if polys is None:
             return None
         b3d_emit._polys_region(polys, Plane.XY)     # validate: raises on a degenerate profile
-        origin = _unalign_vec(Vector(0, 0, lb.min.Z), a)
+        # Round the cut OUTWARD at both ends. The lump ends on the part's own surface, and a depth
+        # rounded to the nearest 0.1 um can stop short of it: FTC-07's four blind holes were cut
+        # 0.03 um shy of the top face, which left a skin over each and four sealed voids.
+        z0, z1 = _floor4(lb.min.Z), _ceil4(lb.max.Z)
+        origin = _unalign_vec(Vector(0, 0, z0), a)
         xdir = _unalign_vec(Vector(1, 0, 0), a)
-        return IR.prism_cut(name, origin=origin.to_tuple(), normal=a.to_tuple(),
-                            xdir=xdir.to_tuple(), depth=round(lb.size.Z, 4), polys=polys)
+        return IR.prism_cut(name, origin=tuple(origin), normal=tuple(a),
+                            xdir=tuple(xdir), depth=round(z1 - z0, 4), polys=polys)
     except Exception:
         return None
 
@@ -230,13 +242,16 @@ def _robust_cut(a, b):
     resolves it. Returning None lets the caller stop carving and KEEP what it has, instead of
     losing every feature to one failed Boolean."""
     try:
-        return a - b
+        r = a - b
+        if _volume(r) < a.volume - RECOVER_EPS:
+            return r
+        # else it took nothing off: the kernel handed `a` back in pieces (CTC-01, late in carving)
     except Exception:
         pass
     try:
         from build123d import Shape
         from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
-        from OCP.TopTools import TopTools_ListOfShape
+        from b3d_emit import TopTools_ListOfShape
         op = BRepAlgoAPI_Cut()
         args, tools = TopTools_ListOfShape(), TopTools_ListOfShape()
         args.Append(a.wrapped)
@@ -288,7 +303,7 @@ def _recover_multiaxis(spec, orig, axis, name):
             continue
         origin_z, depth = (zc, top_z0 - zc) if nrm.Z > 0 else (base_z0, zc - base_z0)
         feats.append(IR.prism_cut(f"pocket{counts['pockets']}", origin=(0, 0, origin_z),
-                                  normal=(0, 0, 1), xdir=(1, 0, 0), depth=round(depth, 4), polys=polys))
+                                  normal=(0, 0, 1), xdir=(1, 0, 0), depth=_ceil4(depth), polys=polys))
         counts["pockets"] += 1
 
     # (B) residual carve
@@ -330,10 +345,15 @@ def _recover_multiaxis(spec, orig, axis, name):
 # surface types (cone/sphere/torus/bspline), unlike a per-face axis check. Then the MERIDIAN (the
 # 2D section in a half-plane through the axis) is the profile the IR revolves.
 
+def _volume(shape):
+    """Volume of a Boolean result: newer build123d returns a list of solids (empty for nothing)."""
+    return sum(s.volume for s in shape) if isinstance(shape, list) else shape.volume
+
+
 def _is_revolve_about(solid, a, delta=17.0):
     try:
-        rot = solid.rotate(Axis((0, 0, 0), a.normalized().to_tuple()), delta)
-        slack = (solid - rot).volume + (rot - solid).volume
+        rot = solid.rotate(Axis((0, 0, 0), tuple(a.normalized())), delta)
+        slack = _volume(solid - rot) + _volume(rot - solid)
     except Exception:
         return False
     return slack < 1e-3 * solid.volume
@@ -413,6 +433,14 @@ def _approx_segments(e, tol, depth=0, t0=0.0, t1=1.0):
     return _approx_segments(e, tol, depth + 1, t0, tm) + _approx_segments(e, tol, depth + 1, tm, t1)
 
 
+def _forward(e):
+    """The edge, forward-oriented: `e @ t` then runs along the curve whatever the build123d version
+    (newer ones follow the edge's orientation, and the callers here flip reversed edges themselves)."""
+    from build123d.topology import downcast
+    from OCP.TopAbs import TopAbs_FORWARD
+    return type(e)(downcast(e.wrapped.Oriented(TopAbs_FORWARD)))
+
+
 def _ordered_edges(wire):
     """A wire's edges IN ORDER, each with a flag for whether it is traversed reversed. OCCT's
     BRepTools_WireExplorer knows the order; reconstructing it by matching rounded endpoints both
@@ -424,7 +452,7 @@ def _ordered_edges(wire):
     ex = BRepTools_WireExplorer(wire.wrapped)
     while ex.More():
         e = ex.Current()
-        out.append((Edge(e), e.Orientation() == TopAbs_REVERSED))
+        out.append((_forward(Edge(e)), e.Orientation() == TopAbs_REVERSED))
         ex.Next()
     return out
 
@@ -710,7 +738,7 @@ def _recognize_shell(orig, name, axis):
         raise ValueError("shell cavity did not close into one loop")
     draft_cav = math.degrees(math.atan(cav_slope)) if cav_drafted else 0.0
     pocket_taper = round(draft_cav if top_open else -draft_cav, 4)
-    warnings = [f"open shell along {tuple(round(c, 3) for c in axis.to_tuple())}: "
+    warnings = [f"open shell along {tuple(round(c, 3) for c in axis)}: "
                 f"{n_ring}/{SHELL_SLICES} ring slices, cavity {depth:.2f} deep from the "
                 f"{'top' if top_open else 'bottom'} face; outline layers: " + ", ".join(notes)
                 + (f"; draft {(drafts[0] if drafts else 0.0):.2f} deg outside, {draft_cav:.2f} deg inside"
@@ -772,14 +800,14 @@ def _section_regions(solid, z):
     from OCP.BRepClass import BRepClass_FaceClassifier
     from OCP.TopAbs import TopAbs_EDGE, TopAbs_IN
     from OCP.TopExp import TopExp_Explorer
-    from OCP.TopoDS import TopoDS
+    from build123d.topology import downcast
     from OCP.gp import gp_Dir, gp_Pln, gp_Pnt
 
     sec = BRepAlgoAPI_Section(solid.wrapped, gp_Pln(gp_Pnt(0, 0, z), gp_Dir(0, 0, 1)), True)
     edges = []
     ex = TopExp_Explorer(sec.Shape(), TopAbs_EDGE)
     while ex.More():
-        edges.append(Edge(TopoDS.Edge_s(ex.Current())))
+        edges.append(Edge(downcast(ex.Current())))
         ex.Next()
     if not edges:
         return []
@@ -997,6 +1025,11 @@ def _recognize_layers(orig, name, axis):
     # "the current top face", so padding a layer's regions one at a time put the second region ON
     # TOP of the first (FTC-07's four feet sent its floor slab 2.5 mm up and out of the part).
     feats, notes, skipped = [], [], []
+    # Where each layer ends up in the BUILT stack: pads are stacked by their rounded lengths, so
+    # that is where a hole has to start and stop. Placing holes at the measured slice heights left
+    # them up to 0.05 um off the pads: FTC-06's counterbores met their holes across a skin of
+    # that thickness, sealing two voids.
+    built, ztop = {}, 0.0
     # Curves that are not lines or circular arcs (ellipses, conic sections, splines) can only be
     # APPROXIMATED by the sketch's arcs. That may still verify within tolerance, but the tree then
     # holds arcs where the designer had, say, an ellipse -- so it is disclosed, never silent.
@@ -1006,6 +1039,7 @@ def _recognize_layers(orig, name, axis):
         zb, ze = bounds_by_layer[li]
         Lz = ze - zb
         rep = L[len(L) // 2]
+        built[li] = (ztop, ztop)
         if Lz < EPS:
             continue
         if not slices[rep]:
@@ -1055,6 +1089,8 @@ def _recognize_layers(orig, name, axis):
         feats.append(IR.sketch(sk, "XY", polys=polys) if first else
                      IR.sketch(sk, polys=polys, on={"face_of": "body", "side": "top"}))
         feats.append(IR.pad("body" if first else f"L{li}", sk, length=round(Lz, 4), taper=taper))
+        built[li] = (ztop, round(ztop + round(Lz, 4), 4))
+        ztop = built[li][1]
         notes.append(f"{Lz:.1f} mm: {len(slices[rep])} region(s), {sum(len(r[1]) for r in slices[rep])} hole(s)")
 
     # 5b. HOLES as vertical RUNS: a hole that continues through several layers (a bolt hole through
@@ -1133,7 +1169,11 @@ def _recognize_layers(orig, name, axis):
             if poly is None:
                 continue
             z0, nz, taper = zb, 1.0, 0.0
-        # pads are built from z = 0 while slice heights are in the aligned frame: shift by base_z
+        # pads are built from z = 0 while slice heights are in the aligned frame: the cut goes
+        # where the run's layers were BUILT (see `built`), not where they were measured
+        bz0, bz1 = built[r["layers"][0]][0], built[r["layers"][-1]][1]
+        if bz1 - bz0 < EPS:
+            continue                            # every layer of the run was dropped
         pieces = _split_pinched(poly)
         # an ISLAND standing in the hole over its whole run (the hub inside a ring groove) is a
         # nested loop of the cut, or the cut would remove the island's pad again
@@ -1147,13 +1187,13 @@ def _recognize_layers(orig, name, axis):
                         _nearest([g[0] for g in slices[k]], kx, ky, khw, 0.3) is not None for k in reps):
                     islands += _split_pinched(_approx_poly(ow))
         for piece in pieces:                    # pieces touch, so each is its own cut
-            feats.append(IR.prism_cut(f"hole{n_cuts}", origin=(0.0, 0.0, z0 - base_z), normal=(0.0, 0.0, nz),
-                                      xdir=(1.0, 0.0, 0.0), depth=round(ze - zb, 4), polys=[piece] + islands,
+            feats.append(IR.prism_cut(f"hole{n_cuts}", origin=(0.0, 0.0, bz0), normal=(0.0, 0.0, nz),
+                                      xdir=(1.0, 0.0, 0.0), depth=round(bz1 - bz0, 4), polys=[piece] + islands,
                                       taper=taper))
             n_cuts += 1
     if not feats:
         raise ValueError("no layers")
-    warnings = [f"layered along {tuple(round(c, 3) for c in axis.to_tuple())}: {len(layers)} layer(s), "
+    warnings = [f"layered along {tuple(round(c, 3) for c in axis)}: {len(layers)} layer(s), "
                 f"{n_cuts} hole run(s) -- " + "; ".join(notes)]
     if gaps:
         warnings.append("section would not close over " + ", ".join(
@@ -1239,7 +1279,7 @@ def _edge_bulge(e):
 def _ordered_poly(edges):
     """Chain line/arc edges by shared endpoints into an ordered loop of (x, y, bulge), where the
     bulge on each vertex describes the segment LEAVING it (0 = straight)."""
-    segs = [(_r2(e @ 0.0), _r2(e @ 1.0), _edge_bulge(e)) for e in edges]
+    segs = [(_r2(e @ 0.0), _r2(e @ 1.0), _edge_bulge(e)) for e in map(_forward, edges)]
     order = [(segs[0][0], segs[0][2])]            # (vertex, outgoing bulge)
     used, tail = {0}, segs[0][1]
     while len(used) < len(segs):
@@ -1300,7 +1340,7 @@ def input_frame(orig, report):
 
     def place(shape):
         s = Pos(0, 0, dz) * shape
-        return s.rotate(Axis((0, 0, 0), k.to_tuple()), -ang) if rotated else s
+        return s.rotate(Axis((0, 0, 0), tuple(k)), -ang) if rotated else s
 
     def _rot(v):                                         # Rodrigues, by -ang about k
         if not rotated:
@@ -1326,11 +1366,37 @@ def _report_for(spec, extras, name):
     return {"name": name, "features": len(spec["features"]), "method": extras.get("method"),
             "through_holes": extras.get("through_holes", 0),
             "blind_holes": extras.get("blind_holes", 0), "warnings": list(extras.get("warnings", [])),
-            "extrude_axis": tuple(round(c, 3) for c in ax.to_tuple()) if ax is not None else None,
+            "extrude_axis": tuple(round(c, 3) for c in ax) if ax is not None else None,
             "verified": None}
 
 
+def _main_solid(shape):
+    """(the largest solid of an imported shape, how many solids it has). A multi-body STEP used to
+    be reduced to its FIRST solid, silently: the tree described one body, was verified against
+    that body alone, and came back VERIFIED at 51% overlap with the file."""
+    solids = list(shape.solids()) if hasattr(shape, "solids") else []
+    if not solids:
+        return shape, 1
+    return max(solids, key=lambda x: x.volume), len(solids)
+
+
 def recognize(step_path, name=None, verify=True, recover=True):
+    """STEP file -> (IR spec, report). See _recognize. A file holding several solids is recognised
+    as its largest solid only, and can then never be VERIFIED: report["input_solids"] says how many
+    there were and report["reason"] says the rest were left out."""
+    spec, report = _recognize(step_path, name=name, verify=verify, recover=recover)
+    _, n = _main_solid(import_step(str(step_path)))
+    report["input_solids"] = n
+    if n > 1:
+        note = f"input has {n} solids; only the largest was recognised"
+        report["warnings"].append(note)
+        if report.get("verified"):
+            report["verified"] = False
+            report["reason"] = note
+    return spec, report
+
+
+def _recognize(step_path, name=None, verify=True, recover=True):
     """STEP file -> (IR spec, report). Recovers a feature tree by EXTRUDE (a 2D profile swept along an
     axis + holes) or REVOLVE. Several axes may look prismatic, so it gathers a candidate per axis and
     lets SELF-VERIFICATION pick the winner: first a candidate whose base re-emit VERIFIES on its own
@@ -1338,7 +1404,7 @@ def recognize(step_path, name=None, verify=True, recover=True):
     holes as prism_cuts) is run per axis and the first that verifies wins (report.recovered has the
     tally). If nothing verifies, the closest residual is returned (report.verified is False)."""
     orig = import_step(str(step_path))
-    orig = orig.solid() if hasattr(orig, "solid") else orig
+    orig, _ = _main_solid(orig)
     name = name or Path(step_path).stem
 
     # candidate decompositions: one extrude per prismatic axis (rank order) + a revolve if applicable.
@@ -1394,7 +1460,7 @@ def recognize(step_path, name=None, verify=True, recover=True):
             if extras.get("method") != "extrude" or extras.get("axis") is None:
                 continue
             try:
-                got = _isolated("_recover_file", (spec, str(step_path), extras["axis"].to_tuple(), name))
+                got = _isolated("_recover_file", (spec, str(step_path), tuple(extras["axis"]), name))
                 if got is None:
                     continue                      # carving crashed the kernel for this candidate
                 rspec, counts = got
@@ -1421,7 +1487,7 @@ def _extrude_along(orig, name, axis, n_bad):
     warnings = []
     solid = _align_to_z(orig, axis)
     if abs(axis.dot(Vector(0, 0, 1))) < 1 - ANG:
-        warnings.append(f"extrude axis {tuple(round(c, 3) for c in axis.to_tuple())} -> rotated onto Z")
+        warnings.append(f"extrude axis {tuple(round(c, 3) for c in axis)} -> rotated onto Z")
     if n_bad:
         warnings.append(f"{n_bad} face(s) not captured by a single extrude (chamfers / cross-holes / "
                         "freeform) — best-effort, expect PARTIAL")
@@ -1580,12 +1646,12 @@ def _candidate_file(fn, step_path, name, axis_xyz):
     """fn(orig, name, axis) in an isolated process; None if it does not apply. The axis goes back
     as a tuple: OCCT vectors do not pickle."""
     orig = import_step(str(step_path))
-    orig = orig.solid() if hasattr(orig, "solid") else orig
+    orig, _ = _main_solid(orig)
     try:
         spec, extras = fn(orig, name, Vector(*axis_xyz))
     except Exception:
         return None
-    return spec, {**extras, "axis": tuple(extras["axis"].to_tuple())}
+    return spec, {**extras, "axis": tuple(extras["axis"])}
 
 
 def _shell_file(step_path, name, axis_xyz):
@@ -1599,14 +1665,14 @@ def _layers_file(step_path, name, axis_xyz):
 def _verify_file(spec, step_path, report):
     """_verify in an isolated process: re-reads the input from its STEP file."""
     orig = import_step(str(step_path))
-    orig = orig.solid() if hasattr(orig, "solid") else orig
+    orig, _ = _main_solid(orig)
     return _verify(spec, orig, report)
 
 
 def _recover_file(spec, step_path, axis_xyz, name):
     """_recover_multiaxis in an isolated process: re-reads the input from its STEP file."""
     orig = import_step(str(step_path))
-    orig = orig.solid() if hasattr(orig, "solid") else orig
+    orig, _ = _main_solid(orig)
     return _recover_multiaxis(spec, orig, Vector(*axis_xyz), name)
 
 
@@ -1619,7 +1685,10 @@ def _verify(spec, solid, report=None):
     them at 95.0% and 93.7% overlap (CTC-03, FTC-07) -- false accepts. So a VERIFIED tree must also
     overlap the input by >= IOU_TOL, measured without Boolean operations (iou_check) through the
     recogniser's own exact transform (input_frame). It runs only on candidates that already pass
-    the cheap tests, so its cost is paid a handful of times per part."""
+    the cheap tests, so its cost is paid a handful of times per part.
+
+    Last, the rebuilt solid must be one closed body like its input (mesh_check): report["body"]
+    and report["body_problems"] carry what was found."""
     try:
         part, res = b3d_emit.emit(spec)
     except Exception as e:
@@ -1651,6 +1720,21 @@ def _verify(spec, solid, report=None):
             if ok:
                 out["verified"] = False
                 out["reason"] = f"two-sided shape test failed to run: {e}"
+    # A tree can pass all of the above and still not be one closed body: split into several
+    # solids, holding sealed voids, or tessellating with open edges (see mesh_check). Recorded on
+    # every near candidate so a PARTIAL says what is wrong with it; a VERIFIED one must be clean.
+    if dvol <= 0.05 * solid.volume:
+        try:
+            import mesh_check
+            out["body"] = mesh_check.check(part)
+            out["body_problems"] = mesh_check.problems(out["body"], mesh_check.check(solid))
+            if out["verified"] and out["body_problems"]:
+                out["verified"] = False
+                out["reason"] = "not one closed body: " + "; ".join(out["body_problems"])
+        except Exception as e:
+            if out["verified"]:
+                out["verified"] = False
+                out["reason"] = f"closed-body test failed to run: {e}"
     return out
 
 def _fixtures(tmp):
@@ -1766,6 +1850,8 @@ def main():
         print(f"  volume: STEP {report['vol_orig']}  vs re-emitted IR {report.get('vol_ir','?')}  "
               f"(Δ{report.get('dvol_pct','?')}%, bbox Δ{report.get('dsize_mm','?')}mm)")
     for w in report["warnings"]:
+        print(f"  ! {w}")
+    for w in report.get("body_problems", []):
         print(f"  ! {w}")
     print(f"  => {tag}" + ("" if v else " — fall back to importing the STEP as one solid"))
 

@@ -265,3 +265,18 @@ def test_emit_roundtrip_reproduces_volume(tmp_path):
     spec, _ = sr.recognize(path)
     reemit, res = b3d_emit.emit(spec)
     assert res["volume"] == pytest.approx(orig.volume, rel=1e-3)
+
+
+def test_multi_solid_input_is_never_verified(tmp_path):
+    """A file with two bodies is recognised as its largest body only. That used to come back
+    VERIFIED (the tree was checked against the first solid alone); it must say what it left out."""
+    from build123d import Compound, Pos, export_step
+    big = Box(40, 30, 10)
+    small = Pos(100, 0, 0) * Box(10, 10, 10)
+    path = str(tmp_path / "two.step")
+    export_step(Compound([small, big]), path)          # the small body first
+    spec, rep = sr.recognize(path)
+    assert rep["input_solids"] == 2
+    assert rep["verified"] is False and "2 solids" in rep["reason"]
+    part, res = __import__("b3d_emit").emit(spec)
+    assert res["volume"] == pytest.approx(big.volume, rel=1e-3)     # the LARGEST, not the first

@@ -30,6 +30,10 @@ import ir as IR  # noqa: E402
 from build123d import (Align, Axis, BuildLine, BuildSketch, Circle, Cylinder, GeomType, Line,
                        Plane, Polygon, Pos, Rectangle, Rot, SagittaArc, Vertex, chamfer, export_stl,
                        extrude, fillet, make_face, revolve)
+try:
+    from OCP.TopTools import TopTools_ListOfShape
+except ImportError:                                       # OCCT 8 bindings renamed the collections
+    from OCP.collections import List_TopoDS_Shape as TopTools_ListOfShape
 
 _BIG = 1.0e4  # a through-cut overshoot (mm), clipped by the actual solid
 
@@ -153,44 +157,101 @@ def _resolve_fillet_edges(part, select, picks=None):
     return cands
 
 
+# Booleans run with this tolerance (mm). Recovered trees stack layers whose outlines agree only
+# to the precision the sketch can state: an arc given by two endpoints and a bulge lands within
+# 0.1 um of the circle it was fitted to, not on it. Exact Booleans keep that difference as a face
+# 0.1 um wide, which no mesher triangulates, and the solid then tessellates with open edges (NIST
+# CTC-05: 180 of them). Faces closer than FUZZY are treated as the same face instead.
+FUZZY = 1e-4
+_TOLERANT = True       # set per build by emit(): tolerant Booleans first, exact ones as a whole-part retry
+
+
 def _bool_fuzzy(a, b, op_cls):
     from build123d import Shape
-    from OCP.TopTools import TopTools_ListOfShape
     op = op_cls()
     args, tools = TopTools_ListOfShape(), TopTools_ListOfShape()
     args.Append(a.wrapped)
     tools.Append(b.wrapped)
     op.SetArguments(args)
     op.SetTools(tools)
-    op.SetFuzzyValue(1e-4)
+    op.SetFuzzyValue(FUZZY)
     op.Build()
     if not op.IsDone() or op.Shape().IsNull():
         raise ValueError("Boolean failed, including with a fuzzy tolerance")
-    return Shape.cast(op.Shape())
+    out = Shape.cast(op.Shape())
+    solids = out.solids()
+    if not solids:
+        raise ValueError("Boolean left no solid")
+    out = solids[0] if len(solids) == 1 else out
+    try:                                        # merge the coplanar faces the operator leaves split
+        tidy = out.clean()
+        if tidy.solids() and abs(tidy.volume - out.volume) <= 1e-9 * abs(out.volume):
+            return tidy
+    except Exception:
+        pass
+    return out
 
 
 def _fuse(a, b):
-    """a + b, retried with a small fuzzy tolerance when OpenCASCADE returns a null shape — which
-    it does for solids with near-coincident faces, e.g. layers stacked exactly on each other."""
+    """a + b. Tolerant build: faces closer than FUZZY are one face, and a result that lost volume
+    is an error. Exact build: the plain operator, retried with the tolerance when OpenCASCADE
+    returns a null shape (which it does for layers stacked exactly on each other)."""
+    from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
+    if _TOLERANT:
+        out = _bool_fuzzy(a, b, BRepAlgoAPI_Fuse)
+        if out.volume < max(a.volume, b.volume) * (1 - 1e-9):
+            raise ValueError("fuse lost volume")
+        return out
     try:
         return a + b
     except Exception:
-        from OCP.BRepAlgoAPI import BRepAlgoAPI_Fuse
         return _bool_fuzzy(a, b, BRepAlgoAPI_Fuse)
 
 
 def _cut(a, b):
-    """a - b, with the same fuzzy retry as _fuse."""
+    """a - b, on the same terms as _fuse."""
+    from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
+    if _TOLERANT:
+        out = _bool_fuzzy(a, b, BRepAlgoAPI_Cut)
+        if out.volume > a.volume * (1 + 1e-9):
+            raise ValueError("cut gained volume")
+        return out
     try:
         return a - b
     except Exception:
-        from OCP.BRepAlgoAPI import BRepAlgoAPI_Cut
         return _bool_fuzzy(a, b, BRepAlgoAPI_Cut)
 
 
 def emit(spec):
     """Build the IR `spec` into a build123d Solid. Returns (part, result_dict) where the
-    result mirrors fc_common.result (tree / volume / editable params) for cross-backend parity."""
+    result mirrors fc_common.result (tree / volume / editable params) for cross-backend parity.
+
+    The part is built with tolerant Booleans (see FUZZY). OpenCASCADE cannot always complete a
+    long chain of them (a layer of NIST CTC-02 fuses to an empty shape), so if that build fails
+    anywhere the whole part is rebuilt with exact Booleans; result["booleans"] says which."""
+    global _TOLERANT
+    try:
+        _TOLERANT = True
+        part, result = _emit(spec)
+        result["booleans"] = "tolerant"
+        return part, result
+    except ValueError as e:
+        if "unknown feature kind" in str(e) or "sketch plane" in str(e) or "taper with" in str(e):
+            raise                               # the spec is wrong, not the kernel
+    except Exception:
+        pass
+    finally:
+        _TOLERANT = True
+    try:
+        _TOLERANT = False
+        part, result = _emit(spec)
+        result["booleans"] = "exact"
+        return part, result
+    finally:
+        _TOLERANT = True
+
+
+def _emit(spec):
     spec = IR.lower(spec)   # ngons -> polys; edge queries -> pick points
     part = None
     sketches = {}          # name -> (faces, z0)  consumed by the next pad/pocket/revolve
@@ -240,7 +301,18 @@ def emit(spec):
                 s = (extrude(fc, amount=length / 2, both=True) if f.get("symmetric")
                      else extrude(fc, amount=length, dir=(0, 0, d), taper=taper))
                 solid = s if solid is None else solid + s
-            part = solid if part is None else _fuse(part, solid)
+            if part is None:
+                part = solid
+            else:
+                try:
+                    part = _fuse(part, solid)
+                except Exception:
+                    if not _TOLERANT:
+                        raise
+                    # OpenCASCADE sometimes returns nothing for a pad that only TOUCHES the part
+                    # (a layer of NIST CTC-02, at every tolerance). Sunk 10 nm into it, far inside
+                    # FUZZY, the same pad fuses.
+                    part = _fuse(part, Pos(0, 0, -d * 1e-5) * solid)
             params[f["name"]] = {"length": round(float(length), 4)}
         elif kind == "pocket":
             faces, z0 = sketches[f["sketch"]]

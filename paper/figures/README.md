@@ -31,7 +31,7 @@ Observed 2026-09-28 (after the multi-region / axis-gate change):
 | `dvol_pct` | `0.14` % |
 | `dsize_mm` | `0.0` mm |
 | features | `54` |
-| `recovered` | `{'pockets': 14, 'holes': 10, 'residual_lumps': 2}` |
+| `recovered` | `{'pockets': 14, 'holes': 10, 'residual_lumps': 1}` |
 | `blind_holes` | `14` |
 | `method` / `extrude_axis` | `extrude` / `[0,0,1]` |
 | wall-clock | `7.7` s (single desktop CPU core) |

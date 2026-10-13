@@ -187,6 +187,7 @@ def recognize_occurrence(occ, tmpdir):
         local = Pos(-c.X, -c.Y, -c.Z) * sh                      # the part in its own frame
         back = (Pos(c.X, c.Y, c.Z) * local).bounding_box().center()
         placement_ok = max(abs(back.X - c.X), abs(back.Y - c.Y), abs(back.Z - c.Z)) < 1e-3
+        local.parent = None                 # newer build123d cannot write a shape still in a tree
         export_step(local, str(tmp))
         spec, report = step_recognize.recognize(str(tmp), name=occ["label"] or occ["id"])
         report["placement_verified"] = placement_ok

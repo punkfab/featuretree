@@ -112,8 +112,8 @@ def _split(bb, planes, cyls):
     from OCP.gp import gp_Ax3, gp_Cylinder, gp_Dir, gp_Pln, gp_Pnt
     from OCP.TopAbs import TopAbs_SOLID
     from OCP.TopExp import TopExp_Explorer
-    from OCP.TopoDS import TopoDS
-    from OCP.TopTools import TopTools_ListOfShape
+    from build123d.topology import downcast
+    from b3d_emit import TopTools_ListOfShape
 
     L = 4 * math.dist((bb.min.X, bb.min.Y, bb.min.Z), (bb.max.X, bb.max.Y, bb.max.Z)) + 10
     box = BRepPrimAPI_MakeBox(gp_Pnt(bb.min.X, bb.min.Y, bb.min.Z), gp_Pnt(bb.max.X, bb.max.Y, bb.max.Z)).Shape()
@@ -136,7 +136,7 @@ def _split(bb, planes, cyls):
     cells = []
     ex = TopExp_Explorer(shape, TopAbs_SOLID)
     while ex.More():
-        cells.append(TopoDS.Solid_s(ex.Current()))
+        cells.append(downcast(ex.Current()))
         ex.Next()
     return shape, cells
 
@@ -176,7 +176,12 @@ def _adjacency(shape, cells):
     """{cell index: set of cell indices sharing a face}."""
     from OCP.TopAbs import TopAbs_FACE, TopAbs_SOLID
     from OCP.TopExp import TopExp
-    from OCP.TopTools import TopTools_IndexedDataMapOfShapeListOfShape, TopTools_IndexedMapOfShape
+    try:
+        from OCP.TopTools import TopTools_IndexedDataMapOfShapeListOfShape, TopTools_IndexedMapOfShape
+    except ImportError:                                  # OCCT 8 bindings renamed the collections
+        from OCP.collections import (
+            IndexedDataMap_TopoDS_Shape_List_TopoDS_Shape_TopTools_ShapeMapHasher as TopTools_IndexedDataMapOfShapeListOfShape,
+            IndexedMap_TopoDS_Shape_TopTools_ShapeMapHasher as TopTools_IndexedMapOfShape)
     idx = TopTools_IndexedMapOfShape()
     TopExp.MapShapes_s(shape, TopAbs_SOLID, idx)
     order = {idx.FindIndex(c): i for i, c in enumerate(cells)}
@@ -363,9 +368,10 @@ def _axis_cells(orig, bb, d, planes, cyls, cloud, cloud_in, max_cells):
 
 def recognize(step_path, name=None, max_cells=MAX_CELLS, verify=True, samples=20000, n_cloud=N_CLOUD):
     from iou_check import _inside
+    from step_recognize import _main_solid
     t0 = time.time()
     orig = import_step(str(step_path))
-    orig = orig.solid() if hasattr(orig, "solid") and orig.solid() is not None else orig
+    orig, _ = _main_solid(orig)
     name = name or Path(step_path).stem
     bb = orig.bounding_box()
     planes, cyls, other = _surfaces(orig, bb)
