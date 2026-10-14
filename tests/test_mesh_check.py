@@ -115,18 +115,22 @@ def test_nist_recoveries_that_were_open_or_hollow_are_now_one_closed_body(part):
     assert mesh_check.problems(mesh_check.check(_recovered(part))) == []
 
 
-# Known defects in the persisted PARTIAL recoveries. Each is xfail(strict): when the recogniser
-# is fixed the test passes, strict turns that into a failure, and the marker has to come off.
-@pytest.mark.xfail(strict=True, reason="CTC-03 rebuilds as five solids")
-def test_nist_ctc03_recovery_is_one_closed_body():
-    assert mesh_check.problems(mesh_check.check(_recovered("nist_ctc_03_asme1_rc.stp"))) == []
+# These three were strict xfails until the recogniser learned to nest holes inside a curved
+# outline as holes (CTC-02) and to step curved faces that cross the layering axis where a stack
+# came apart -- a sheet bend (CTC-03), a tilted lug and its holes (CTC-04).
+@pytest.mark.parametrize("part, was", [
+    ("nist_ctc_02_asme1_rc.stp", "sixteen sealed hole segments"),
+    ("nist_ctc_03_asme1_rc.stp", "five separate solids"),
+    ("nist_ctc_04_asme1_rd.stp", "two detached feet"),
+])
+def test_nist_recoveries_that_were_split_or_sealed_are_now_one_closed_body(part, was):
+    assert mesh_check.problems(mesh_check.check(_recovered(part))) == [], f"was: {was}"
 
 
-@pytest.mark.xfail(strict=True, reason="CTC-04 rebuilds with two detached feet")
-def test_nist_ctc04_recovery_is_one_closed_body():
-    assert mesh_check.problems(mesh_check.check(_recovered("nist_ctc_04_asme1_rd.stp"))) == []
-
-
-@pytest.mark.xfail(strict=True, reason="CTC-02 rebuild holds sixteen sealed hole segments")
-def test_nist_ctc02_recovery_is_one_closed_body():
-    assert mesh_check.problems(mesh_check.check(_recovered("nist_ctc_02_asme1_rc.stp"))) == []
+def test_every_nist_recovery_is_one_closed_body():
+    fns = sorted(RECOVERED.glob("nist_*.stp.json"))
+    if not fns:
+        pytest.skip("recovered trees not present")
+    bad = {fn.name: mesh_check.problems(mesh_check.check(b3d_emit.emit(json.loads(fn.read_text())["spec"])[0]))
+           for fn in fns}
+    assert {k: v for k, v in bad.items() if v} == {}

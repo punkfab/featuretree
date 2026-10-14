@@ -280,3 +280,23 @@ def test_multi_solid_input_is_never_verified(tmp_path):
     assert rep["verified"] is False and "2 solids" in rep["reason"]
     part, res = __import__("b3d_emit").emit(spec)
     assert res["volume"] == pytest.approx(big.volume, rel=1e-3)     # the LARGEST, not the first
+
+
+def test_holes_near_a_two_spline_outline_are_holes():
+    """A section loop of two curved edges must nest its holes as holes. Sampled at each edge's start
+    and midpoint it was a 4-point quadrilateral, and holes outside that were nested as solid
+    regions: on CTC-02 the layer was then built solid over six bolt holes, sealing them."""
+    from build123d import Cylinder, Edge, Face, Pos, Wire
+    r = 50.0
+    # two B-spline halves, as CTC-02's outline was (two arcs would section as one full circle)
+    half = lambda a0: Edge.make_spline([(r * math.cos(a0 + math.pi * i / 12), r * math.sin(a0 + math.pi * i / 12), 0)
+                                        for i in range(13)])
+    top, bot = half(0.0), half(math.pi)
+    disc = extrude(Face(Wire([top, bot])), amount=10)
+    rr = 42.0                                   # outside the old square (35.4 mm at 45 degrees)
+    for k in range(4):
+        a = math.radians(45 + 90 * k)
+        disc = disc - Pos(rr * math.cos(a), rr * math.sin(a), 5) * Cylinder(3, 20)
+    regs = sr._section_regions(disc, 5.0)
+    assert len(regs) == 1, [round(a_, 1) for _, _, a_ in regs]
+    assert len(regs[0][1]) == 4

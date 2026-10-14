@@ -64,6 +64,8 @@ AXIS_BAD_FRAC = 0.75
 VOL_TOL = 0.005      # 0.5% volume agreement -> "verified"
 IOU_TOL = 0.995      # ...AND >= 99.5% two-sided overlap (see _verify): volume alone lets errors cancel
 IOU_SAMPLES = 12000  # points for that check: ~+-0.2% at 99.5%, a few seconds on a large part
+BEND_STEP = 1.0      # mm: layer spacing across a bend when a layered stack comes apart (refine)
+BODY_PENALTY = 2.0   # overlap points a PARTIAL gives up for not being one closed body (see _recognize)
 DIM_TOL = 0.05       # mm bbox-size agreement
 RECOVER_PASSES = 4   # multi-axis residual-carve passes (each re-decomposes what's left)
 RECOVER_EPS = 5.0    # mm^3: ignore boolean slivers / zero-volume sheets in the residual
@@ -458,9 +460,10 @@ def _ordered_edges(wire):
 
 
 def _loop_points(wire):
-    """A cheap ordered point list around a loop: each edge's start and midpoint. Uses EDGE
-    parameters; `wire @ t` re-measures the whole wire's arc length on every call, and ~96,000 such
-    calls were 180 s of a 183 s recognition of CTC-02."""
+    """A cheap ordered point list around a loop: a straight edge's start and midpoint, a curved
+    edge's start and seven more points along it. Uses EDGE parameters; `wire @ t` re-measures the
+    whole wire's arc length on every call, and ~96,000 such calls were 180 s of a 183 s recognition
+    of CTC-02."""
     pts = []
     oe = _ordered_edges(wire)
     if len(oe) == 1:
@@ -468,8 +471,12 @@ def _loop_points(wire):
         # nothing, so a hole inside a round boss was nested as a second region, not as its hole
         return [((oe[0][0] @ (i / 8)).X, (oe[0][0] @ (i / 8)).Y) for i in range(8)]
     for e, rev in oe:
-        a, m = (e @ 1.0, e @ 0.5) if rev else (e @ 0.0, e @ 0.5)
-        pts += [(a.X, a.Y), (m.X, m.Y)]
+        # Curved edges need more than a midpoint: CTC-02's outline at one height is two B-spline
+        # edges, sampled as a 4-point quadrilateral, and six of the ten bolt holes inside it fell
+        # outside that and were nested as solid regions -- the layer was built solid over them.
+        n = 2 if e.geom_type == GeomType.LINE else 8
+        ts = [i / n for i in range(n)]
+        pts += [((e @ (1.0 - t)).X, (e @ (1.0 - t)).Y) if rev else ((e @ t).X, (e @ t).Y) for t in ts]
     return pts
 
 
@@ -862,8 +869,12 @@ def _signature(regs, min_hole=0.0):
     return tuple(sorted(((len(h) for _, h, _ in regs)), reverse=True)) + (len(regs),)
 
 
-def _recognize_layers(orig, name, axis):
-    """Recognize `orig` as a stack of 2.5D layers along `axis`. Raises if it cannot."""
+def _recognize_layers(orig, name, axis, refine=()):
+    """Recognize `orig` as a stack of 2.5D layers along `axis`. Raises if it cannot.
+
+    `refine`: heights above the part's base where an earlier stack came apart. Each curved face
+    whose axis CROSSES the layering axis (a sheet bend, a tilted boss) and that spans one of them
+    gets layer boundaries every BEND_STEP mm: see _layers_file for when."""
     from build123d import Face, offset, Kind
     solid = _align_to_z(orig, axis)
     bb = solid.bounding_box()
@@ -887,6 +898,30 @@ def _recognize_layers(orig, name, axis):
     intervals = [(a, b) for a, b in zip(merged_ev, merged_ev[1:])]
     if len(intervals) > 60:
         raise ValueError(f"{len(intervals)} step heights: not a 2.5D part along this axis")
+    n_refined = 0
+    if refine:
+        # A bend whose axis crosses the layering axis changes the section CONTINUOUSLY, and a
+        # layer's one (median) outline drops it: CTC-03's flat plate and the wall it bends up into
+        # came out as slabs that do not touch. Thin steps across such a face are a staircase whose
+        # neighbouring steps overlap, so the stack stays one body (an approximation the
+        # verification gate still judges).
+        ref = set()
+        for f in solid.faces().filter_by(lambda f: f.geom_type in (GeomType.CYLINDER, GeomType.CONE)):
+            ca = _cyl_axis(f)
+            if ca is None or abs(ca.Z) > 1 - ANG:
+                continue
+            fb = f.bounding_box()
+            if not any(fb.min.Z - 0.05 <= base_z + h <= fb.max.Z + 0.05 for h in refine):
+                continue                          # a cross hole or fillet the stack got past
+            n = max(1, math.ceil((fb.max.Z - fb.min.Z) / BEND_STEP))
+            ref.update(round(fb.min.Z + i * (fb.max.Z - fb.min.Z) / n, 4) for i in range(n + 1))
+        ev2 = sorted(set(merged_ev) | {z for z in ref if base_z < z < bb.max.Z})
+        merged_ev = [ev2[0]]
+        for z in ev2[1:]:
+            if z - merged_ev[-1] > 0.05:
+                merged_ev.append(z)
+        n_refined = len(merged_ev) - 1 - len(intervals)
+        intervals = [(a, b) for a, b in zip(merged_ev, merged_ev[1:])]
 
     # ...but flat faces are not the only place the section changes: topology also changes at the
     # end of a CURVED face -- a boss merging into a wall, a rounded rib -- with no flat face there.
@@ -917,7 +952,7 @@ def _recognize_layers(orig, name, axis):
         cuts.append(b)
         split += [(u, v) for u, v in zip(cuts, cuts[1:]) if v - u > 0.05]
     intervals = split
-    if len(intervals) > 80:
+    if len(intervals) > 80 + n_refined:
         raise ValueError(f"{len(intervals)} section changes: not a 2.5D part along this axis")
     # a few slices per interval: the middle, plus quarter points on long intervals so draft and
     # curvature (chamfers, fillets) can be told apart from a constant section
@@ -1195,6 +1230,9 @@ def _recognize_layers(orig, name, axis):
         raise ValueError("no layers")
     warnings = [f"layered along {tuple(round(c, 3) for c in axis)}: {len(layers)} layer(s), "
                 f"{n_cuts} hole run(s) -- " + "; ".join(notes)]
+    if n_refined:
+        warnings.append(f"curved faces across the axis (bends) stepped in {BEND_STEP} mm layers: "
+                        f"{n_refined} extra layer boundaries -- a staircase, not the true curve")
     if gaps:
         warnings.append("section would not close over " + ", ".join(
             f"{a - base_z:.2f}..{b - base_z:.2f} mm" for a, b in gaps) + " -- the layer below was extended over it")
@@ -1452,8 +1490,14 @@ def _recognize(step_path, name=None, verify=True, recover=True):
         reports.append((spec, extras, report))
 
     # Pass 2: multi-axis recovery per extrude candidate (rank order); first that verifies wins.
-    def _closeness(r):                  # best overlap first; volume error only when unmeasured
-        return (-r["iou_pct"], 0.0) if r.get("iou_pct") is not None else (0.0, r.get("dvol_pct", 1e9))
+    # Best overlap first; volume error only when unmeasured. A tree that is not one closed body
+    # (split solids, sealed voids, open tessellation) is unusable to anything that meshes it, so
+    # it ranks BODY_PENALTY points of overlap lower: before bends were stepped, CTC-04's
+    # three-solid candidate at 99.0% beat a sound one at 98.0%.
+    def _closeness(r):
+        if r.get("iou_pct") is None:
+            return (0.0, r.get("dvol_pct", 1e9))
+        return (-(r["iou_pct"] - (BODY_PENALTY if r.get("body_problems") else 0.0)), 0.0)
     best = min(reports, key=lambda c: _closeness(c[2]))
     if recover:
         for spec, extras, report in reports:
@@ -1659,7 +1703,28 @@ def _shell_file(step_path, name, axis_xyz):
 
 
 def _layers_file(step_path, name, axis_xyz):
-    return _candidate_file(_recognize_layers, step_path, name, axis_xyz)
+    """The layered candidate; if its stack comes apart into more solids than the input has, the
+    same again with bends stepped (refine=True), kept only when that splits into fewer."""
+    got = _candidate_file(_recognize_layers, step_path, name, axis_xyz)
+    if got is None:
+        return None
+    try:
+        orig, _ = _main_solid(import_step(str(step_path)))
+        n_in = len(orig.solids())
+        pieces = b3d_emit.emit(got[0])[0].solids()
+        n = len(pieces)
+        if n <= n_in:
+            return got
+        # where the stack came apart: the pieces' own ends along the axis (the stack is built
+        # from z = 0, so these are heights above the part's base), less the part's two ends
+        zs = sorted({round(z, 4) for s in pieces for z in (s.bounding_box().min.Z, s.bounding_box().max.Z)})
+        fine = _candidate_file(lambda o, nm, a: _recognize_layers(o, nm, a, refine=zs[1:-1]),
+                               step_path, name, axis_xyz)
+        if fine is not None and len(b3d_emit.emit(fine[0])[0].solids()) < n:
+            return fine
+    except Exception:
+        pass
+    return got
 
 
 def _verify_file(spec, step_path, report):
